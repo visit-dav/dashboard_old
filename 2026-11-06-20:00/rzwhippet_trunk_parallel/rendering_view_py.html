@@ -1,0 +1,382 @@
+<html><body bgcolor="#e0e0e0"><head><title>rendering/view.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  view.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 2D structured, single domain </font>
+<font color="#a02030">#                        - 3D unstructured, multiple domains</font>
+<font color="#a02030">#                        - 3D rectilinear, single domain</font>
+<font color="#a02030">#                        - Curve</font>
+<font color="#a02030">#              plots     - pseudocolor, curve, mesh</font>
+<font color="#a02030">#              operators - none</font>
+<font color="#a02030">#              selection - none</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  VisIt00003915, VisIt00004247, VisIt00003398, VisIt00004896,</font>
+<font color="#a02030">#              VisIt00005337</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Eric Brugger</font>
+<font color="#a02030">#  Date:       November 18, 2003 </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Eric Brugger, Fri Apr 23 08:54:22 PDT 2004</font>
+<font color="#a02030">#    Add a test to make sure that we can set the 3d view before any plots</font>
+<font color="#a02030">#    are created.  Add tests to make sure that we can reset and recenter</font>
+<font color="#a02030">#    the view when no plots are present.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Thu May 13 10:26:02 PDT 2004</font>
+<font color="#a02030">#    Add a test to make sure switching view extents type to actual results</font>
+<font color="#a02030">#    in new plots being centered after deleting all the existing plots.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Mon May 24 11:21:04 PDT 2004</font>
+<font color="#a02030">#    Add a test with small extents.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Tue May 25 15:17:18 PDT 2004</font>
+<font color="#a02030">#    Modify the test for small extents, and add more small and large extents</font>
+<font color="#a02030">#    tests.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Mon Sep 20 13:37:52 PDT 2004</font>
+<font color="#a02030">#    Add several tests for combining 3d plots with degenerate extents.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Thu Mar 15 11:31:26 PDT 2007</font>
+<font color="#a02030">#    Test that the bindings for 2D,3D views can still interpolate.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#a02030"># Test setting the 3d view before creating the first plot.</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.2</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.2</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.707107</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.707107</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create a psuedocolor plot and test various degenerate 2d views.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Test degenerate 2D views&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">4.68395</font><font color="#4000C0">,</font> <font color="#0080C0">4.89802</font><font color="#4000C0">,</font> <font color="#0080C0">2.5</font><font color="#4000C0">,</font> <font color="#0080C0">2.5</font><font color="#4000C0">)</font>
+<font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.216897</font><font color="#4000C0">,</font> <font color="#0080C0">4.925</font><font color="#4000C0">)</font>
+<font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">2.5</font><font color="#4000C0">,</font> <font color="#0080C0">2.5</font><font color="#4000C0">)</font>
+<font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create several curve plots and test various degenerate curve views.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Test degenerate curve views&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/c051.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;flat&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;going_up&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;going_down&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;parabolic&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">ViewCurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.</font><font color="#4000C0">,</font> <font color="#0080C0">1.</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.3</font><font color="#4000C0">,</font> <font color="#0080C0">0.3</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.6</font><font color="#4000C0">,</font> <font color="#0080C0">0.6</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.</font><font color="#4000C0">,</font> <font color="#0080C0">1.</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.6</font><font color="#4000C0">,</font> <font color="#0080C0">0.6</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.3</font><font color="#4000C0">,</font> <font color="#0080C0">0.3</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_08&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.</font><font color="#4000C0">,</font> <font color="#0080C0">0.</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.</font><font color="#4000C0">,</font> <font color="#0080C0">0.</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_09&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create a pseudocolor and mesh plot and zoom in on a sharp edge to</font>
+<font color="#a02030"># verify that the mesh lines are not bleeding through the surface.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Test zoom in on mesh lines&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.335187</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.557088</font><font color="#4000C0">,</font> <font color="#0080C0">0.759804</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">2.5</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.327416</font><font color="#4000C0">,</font> <font color="#0080C0">0.825068</font><font color="#4000C0">,</font> <font color="#0080C0">0.460501</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">11.4564</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">22.9129</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">22.9129</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.136785</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.172112</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">20.125</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_10&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test resetting and recentering the view when no plot is present.</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_11&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.393726</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.416942</font><font color="#4000C0">,</font> <font color="#0080C0">0.819231</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">5.</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.603958</font><font color="#4000C0">,</font> <font color="#0080C0">0.554522</font><font color="#4000C0">,</font> <font color="#0080C0">0.572486</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">11.4564</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">22.9129</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">22.9129</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.05</font><font color="#4000C0">,</font> <font color="#0080C0">0.</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">2.</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_12&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">RecenterView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_13&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test that setting view extents type to actual works.  Test that</font>
+<font color="#a02030"># switching view extents type to actual results in new plots being</font>
+<font color="#a02030"># centered after deleting all the existing plots.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Test actual extents&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Clip&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewExtentsType</font><font color="#4000C0">(</font><font color="#008000">&quot;actual&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_14&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_15&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test setting the view with small extents.</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">scale</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">scale</font><font color="#4000C0">.</font><font color="#000000">scaleX</font> <font color="#4000C0">=</font> <font color="#0080C0">1.0e-21</font>
+<font color="#000000">scale</font><font color="#4000C0">.</font><font color="#000000">scaleY</font> <font color="#4000C0">=</font> <font color="#0080C0">1.0e-21</font>
+<font color="#000000">scale</font><font color="#4000C0">.</font><font color="#000000">scaleZ</font> <font color="#4000C0">=</font> <font color="#0080C0">1.0e-21</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">scale</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_16&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;t&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_17&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test setting the view with large extents.</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">scale</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">scale</font><font color="#4000C0">.</font><font color="#000000">scaleX</font> <font color="#4000C0">=</font> <font color="#0080C0">1.0e17</font>
+<font color="#000000">scale</font><font color="#4000C0">.</font><font color="#000000">scaleY</font> <font color="#4000C0">=</font> <font color="#0080C0">1.0e17</font>
+<font color="#000000">scale</font><font color="#4000C0">.</font><font color="#000000">scaleZ</font> <font color="#4000C0">=</font> <font color="#0080C0">1.0e17</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">scale</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_18&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;t&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_19&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test various combinations of 3d plots with degenerate extents.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Test 3D plots with degenerate extents&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/rect_flat_i.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/rect_flat_j.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_20&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/rect_flat_j.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/rect_flat_k.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_21&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/rect_flat_k.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/rect_flat_i.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_22&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test that the View3DAttributes object&#x27;s Python binding still has the</font>
+<font color="#a02030"># ability to interpolate the view.</font>
+<font color="#a02030">#</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Test interpolation of View3DAttributes&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;speed&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.416973</font><font color="#4000C0">,</font> <font color="#0080C0">0.447113</font><font color="#4000C0">,</font> <font color="#0080C0">0.791343</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.23799</font><font color="#4000C0">,</font> <font color="#0080C0">0.893974</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.379699</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+
+<font color="#000000">v1</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.416973</font><font color="#4000C0">,</font> <font color="#0080C0">0.447113</font><font color="#4000C0">,</font> <font color="#0080C0">0.791343</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.23799</font><font color="#4000C0">,</font> <font color="#0080C0">0.893974</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.379699</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.160832</font><font color="#4000C0">,</font> <font color="#0080C0">0.126504</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">3.95662</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+
+<font color="#000000">idx</font> <font color="#4000C0">=</font> <font color="#0080C0">23</font>
+<font color="#000000">nsteps</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">nsteps</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font> <font color="#4000C0">/</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">nsteps</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.</font> <font color="#4000C0">-</font> <font color="#000000">t</font><font color="#4000C0">)</font> <font color="#4000C0">*</font> <font color="#000000">v0</font> <font color="#4000C0">+</font> <font color="#000000">t</font> <font color="#4000C0">*</font> <font color="#000000">v1</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_%d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">idx</font><font color="#4000C0">)</font>
+    <font color="#000000">idx</font> <font color="#4000C0">=</font> <font color="#000000">idx</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test that the View2DAttributes object&#x27;s Python binding still has the</font>
+<font color="#a02030"># ability to interpolate the view.</font>
+<font color="#a02030">#</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Test interpolation of View2DAttributes&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;shapefile_test_data/prism0p020/prism0p020.shp&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;RANGE&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">124.756</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">66.954</font><font color="#4000C0">,</font> <font color="#0080C0">24.5183</font><font color="#4000C0">,</font> <font color="#0080C0">49.3856</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">Off</font>  <font color="#a02030"># On, Off, Auto</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+
+<font color="#000000">v1</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">77.667</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">74.881</font><font color="#4000C0">,</font> <font color="#0080C0">36.6969</font><font color="#4000C0">,</font> <font color="#0080C0">39.662</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">Off</font>  <font color="#a02030"># On, Off, Auto</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+
+<font color="#000000">nsteps</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">nsteps</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font> <font color="#4000C0">/</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">nsteps</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.</font> <font color="#4000C0">-</font> <font color="#000000">t</font><font color="#4000C0">)</font> <font color="#4000C0">*</font> <font color="#000000">v0</font> <font color="#4000C0">+</font> <font color="#000000">t</font> <font color="#4000C0">*</font> <font color="#000000">v1</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;view_%d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">idx</font><font color="#4000C0">)</font>
+    <font color="#000000">idx</font> <font color="#4000C0">=</font> <font color="#000000">idx</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

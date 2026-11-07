@@ -1,0 +1,247 @@
+<html><body bgcolor="#e0e0e0"><head><title>databases/pdbdatabase.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  pdbdatabase.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 2D,3D curvilinear, single domain</font>
+<font color="#a02030">#              plots     - Pseudocolor, Subset, Vector</font>
+<font color="#a02030">#              operators - Clip</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Thu Sep 25 09:31:28 PDT 2003</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Brad Whitlock, Wed Mar 31 09:11:08 PDT 2004</font>
+<font color="#a02030">#    I added code to clear the engine cache to reduce memory usage.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Fri Apr 9 16:54:15 PST 2004</font>
+<font color="#a02030">#    I added TestSection to divide up the tests a little.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Thu Sep 2 12:08:59 PDT 2004</font>
+<font color="#a02030">#    I replaced some deprecated calls with their new equivalents.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Tue Dec 7 17:52:33 PST 2004</font>
+<font color="#a02030">#    I added a test for mixvars in Flash files.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Sat Feb  3 00:42:05 PST 2007</font>
+<font color="#a02030">#    Added tests for array variables</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Mon Dec 19 15:45:38 PST 2016</font>
+<font color="#a02030">#    Use FilledBoundary plot for materials instead of Subset.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Mon Nov 28, 2022</font>
+<font color="#a02030">#    Replace obsolete Label text attributes with new versions.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#000000">RequiredDatabasePlugin</font><font color="#4000C0">(</font><font color="#008000">&quot;PDB&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">##</font>
+<font color="#a02030">## This creates a name for a test.</font>
+<font color="#a02030">##</font>
+<font color="#C00000">def</font> <font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#000000">testIndex</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">name</font> <font color="#4000C0">=</font> <font color="#008000">&quot;%s_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#000000">testIndex</font><font color="#4000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">name</font>
+
+<font color="#C00000">def</font> <font color="#000000">sv3</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">v3</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v3</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.516282</font><font color="#4000C0">,</font> <font color="#0080C0">0.582114</font><font color="#4000C0">,</font> <font color="#0080C0">0.628169</font><font color="#4000C0">)</font>
+    <font color="#000000">v3</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v3</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.488576</font><font color="#4000C0">,</font> <font color="#0080C0">0.80261</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.342213</font><font color="#4000C0">)</font>
+    <font color="#000000">v3</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v3</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">43.589</font>
+    <font color="#000000">v3</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">87.178</font>
+    <font color="#000000">v3</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">87.178</font>
+    <font color="#000000">v3</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v3</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.41577</font>
+    <font color="#000000">v3</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v3</font><font color="#4000C0">)</font>
+
+<font color="#a02030">##</font>
+<font color="#a02030">## This function performs the test using the specified database.</font>
+<font color="#a02030">##</font>
+<font color="#C00000">def</font> <font color="#000000">TestWithDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">,</font> <font color="#000000">testName</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing with %s&quot;</font> <font color="#4000C0">%</font> <font color="#000000">db</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Open the test database</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">##</font>
+    <font color="#a02030">## Do the 2D tests.</font>
+    <font color="#a02030">##</font>
+
+    <font color="#a02030"># Add the plots.</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;material(mesh)&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do the first test in the series</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">6</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">15</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do a test on the last frame in the animation.</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">22</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">6.07862</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.374491</font><font color="#4000C0">,</font> <font color="#0080C0">4.48986</font><font color="#4000C0">,</font> <font color="#0080C0">10.8545</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Try turning off material 2</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#008000">&quot;2&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TurnMaterialsOn</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh/a&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">6</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Define a expression. I&#x27;m testing this because of the strange</font>
+    <font color="#a02030"># &lt;mesh/var&gt; syntax that my plugin has.</font>
+    <font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;testexp1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3.0 * {&lt;mesh/lt&gt;, &lt;mesh/a&gt;/399.0}&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;testexp1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">vec</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">nVectors</font> <font color="#4000C0">=</font> <font color="#0080C0">1200</font>
+    <font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">colorByMagnitude</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vec</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">9.51217</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.289482</font><font color="#4000C0">,</font> <font color="#0080C0">0.983025</font><font color="#4000C0">,</font> <font color="#0080C0">10.6717</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">7</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Set the time back to frame 0</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">##</font>
+    <font color="#a02030">## Do the 3D tests.</font>
+    <font color="#a02030">##</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;material2(revolved_mesh)&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Clip&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">ClipAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">funcType</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Plane</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane1Status</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane2Status</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane3Status</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Set the view</font>
+    <font color="#000000">sv3</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">8</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">6</font><font color="#4000C0">)</font>
+    <font color="#000000">sv3</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">9</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">15</font><font color="#4000C0">)</font>
+    <font color="#000000">sv3</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do a test on the last frame in the animation.</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">22</font><font color="#4000C0">)</font>
+    <font color="#000000">sv3</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">11</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn off some materials</font>
+    <font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#008000">&quot;1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;4&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">sv3</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">12</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TurnMaterialsOn</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Set the time back to frame 2</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Test array variables</font>
+    <font color="#a02030">#</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;logical_mesh/marray_comps/comp_002&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">13</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;revolved_mesh/marray_comps/comp_002&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">14</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;logical_mesh/marray&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">CreateTestName</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#0080C0">15</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Set the time back to frame 0</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">ClearCache</font><font color="#4000C0">(</font><font color="#008000">&quot;localhost&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test mixvars.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">TestMixvars</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing mixvars in Flash files&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh/mixvar&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">9.51866</font><font color="#4000C0">,</font> <font color="#0080C0">3.29394</font><font color="#4000C0">,</font> <font color="#0080C0">13.9258</font><font color="#4000C0">,</font> <font color="#0080C0">26.4126</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Off</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;pdb_nomix&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do the same plot but with forced MIR so the mixvar gets reconstructed.</font>
+    <font color="#000000">ClearWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">GetMaterialAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">forceMIR</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetMaterialAttributes</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;pdb_mix&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Run the test a few times with different versions of the database. We do this</font>
+<font color="#a02030"># because we have the same database split up three different ways and all the</font>
+<font color="#a02030"># ways a database can be split up must work.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#   multi{00,01,02}.pdb  - Contains multiple time states in each file but</font>
+<font color="#a02030">#                          we group them all into &quot;multi*.pdb database&quot;.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#   family??.pdb         - Contains a single time state in each file but</font>
+<font color="#a02030">#                          we group them all into &quot;family*.pdb database&quot;.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#   allinone00.pdb       - Contains all of the time states in one file.</font>
+<font color="#a02030">#</font>
+
+<font color="#000000">databases</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;pdb_test_data/multi*.pdb database&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font>
+             <font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;pdb_test_data/family*.pdb database&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font>
+             <font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;pdb_test_data/allinone00.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">testNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;pdb_multi&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pdb_family&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pdb_allinone&quot;</font><font color="#4000C0">)</font>
+<font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">databases</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestWithDatabase</font><font color="#4000C0">(</font><font color="#000000">databases</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">testNames</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Do the mixvar test.</font>
+<font color="#000000">TestMixvars</font><font color="#4000C0">(</font><font color="#000000">databases</font><font color="#4000C0">[</font><font color="#0080C0">2</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

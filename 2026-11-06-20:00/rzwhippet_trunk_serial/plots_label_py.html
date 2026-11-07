@@ -1,0 +1,1005 @@
+<html><body bgcolor="#e0e0e0"><head><title>plots/label.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  MODES: serial</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  label.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      Tests the label plot</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Fri Oct 22 15:50:06 PST 2004</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Brad Whitlock, Wed Oct 27 15:08:27 PST 2004</font>
+<font color="#a02030">#    I made the baseline images larger.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Mon Apr 25 21:35:54 PDT 2005</font>
+<font color="#a02030">#    I added tests for different data types</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Thu Jul 14 07:53:46 PDT 2005</font>
+<font color="#a02030">#    Added TestLabeledVTK, to test reading and use of char data from VTK.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Thu Aug 4 14:25:22 PST 2005</font>
+<font color="#a02030">#    Added tests for labelling subsets and I also removed the single cell/node</font>
+<font color="#a02030">#    stuff and replaced it with tests for setting individual cell/node</font>
+<font color="#a02030">#    colors and text heights.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Jeremy Meredith, Wed Sep  7 12:06:04 PDT 2005</font>
+<font color="#a02030">#    Allowed spaces in variable names.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Tue Nov 15 09:56:44 PDT 2005</font>
+<font color="#a02030">#    Added another test for sliced vectors.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Tue Apr 25 15:47:21 PST 2006</font>
+<font color="#a02030">#    I added tests for making sure that Label plots of structured meshes</font>
+<font color="#a02030">#    actually show their logical index nature by default. The tests also</font>
+<font color="#a02030">#    show the Label plot with zooms that used to make the labels be incorrectly</font>
+<font color="#a02030">#    offset from the other plots.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Thu Mar 25 09:57:34 PDT 2010</font>
+<font color="#a02030">#    Added call(s) to DrawPlots() b/c of changes to the default plot state</font>
+<font color="#a02030">#    behavior when an operator is added.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Alister Maguire, Mon Feb 26 10:22:04 PST 2018</font>
+<font color="#a02030">#    Added TestMixedVariables for testing datasets with mixed variables.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Mon Nov 28, 2022</font>
+<font color="#a02030">#    Replace obsolete Label text attributes with new versions.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#000000">RequiredDatabasePlugin</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#008000">&quot;Boxlib2D&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;SAMRAI&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;VTK&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># Create label attributes with somewhat larger text.</font>
+<font color="#C00000">def</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">LabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#C00000">return</font> <font color="#000000">L</font>
+
+<font color="#C00000">def</font> <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#000000">name</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Save these images somewhat larger than a regular test case image</font>
+    <font color="#a02030"># since the images contain a lot of text.</font>
+    <font color="#000000">swa</font> <font color="#4000C0">=</font> <font color="#000000">SaveWindowAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">width</font> <font color="#4000C0">=</font> <font color="#0080C0">500</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">height</font> <font color="#4000C0">=</font> <font color="#0080C0">500</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">screenCapture</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">name</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestGeneralFeatures</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;General label plot features&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curvmesh2d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change the zoom a few times to see the number of labels adaptively change.</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">11.6154</font><font color="#4000C0">,</font> <font color="#0080C0">11.8294</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">3.18886</font><font color="#4000C0">,</font> <font color="#0080C0">8.33075</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">Off</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v1</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1.0815</font><font color="#4000C0">,</font> <font color="#0080C0">1.29556</font><font color="#4000C0">,</font> <font color="#0080C0">1.98696</font><font color="#4000C0">,</font> <font color="#0080C0">3.15493</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">Off</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v1</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v2</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.78125</font><font color="#4000C0">,</font> <font color="#0080C0">3.00819</font><font color="#4000C0">,</font> <font color="#0080C0">0.209532</font><font color="#4000C0">,</font> <font color="#0080C0">0.812385</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">Off</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curvmesh2d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v2</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn on nodes</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">showNodes</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_04&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn off cells</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">showCells</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_05&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Try showing nodes and cells and alter their respective sizes</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">showCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">showNodes</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">6</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_06&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change the cell color.</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">color</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">useForegroundColor</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_07&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change the node color</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">color</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">100</font><font color="#4000C0">,</font><font color="#0080C0">10</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">useForegroundColor</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_08&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">color</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">color</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change the structured indices to regular indices</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">showCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">labelDisplayFormat</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">Index</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_09&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Make the text a little bigger</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">8</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">8</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">showCells</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_10&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test different text alignments</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">6</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">6</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">horizontalJustification</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">Left</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_11&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">horizontalJustification</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">Right</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_12&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">horizontalJustification</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">HCenter</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">verticalJustification</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">Top</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_13&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">verticalJustification</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">Bottom</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_14&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test changing the number of labels.</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">verticalJustification</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">VCenter</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_15&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">numberOfLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">40</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_16&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn off restricting the number of labels.</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">restrictNumberOfLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_17&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># test different data types from the file</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave0000.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;chars&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v3d</font><font color="#4000C0">=</font><font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v3d</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v3d</font><font color="#4000C0">.</font><font color="#000000">viewUp</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v3d</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_18&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;shorts&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_19&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;ints&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_0_20&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestCurvilinear2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Curvilinear 2D&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curvmesh2d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">opaqueMode</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">Auto</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Do a point variable</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_1_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Make the labels a little larger and zoom in on the cells</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.632297</font><font color="#4000C0">,</font> <font color="#0080C0">0.483674</font><font color="#4000C0">,</font> <font color="#0080C0">3.38963</font><font color="#4000C0">,</font> <font color="#0080C0">4.57713</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">Off</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_1_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change the a cell centered variable</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_1_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change to a node centered vector variable</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.662647</font><font color="#4000C0">,</font> <font color="#0080C0">0.179177</font><font color="#4000C0">,</font> <font color="#0080C0">3.52611</font><font color="#4000C0">,</font> <font color="#0080C0">4.4219</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;vel&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_1_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change to a mesh variable</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;curvmesh2d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">showNodes</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_1_04&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn off a material</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1.73904</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.385797</font><font color="#4000C0">,</font> <font color="#0080C0">2.20216</font><font color="#4000C0">,</font> <font color="#0080C0">3.64214</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_1_05&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#008000">&quot;2&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_1_06&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestRectilinear2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Rectilinear 2D&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;ascii&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;quadmesh2d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">opaqueMode</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">Auto</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;ascii&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.425121</font><font color="#4000C0">,</font> <font color="#0080C0">0.574879</font><font color="#4000C0">,</font> <font color="#0080C0">0.566829</font><font color="#4000C0">,</font> <font color="#0080C0">0.766505</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">Off</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_2_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change to a cell centered float variable.</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_2_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change to a node centered variable</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_2_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change to a node centered vector variable</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;vel&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.478575</font><font color="#4000C0">,</font> <font color="#0080C0">0.543393</font><font color="#4000C0">,</font> <font color="#0080C0">0.650721</font><font color="#4000C0">,</font> <font color="#0080C0">0.737145</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v1</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_2_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change to the mesh variable</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;quadmesh2d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">showNodes</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_2_04&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn off a material</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#008000">&quot;16&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_2_05&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">TestUnstructured2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Unstructured 2D&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;ucd2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;ucdmesh2d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">opaqueMode</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">Auto</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;ucdmesh2d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">showNodes</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">6</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">6</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">color</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">color</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">useForegroundColor</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">useForegroundColor</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">restrictNumberOfLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.154956</font><font color="#4000C0">,</font> <font color="#0080C0">4.15496</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.154956</font><font color="#4000C0">,</font> <font color="#0080C0">4.15496</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">Off</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_3_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change to a nodal variable</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_3_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change to a cell centered variable</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_3_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change to a mesh variable and remove a material.</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;ucdmesh2d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">useForegroundColor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">useForegroundColor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#008000">&quot;2&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_3_03&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestSlice</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing slicing 3D data to 2D&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">opaqueMode</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">Auto</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;chromeVf&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;chromeVf&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Add a slice operator to all of the plots</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SliceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">normal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">upAxis</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">project2d</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Make the labels a little bigger</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">7</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">7</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">depthTestMode</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">LABEL_DT_NEVER</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Look at the slice from the front</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.550782</font><font color="#4000C0">,</font> <font color="#0080C0">0.318825</font><font color="#4000C0">,</font> <font color="#0080C0">0.771355</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.200365</font><font color="#4000C0">,</font> <font color="#0080C0">0.94765</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.248624</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.82449</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_4_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Look at the slice from the back. It will only be visible if the</font>
+    <font color="#a02030"># quantized normals were thrown out.</font>
+    <font color="#000000">v1</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.681715</font><font color="#4000C0">,</font> <font color="#0080C0">0.349442</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.642771</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.26946</font><font color="#4000C0">,</font> <font color="#0080C0">0.936726</font><font color="#4000C0">,</font> <font color="#0080C0">0.223465</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.82449</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v1</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_4_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Project the slice to 2D</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">project2d</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">8.64231</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">5.11567</font><font color="#4000C0">,</font> <font color="#0080C0">2.53613</font><font color="#4000C0">,</font> <font color="#0080C0">6.24948</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v2</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_4_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Set the slice normal so it does not line up with an axis.</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">normal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">,</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_4_03&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestLabeledVTK</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;VTK with labels&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/labeledBox.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;cellLabel&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;nodeLabels&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">l</font> <font color="#4000C0">=</font> <font color="#000000">LabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">8</font>
+    <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">textFont2</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">8</font>
+    <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">depthTestMode</font> <font color="#4000C0">=</font> <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">LABEL_DT_NEVER</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">l</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.826308</font><font color="#4000C0">,</font> <font color="#0080C0">0.365749</font><font color="#4000C0">,</font> <font color="#0080C0">0.428303</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.262408</font><font color="#4000C0">,</font> <font color="#0080C0">0.92288</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.28184</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">1.55885</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">3.11769</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font>  <font color="#4000C0">=</font>  <font color="#0080C0">3.11769</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">0.941919</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_5_01&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestLabellingSubsets</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Labelling subsets&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;bigsil.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;blocks&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;blocks&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">l</font> <font color="#4000C0">=</font> <font color="#000000">LabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">restrictNumberOfLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">depthTestMode</font> <font color="#4000C0">=</font> <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">LABEL_DT_NEVER</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">l</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TurnDomainsOff</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TurnDomainsOn</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#008000">&quot;domain1&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;domain10&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;domain19&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.465057</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.448026</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.763541</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.166667</font><font color="#4000C0">,</font> <font color="#0080C0">0.166667</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.243345</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.893956</font><font color="#4000C0">,</font> <font color="#0080C0">0.376333</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.552771</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1.10554</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">1.10554</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.0545619</font><font color="#4000C0">,</font> <font color="#0080C0">0.050939</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.32578</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.166667</font><font color="#4000C0">,</font> <font color="#0080C0">0.166667</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_6_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;domains&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_6_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;mat&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_6_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Try an AMR dataset</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_test_data/2D/plt0822/Header&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;patches&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SubsetAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">legendFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;patches&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">l</font> <font color="#4000C0">=</font> <font color="#000000">LabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">restrictNumberOfLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">4.7</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">l</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.0126663</font><font color="#4000C0">,</font> <font color="#0080C0">0.0146908</font><font color="#4000C0">,</font> <font color="#0080C0">0.115281</font><font color="#4000C0">,</font> <font color="#0080C0">0.117298</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Off</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_6_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;levels&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.0250949</font><font color="#4000C0">,</font> <font color="#0080C0">0.0437515</font><font color="#4000C0">,</font> <font color="#0080C0">0.11359</font><font color="#4000C0">,</font> <font color="#0080C0">0.132218</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Off</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">4</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">l</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_6_04&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Try a dataset with real material names.</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">l</font> <font color="#4000C0">=</font> <font color="#000000">LabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">l</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">9.37363</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">6.58974</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">2.85531</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.327839</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Off</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_6_05&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">TestLabellingTensors</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Labelling tensors&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Tensor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;grad_tensor&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">TensorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">useStride</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;grad_tensor&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_7_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">9.13799</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">4.37695</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">7.71782</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">2.97379</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Off</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_7_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">8.50106</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">7.83502</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">6.43747</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">5.77381</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Off</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_7_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Now see how changing the text height affects binning</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">l</font> <font color="#4000C0">=</font> <font color="#000000">LabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">l</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_7_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">l</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">6</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">l</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_7_04&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_7_05&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestLabelling3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Labelling in 3D with Z buffer&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;airVf&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;airVf&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">LabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">restrictNumberOfLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">depthTestMode</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">LABEL_DT_NEVER</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_8_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn on depth testing</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">depthTestMode</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">LABEL_DT_AUTO</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_8_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Apply an Isosurface operator to make things really convoluted</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Isosurface&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">iso</font> <font color="#4000C0">=</font> <font color="#000000">IsosurfaceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">iso</font><font color="#4000C0">.</font><font color="#000000">contourNLevels</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">iso</font><font color="#4000C0">.</font><font color="#000000">variable</font><font color="#4000C0">=</font><font color="#008000">&quot;hardyglobal&quot;</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">iso</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.883239</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.244693</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.400019</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.435303</font><font color="#4000C0">,</font> <font color="#0080C0">0.745036</font><font color="#4000C0">,</font> <font color="#0080C0">0.505404</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.022398</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.134568</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">3.35882</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_8_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Try labelling a mesh that has interior stuff</font>
+    <font color="#a02030">#</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;speed&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">restrictNumberOfLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">drawLabelsFacing</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">FrontAndBack</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">depthTestMode</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">LABEL_DT_AUTO</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.735192</font><font color="#4000C0">,</font> <font color="#0080C0">0.371514</font><font color="#4000C0">,</font> <font color="#0080C0">0.566984</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2695</font><font color="#4000C0">,</font> <font color="#0080C0">0.927683</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.258407</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.60959</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_8_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v1</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">5.06081</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v1</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_8_04&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn on node labels</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">showNodes</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_8_05&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Label a variable that would normally have labels that protrude into</font>
+    <font color="#a02030"># the dataset</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;speed&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_8_06&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_8_07&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Try labelling a 3D AMR dataset</font>
+    <font color="#a02030">#</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;samrai_test_data/sil_changes/dumps.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Primitive Var _number_0&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;amr_mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;levels&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">showNodes</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">showCells</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">restrictNumberOfLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">depthTestMode</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">LABEL_DT_NEVER</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.643521</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.624962</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.441931</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">15</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.320552</font><font color="#4000C0">,</font> <font color="#0080C0">0.304253</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.897038</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">20.6155</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">41.2311</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">41.2311</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.0412674</font><font color="#4000C0">,</font> <font color="#0080C0">0.141248</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.871</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">15</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v2</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_8_08&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn on zbuffering</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">depthTestMode</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">LABEL_DT_AUTO</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_8_09&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Restrict the number of labels</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">restrictNumberOfLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">numberOfLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">900</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">depthTestMode</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">LABEL_DT_NEVER</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_8_10&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn on zbuffering</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">depthTestMode</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">LABEL_DT_AUTO</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_8_11&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestSlicedVectors</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Labelling sliced vectors&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;grad&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">depthTestMode</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">LABEL_DT_NEVER</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.370383</font><font color="#4000C0">,</font> <font color="#0080C0">0.566874</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.275836</font><font color="#4000C0">,</font> <font color="#0080C0">0.66177</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Off</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_9_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;grad&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">vec</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">useStride</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.5</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vec</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SliceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">project2d</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.332304</font><font color="#4000C0">,</font> <font color="#0080C0">0.933436</font><font color="#4000C0">,</font> <font color="#0080C0">0.135169</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.353747</font><font color="#4000C0">,</font> <font color="#0080C0">0.00950422</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.935293</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">14.1421</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">28.2843</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">28.2843</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3567</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_9_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test a case where having the vector be an expression was causing</font>
+    <font color="#a02030"># VisIt to mess up.</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;quadmesh3d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;vel&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">LabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">6</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">color</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">textFont1</font><font color="#4000C0">.</font><font color="#000000">useForegroundColor</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SliceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">originType</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">Intercept</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">originIntercept</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">axisType</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">YAxis</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">project2d</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.0476715</font><font color="#4000C0">,</font> <font color="#0080C0">0.155784</font><font color="#4000C0">,</font> <font color="#0080C0">0.874164</font><font color="#4000C0">,</font> <font color="#0080C0">0.991825</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Off</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_9_02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestRectilinearLogicalDisplay</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Test 3D zooming and logical mesh display&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;hardyglobal&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Also zoom in using some views obtained from rubber-band style</font>
+    <font color="#a02030"># views that would have made the labels migrate from their</font>
+    <font color="#a02030"># correct locations in older versions of VisIt.</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.566084</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.288713</font><font color="#4000C0">,</font> <font color="#0080C0">0.772135</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.357175</font><font color="#4000C0">,</font> <font color="#0080C0">0.930078</font><font color="#4000C0">,</font> <font color="#0080C0">0.0859103</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.104981</font><font color="#4000C0">,</font> <font color="#0080C0">0.174394</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">12.8916</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_10_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Make it be displayed using index style numbers.</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">labelDisplayFormat</font> <font color="#4000C0">=</font> <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">Index</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_10_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Make sure the labels are in the right place when we tell VisIt</font>
+    <font color="#a02030"># to draw them all instead of binning.</font>
+    <font color="#000000">L</font><font color="#4000C0">.</font><font color="#000000">restrictNumberOfLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_10_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Try a nodal variable.</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;hardyglobal&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_10_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Try a 2D rectilinear mesh</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;hgslice&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh2D&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh2D&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v1</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">7.52178</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">5.09684</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">8.8535</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">6.43779</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v1</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_10_04&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Try a 3D curvilinear mesh</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curvmesh3d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">opaqueMode</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">On</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curvmesh3d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.405434</font><font color="#4000C0">,</font> <font color="#0080C0">0.494827</font><font color="#4000C0">,</font> <font color="#0080C0">0.768615</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">2.5</font><font color="#4000C0">,</font> <font color="#0080C0">15</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.296176</font><font color="#4000C0">,</font> <font color="#0080C0">0.866572</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.401662</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">16.0078</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">32.0156</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">32.0156</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.129303</font><font color="#4000C0">,</font> <font color="#0080C0">0.36944</font><font color="#4000C0">)</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">43.2454</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v2</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">2.5</font><font color="#4000C0">,</font> <font color="#0080C0">15</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v2</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_10_05&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_10_06&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestMixedVariables</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Test datasets with mixed variables&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ma</font> <font color="#4000C0">=</font> <font color="#000000">GetMaterialAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ma</font><font color="#4000C0">.</font><font color="#000000">forceMIR</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetMaterialAttributes</font><font color="#4000C0">(</font><font color="#000000">ma</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;specmix_ucd.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">L</font> <font color="#4000C0">=</font> <font color="#000000">CreateLabelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">L</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">View2DAtts</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">View2DAtts</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">10.9988</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">8.83259</font><font color="#4000C0">,</font> <font color="#0080C0">1.01139</font><font color="#4000C0">,</font> <font color="#0080C0">3.18029</font><font color="#4000C0">)</font>
+    <font color="#000000">View2DAtts</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">View2DAtts</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_11_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">View2DAtts</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">View2DAtts</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.474811</font><font color="#4000C0">,</font> <font color="#0080C0">3.09596</font><font color="#4000C0">,</font> <font color="#0080C0">1.20289</font><font color="#4000C0">,</font> <font color="#0080C0">3.82726</font><font color="#4000C0">)</font>
+    <font color="#000000">View2DAtts</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">View2DAtts</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SaveTestImage</font><font color="#4000C0">(</font><font color="#008000">&quot;label_11_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestGeneralFeatures</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestCurvilinear2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestRectilinear2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestUnstructured2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestSlice</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestLabeledVTK</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestLabellingSubsets</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestLabellingTensors</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestLabelling3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestSlicedVectors</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestRectilinearLogicalDisplay</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestMixedVariables</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Run all of the tests</font>
+<font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Exit the test</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

@@ -1,0 +1,162 @@
+<html><body bgcolor="#e0e0e0"><head><title>rendering/timeslider.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  timeslider.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh        - 2D curvilinear, single domain</font>
+<font color="#a02030">#              plots       - Pseudocolor</font>
+<font color="#a02030">#              annotations - Time slider</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  VisIt00003746</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Thu Dec 4 14:39:21 PST 2003</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Brad Whitlock, Wed Mar 9 09:15:30 PDT 2005</font>
+<font color="#a02030">#    Removed deprecated functions.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Update due to change </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Wed Sep 28 14:12:00 PDT 2011</font>
+<font color="#a02030">#    Move the time slider around a couple times.</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#a02030"># Set up the annotation colors, etc.</font>
+<font color="#000000">a</font> <font color="#4000C0">=</font> <font color="#000000">GetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">backgroundColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">foregroundColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">backgroundMode</font> <font color="#4000C0">=</font> <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">Solid</font>
+<font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Open up the database and create a plot.</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;pdb_test_data/allinone00.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh/a&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create a time slider</font>
+<font color="#000000">slider</font> <font color="#4000C0">=</font> <font color="#000000">CreateAnnotationObject</font><font color="#4000C0">(</font><font color="#008000">&quot;TimeSlider&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider00&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Turn it off</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">visible</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Turn it back on and move and resize it</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">visible</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">width</font> <font color="#4000C0">=</font> <font color="#0080C0">0.60</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">height</font> <font color="#4000C0">=</font> <font color="#0080C0">0.1</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.03</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Change the colors</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">startColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">endColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Change the rounding mode</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">rounded</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Change the shading mode</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">shaded</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Change the text</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">text</font> <font color="#4000C0">=</font> <font color="#008000">&quot;The time is: $time&quot;</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider06&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">14</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Change the text color</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">shaded</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">rounded</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">useForegroundForTextColor</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">textColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider08&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create a new slider</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">18</font><font color="#4000C0">)</font>
+<font color="#000000">slider2</font> <font color="#4000C0">=</font> <font color="#000000">CreateAnnotationObject</font><font color="#4000C0">(</font><font color="#008000">&quot;TimeSlider&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;slider_obj&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">slider2</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.3</font><font color="#4000C0">,</font> <font color="#0080C0">0.8</font><font color="#4000C0">)</font>
+<font color="#000000">slider2</font><font color="#4000C0">.</font><font color="#000000">height</font> <font color="#4000C0">=</font> <font color="#0080C0">0.15</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider09&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Delete the first slider.</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">Delete</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider10&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create an alias to the second slider using the GetAnnotationObject call.</font>
+<font color="#000000">foo</font> <font color="#4000C0">=</font> <font color="#000000">GetAnnotationObject</font><font color="#4000C0">(</font><font color="#008000">&quot;slider_obj&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">foo</font><font color="#4000C0">.</font><font color="#000000">startColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">foo</font><font color="#4000C0">.</font><font color="#000000">endColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">100</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider11&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Delete the annotation using the alias.</font>
+<font color="#000000">foo</font><font color="#4000C0">.</font><font color="#000000">Delete</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider12&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Delete all plots and open a new database</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;speed&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.556371</font><font color="#4000C0">,</font> <font color="#0080C0">0.348221</font><font color="#4000C0">,</font> <font color="#0080C0">0.754449</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.185162</font><font color="#4000C0">,</font> <font color="#0080C0">0.93708</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.295968</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.20945</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+
+<font color="#000000">v1</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.501427</font><font color="#4000C0">,</font> <font color="#0080C0">0.560716</font><font color="#4000C0">,</font> <font color="#0080C0">0.658915</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.272851</font><font color="#4000C0">,</font> <font color="#0080C0">0.825194</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.494577</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.52784</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+
+<font color="#a02030"># Create a new slider</font>
+<font color="#000000">slider</font> <font color="#4000C0">=</font> <font color="#000000">CreateAnnotationObject</font><font color="#4000C0">(</font><font color="#008000">&quot;TimeSlider&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.02</font><font color="#4000C0">)</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">width</font> <font color="#4000C0">=</font> <font color="#0080C0">0.6</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">height</font> <font color="#4000C0">=</font> <font color="#0080C0">0.08</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">percentComplete</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">timeDisplay</font> <font color="#4000C0">=</font> <font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">UserSpecified</font>
+<font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">text</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Using percentComplete manually&quot;</font>
+<font color="#000000">testnum</font> <font color="#4000C0">=</font> <font color="#0080C0">13</font>
+<font color="#000000">nsteps</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">moves</font> <font color="#4000C0">=</font> <font color="#4000C0">{</font><font color="#0080C0">4</font> <font color="#4000C0">:</font> <font color="#4000C0">(</font><font color="#0080C0">0.02</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">8</font> <font color="#4000C0">:</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.9</font><font color="#4000C0">)</font><font color="#4000C0">}</font>
+<font color="#a02030"># Set the percentComplete manually</font>
+<font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">nsteps</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font> <font color="#4000C0">/</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">nsteps</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">percentComplete</font> <font color="#4000C0">=</font> <font color="#000000">t</font> <font color="#4000C0">*</font> <font color="#0080C0">100.</font>
+    <font color="#C00000">if</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">list</font><font color="#4000C0">(</font><font color="#000000">moves</font><font color="#4000C0">.</font><font color="#000000">keys</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#000000">moves</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">v0</font> <font color="#4000C0">*</font> <font color="#4000C0">(</font><font color="#0080C0">1.</font> <font color="#4000C0">-</font> <font color="#000000">t</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#000000">v1</font> <font color="#4000C0">*</font> <font color="#000000">t</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timeslider%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">testnum</font><font color="#4000C0">)</font>
+    <font color="#000000">testnum</font> <font color="#4000C0">=</font> <font color="#000000">testnum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

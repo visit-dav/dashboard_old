@@ -1,0 +1,36 @@
+<html><body bgcolor="#e0e0e0"><head><title>plugins/databasesVsInstall.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES:    nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  databasesVsInstall.py </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      Building database plugins against an installed version of VisIt</font>
+<font color="#a02030">#              </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Kathleen Biagas </font>
+<font color="#a02030">#  Date:       November 8, 2018 </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Eric Brugger, Wed Jun 26 09:32:06 PDT 2019</font>
+<font color="#a02030">#    Removed the ccm readler.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Tue Nov 26 10:23:31 PST 2019</font>
+<font color="#a02030">#    Modified to pass a &#x27;test-this&#x27; list instead of a &#x27;skip-this&#x27; list.</font>
+<font color="#a02030">#    Plugins chosen based on third-party dependence, ability to auto-regen</font>
+<font color="#a02030">#    their CMakeLists.txt and tests currently available to run against the</font>
+<font color="#a02030">#    version built (to be added at a future time).</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Tue Feb 10, 2026</font>
+<font color="#a02030">#    Use of pathlib is now part of tests_path.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#000000">Source</font><font color="#4000C0">(</font><font color="#000000">tests_path</font><font color="#4000C0">(</font><font color="#008000">&quot;plugins&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pluginVsInstallHelpers&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">do_plugin_type</font><font color="#4000C0">(</font><font color="#008000">&quot;databases&quot;</font><font color="#4000C0">,</font> <font color="#4000C0">[</font><font color="#008000">&quot;BOV&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Blueprint&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;CGNS&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Cale&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Claw&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Exodus&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;FITS&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;H5Part&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;MFEM&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mili&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;SAMRAI&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;VTK&quot;</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># for future use</font>
+<font color="#a02030">#do_tests(&quot;database&quot;, [&quot;bov.py&quot;, &quot;blueprint.py&quot;, &quot;CGNS.py&quot;, &quot;Cale.py&quot;, &quot;claw.py&quot;, &quot;exodus.py&quot;, &quot;FITS.py&quot;, &quot;h5part.py&quot;, &quot;mfem.py&quot;, &quot;mili.py&quot;, &quot;samrai.py&quot;, &quot;vtk.py&quot;])</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

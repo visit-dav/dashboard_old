@@ -1,0 +1,56 @@
+<html><body bgcolor="#e0e0e0"><head><title>unit/test_value_simple.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  test_value_simple.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      VisIt Test Suite Test Value tests</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  none</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Mark C. Miller, Sun Jan 10 10:24:59 PST 2021</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#a02030"># Basic cases</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Basic&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_basic_001&quot;</font><font color="#4000C0">,</font><font color="#0080C0">100</font><font color="#4000C0">,</font><font color="#0080C0">100</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueNE</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_basic_002&quot;</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">100</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestValueLT</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_basic_003&quot;</font><font color="#4000C0">,</font><font color="#0080C0">100</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueLE</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_basic_004&quot;</font><font color="#4000C0">,</font><font color="#0080C0">100</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueLE</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_basic_005&quot;</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestValueGT</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_basic_006&quot;</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">100</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueGE</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_basic_007&quot;</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">100</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueGE</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_basic_008&quot;</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_basic_009&quot;</font><font color="#4000C0">,</font><font color="#0080C0">100.0</font><font color="#4000C0">,</font><font color="#0080C0">100</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Rounding cases</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Precision&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_prec_001&quot;</font><font color="#4000C0">,</font><font color="#0080C0">200.0001</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_prec_002&quot;</font><font color="#4000C0">,</font><font color="#0080C0">200.0000000001</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">9</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueNE</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_prec_004&quot;</font><font color="#4000C0">,</font><font color="#0080C0">200.0001</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">9</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># IN operator</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;In Operator&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueIN</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_in_001&quot;</font><font color="#4000C0">,</font><font color="#4000C0">(</font><font color="#0080C0">100</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">300</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueIN</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_in_001&quot;</font><font color="#4000C0">,</font><font color="#4000C0">[</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">]</font><font color="#4000C0">,</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Custom equivalence operator for TestValueIN</font>
+<font color="#C00000">def</font> <font color="#000000">EqMod5</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">,</font><font color="#000000">b</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#C00000">return</font> <font color="#000000">a</font><font color="#4000C0">%</font><font color="#0080C0">5</font> <font color="#4000C0">==</font> <font color="#000000">b</font><font color="#4000C0">%</font><font color="#0080C0">5</font>
+
+<font color="#a02030"># This tests that &#x27;35&#x27; is IN &#x27;(17,18,19,20,21)&#x27; by the EqMod5 operator</font>
+<font color="#a02030"># which says two things are equal if their mod 5 values are equal. So,</font>
+<font color="#a02030"># &#x27;35&#x27; is IN the list because 20%5==35%5 (0)</font>
+<font color="#000000">TestValueIN</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_in_002&quot;</font><font color="#4000C0">,</font><font color="#4000C0">(</font><font color="#0080C0">17</font><font color="#4000C0">,</font><font color="#0080C0">18</font><font color="#4000C0">,</font><font color="#0080C0">19</font><font color="#4000C0">,</font><font color="#0080C0">20</font><font color="#4000C0">,</font><font color="#0080C0">21</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#0080C0">35</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">,</font><font color="#000000">EqMod5</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># General Python objects wind up being tested as strings</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Objects&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_object_001&quot;</font><font color="#4000C0">,</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#008000">&#x27;2&#x27;</font><font color="#4000C0">,</font><font color="#0080C0">3</font><font color="#4000C0">]</font><font color="#4000C0">,</font><font color="#008000">&quot;[1, &#x27;2&#x27;, 3]&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueLT</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_object_002&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;apple&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;carrot&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueLT</font><font color="#4000C0">(</font><font color="#008000">&quot;test_value_object_003&quot;</font><font color="#4000C0">,</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0.00000471</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0.00000501</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

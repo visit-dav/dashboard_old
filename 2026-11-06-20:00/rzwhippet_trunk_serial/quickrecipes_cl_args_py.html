@@ -1,0 +1,30 @@
+<html><body bgcolor="#e0e0e0"><head><title>quickrecipes/cl_args.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Mark C. Miller, Fri Aug 26 14:31:48 PDT 2022</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Get some utils shared across many .py files used for quick recipes.</font>
+<font color="#a02030">#</font>
+<font color="#000000">Source</font><font color="#4000C0">(</font><font color="#000000">tests_path</font><font color="#4000C0">(</font><font color="#008000">&#x27;quickrecipes&#x27;</font><font color="#4000C0">,</font><font color="#008000">&#x27;vqr_utils.py.inc&#x27;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">handling_command_line_arguments</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+  <font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># handling command line arguments {</font>
+    <font color="#C00000">import</font> <font color="#000000">sys</font>
+    <font color="#000000">print</font><font color="#4000C0">(</font><font color="#000000">Argv</font><font color="#4000C0">)</font>
+    <font color="#000000">print</font><font color="#4000C0">(</font><font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">argv</font><font color="#4000C0">)</font>
+    <font color="#a02030"># handling command line arguments }</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&#x27;handling command line arguments errors&#x27;</font><font color="#4000C0">,</font><font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;handling command line arguments no exceptions&#x27;</font><font color="#4000C0">)</font>
+  <font color="#C00000">except</font> <font color="#000000">Exception</font> <font color="#C00000">as</font> <font color="#000000">inst</font><font color="#4000C0">:</font>
+    <font color="#000000">TestFOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;handling command line argumentts exception &quot;%s&quot;&#x27;</font><font color="#4000C0">%</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">inst</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">LINE</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">pass</font>
+  <font color="#000000">vqr_cleanup</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">handling_command_line_arguments</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

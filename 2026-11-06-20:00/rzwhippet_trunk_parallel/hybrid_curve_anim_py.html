@@ -1,0 +1,77 @@
+<html><body bgcolor="#e0e0e0"><head><title>hybrid/curve_anim.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  curve_anim.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - polygonal line from .curve file.</font>
+<font color="#a02030">#              plots     - curve</font>
+<font color="#a02030">#              operators - none</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  &#x27;2973</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       January 15, 2003</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Mon Aug  4 09:51:40 PDT 2003</font>
+<font color="#a02030">#    Curves are no longer valid subsets, but they are now curve plots.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Wed Mar 9 09:15:30 PDT 2005</font>
+<font color="#a02030">#    Removed deprecated functions.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Wed Aug 28 09:04:00 MST 2019</font>
+<font color="#a02030">#    Turn off cycling of colors for all Curve plot tests.  Set the colors</font>
+<font color="#a02030">#    individually to match current baseline results.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/curve.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">curveAtts</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;flat&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;going_up&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;going_down&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;parabolic&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">40</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#a02030"># This additional set frame is so that the saved</font>
+<font color="#a02030"># image is correct.</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">40</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_anim1&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">99</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_anim2&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_anim3&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">40</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_anim4&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_anim5&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;flat&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_anim6&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

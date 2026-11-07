@@ -1,0 +1,195 @@
+<html><body bgcolor="#e0e0e0"><head><title>quickrecipes/working_with_annotations.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Mark C. Miller, Fri Aug 26 14:31:48 PDT 2022</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Get some utils shared across many .py files used for quick recipes.</font>
+<font color="#a02030">#</font>
+<font color="#000000">Source</font><font color="#4000C0">(</font><font color="#000000">tests_path</font><font color="#4000C0">(</font><font color="#008000">&#x27;quickrecipes&#x27;</font><font color="#4000C0">,</font><font color="#008000">&#x27;vqr_utils.py.inc&#x27;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">using_gradient_background_colors</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+  <font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># using gradient background colors {</font>
+    <font color="#a02030"># Set a blue/black, radial, gradient background.</font>
+    <font color="#000000">a</font> <font color="#4000C0">=</font> <font color="#000000">AnnotationAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">backgroundMode</font> <font color="#4000C0">=</font> <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">Gradient</font>
+    <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">gradientBackgroundStyle</font> <font color="#4000C0">=</font> <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">Radial</font>
+    <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">gradientColor1</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font> <font color="#a02030"># Blue</font>
+    <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">gradientColor2</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font> <font color="#a02030"># Black</font>
+    <font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">)</font>
+    <font color="#a02030"># using gradient background colors }</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&#x27;using gradient background colors error message&#x27;</font><font color="#4000C0">,</font><font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;using gradient background colors exceptions&#x27;</font><font color="#4000C0">)</font>
+  <font color="#C00000">except</font> <font color="#000000">Exception</font> <font color="#C00000">as</font> <font color="#000000">inst</font><font color="#4000C0">:</font>
+    <font color="#000000">TestFOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;using gradient background colors exception &quot;%s&quot;&#x27;</font><font color="#4000C0">%</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">inst</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">LINE</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">pass</font>
+  <font color="#000000">vqr_cleanup</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">adding_a_banner</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+  <font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># adding a banner {</font>
+    <font color="#a02030"># Create a Text2D object to indicate the visualization is unclassified.</font>
+
+    <font color="#a02030"># Note the annoation object is added to the viewer window the moment it is created.</font>
+    <font color="#000000">banner</font> <font color="#4000C0">=</font> <font color="#000000">CreateAnnotationObject</font><font color="#4000C0">(</font><font color="#008000">&quot;Text2D&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Note text is updated in the viewer window the moment it is changed.</font>
+    <font color="#000000">banner</font><font color="#4000C0">.</font><font color="#000000">text</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Unclassified&quot;</font>
+
+    <font color="#000000">banner</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.37</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">banner</font><font color="#4000C0">.</font><font color="#000000">fontBold</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+
+    <font color="#a02030"># print the attributes to see what you can set in the Text2D object.</font>
+    <font color="#000000">print</font><font color="#4000C0">(</font><font color="#000000">banner</font><font color="#4000C0">)</font>
+    <font color="#a02030"># print(banner) will print something like...</font>
+    <font color="#a02030">#    visible = 1</font>
+    <font color="#a02030">#    position = (0.5, 0.5)</font>
+    <font color="#a02030">#    height = 0.03</font>
+    <font color="#a02030">#    textColor = (0, 0, 0, 255)</font>
+    <font color="#a02030">#    useForegroundForTextColor = 1</font>
+    <font color="#a02030">#    text = &quot;2D text annotation&quot;</font>
+    <font color="#a02030">#    fontFamily = Arial  # Arial, Courier, Times</font>
+    <font color="#a02030">#    fontBold = 0</font>
+    <font color="#a02030">#    fontItalic = 0</font>
+    <font color="#a02030">#    fontShadow = 0</font>
+    <font color="#a02030"># adding a banner }</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&#x27;adding a banner error message&#x27;</font><font color="#4000C0">,</font><font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;adding a banner exceptions&#x27;</font><font color="#4000C0">)</font>
+  <font color="#C00000">except</font> <font color="#000000">Exception</font> <font color="#C00000">as</font> <font color="#000000">inst</font><font color="#4000C0">:</font>
+    <font color="#000000">TestFOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;adding a banner exception &quot;%s&quot;&#x27;</font><font color="#4000C0">%</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">inst</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">LINE</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">pass</font>
+  <font color="#000000">vqr_cleanup</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">adding_a_time_slider</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+  <font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># adding a time slider {</font>
+    <font color="#a02030"># Add a time slider in the lower left corner</font>
+    <font color="#000000">slider</font> <font color="#4000C0">=</font> <font color="#000000">CreateAnnotationObject</font><font color="#4000C0">(</font><font color="#008000">&quot;TimeSlider&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Adjust the height. Takes effect immediately as the value is assigned.</font>
+    <font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">height</font> <font color="#4000C0">=</font> <font color="#0080C0">0.07</font>
+
+    <font color="#a02030"># Print members that are available in the time slider object</font>
+    <font color="#000000">print</font><font color="#4000C0">(</font><font color="#000000">slider</font><font color="#4000C0">)</font>
+    <font color="#a02030"># will produce something like...</font>
+    <font color="#a02030">#    visible = 1</font>
+    <font color="#a02030">#    active = 1</font>
+    <font color="#a02030">#    position = (0.01, 0.01)</font>
+    <font color="#a02030">#    width = 0.4</font>
+    <font color="#a02030">#    height = 0.05</font>
+    <font color="#a02030">#    textColor = (0, 0, 0, 255)</font>
+    <font color="#a02030">#    useForegroundForTextColor = 1</font>
+    <font color="#a02030">#    startColor = (0, 255, 255, 255)</font>
+    <font color="#a02030">#    endColor = (255, 255, 255, 153)</font>
+    <font color="#a02030">#    text = &quot;Time=$time&quot;</font>
+    <font color="#a02030">#    timeFormatString = &quot;%g&quot;</font>
+    <font color="#a02030">#    timeDisplay = AllFrames  # AllFrames, FramesForPlot, StatesForPlot, UserSpecified</font>
+    <font color="#a02030">#    percentComplete = 0</font>
+    <font color="#a02030">#    rounded = 1</font>
+    <font color="#a02030">#    shaded = 1</font>
+    <font color="#a02030"># adding a time slider }</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&#x27;adding a time slider error message&#x27;</font><font color="#4000C0">,</font><font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;adding a time slider exceptions&#x27;</font><font color="#4000C0">)</font>
+  <font color="#C00000">except</font> <font color="#000000">Exception</font> <font color="#C00000">as</font> <font color="#000000">inst</font><font color="#4000C0">:</font>
+    <font color="#000000">TestFOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;adding a time slider exception &quot;%s&quot;&#x27;</font><font color="#4000C0">%</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">inst</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">LINE</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">pass</font>
+  <font color="#000000">vqr_cleanup</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">adding_a_logo</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+  <font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># adding a logo {</font>
+    <font color="#a02030"># Incorporate LLNL logo image (llnl.jpeg) as an annotation</font>
+    <font color="#000000">image</font> <font color="#4000C0">=</font> <font color="#000000">CreateAnnotationObject</font><font color="#4000C0">(</font><font color="#008000">&quot;Image&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">image</font><font color="#4000C0">.</font><font color="#000000">image</font> <font color="#4000C0">=</font> <font color="#008000">&quot;llnl.jpeg&quot;</font>
+    <font color="#000000">image</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.02</font><font color="#4000C0">,</font> <font color="#0080C0">0.02</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Print the other image annotation options</font>
+    <font color="#000000">print</font><font color="#4000C0">(</font><font color="#000000">image</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Will print something like...</font>
+    <font color="#a02030">#    visible = 1</font>
+    <font color="#a02030">#    active = 1</font>
+    <font color="#a02030">#    position = (0, 0)</font>
+    <font color="#a02030">#    transparencyColor = (0, 0, 0, 255)</font>
+    <font color="#a02030">#    useTransparencyColor = 0</font>
+    <font color="#a02030">#    width = 100.000000</font>
+    <font color="#a02030">#    height = 100.000000</font>
+    <font color="#a02030">#    maintainAspectRatio = 1</font>
+    <font color="#a02030">#    image = (&quot;&quot;)</font>
+    <font color="#a02030"># adding a logo }</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&#x27;adding a logo error message&#x27;</font><font color="#4000C0">,</font><font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;adding a logo exceptions&#x27;</font><font color="#4000C0">)</font>
+  <font color="#C00000">except</font> <font color="#000000">Exception</font> <font color="#C00000">as</font> <font color="#000000">inst</font><font color="#4000C0">:</font>
+    <font color="#000000">TestFOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;adding a logo exception &quot;%s&quot;&#x27;</font><font color="#4000C0">%</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">inst</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">LINE</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">pass</font>
+  <font color="#000000">vqr_cleanup</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">modifying_a_legend</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+  <font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># modifying a legend {</font>
+    <font color="#a02030"># Open a file and make a plot</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;~juanita/silo/stuff/noise.silo&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;hardyglobal&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Get the legend annotation object for the Pseudocolor plot, the second</font>
+    <font color="#a02030"># plot in the list (0-indexed).</font>
+    <font color="#000000">plotName</font> <font color="#4000C0">=</font> <font color="#000000">GetPlotList</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">GetPlots</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">plotName</font>
+    <font color="#000000">legend</font> <font color="#4000C0">=</font> <font color="#000000">GetAnnotationObject</font><font color="#4000C0">(</font><font color="#000000">plotName</font><font color="#4000C0">)</font>
+    <font color="#a02030"># See if we can scale the legend.</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">xScale</font> <font color="#4000C0">=</font> <font color="#0080C0">3.</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">yScale</font> <font color="#4000C0">=</font> <font color="#0080C0">3.</font>
+    <font color="#a02030"># the bounding box.</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">drawBoundingBox</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">boundingBoxColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">180</font><font color="#4000C0">,</font><font color="#0080C0">180</font><font color="#4000C0">,</font><font color="#0080C0">180</font><font color="#4000C0">,</font><font color="#0080C0">230</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Make it horizontal</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">orientation</font> <font color="#4000C0">=</font> <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">HorizontalBottom</font>
+    <font color="#a02030"># moving the legend</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">managePosition</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.7</font><font color="#4000C0">,</font><font color="#0080C0">0.15</font><font color="#4000C0">)</font>
+    <font color="#a02030"># text color</font>
+    <font color="#000000">InvertBackgroundColor</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">useForegroundForTextColor</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">textColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#a02030"># number format</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">numberFormat</font> <font color="#4000C0">=</font> <font color="#008000">&quot;%1.4e&quot;</font>
+    <font color="#a02030"># the font.</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">fontFamily</font> <font color="#4000C0">=</font> <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">Arial</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">fontBold</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">fontItalic</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#a02030"># turning off the labels.</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">fontItalic</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">drawLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">drawMinMax</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#a02030"># turning off the title.</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">drawTitle</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#a02030"># Use user-supplied labels, rather than numeric values.</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">controlTicks</font><font color="#4000C0">=</font><font color="#0080C0">0</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">drawLabels</font> <font color="#4000C0">=</font> <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">Labels</font>
+    <font color="#a02030"># suppliedLabels must be strings, only valid when controlTicks is 0</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">suppliedLabels</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#008000">&quot;A&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;B&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;C&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;D&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;E&quot;</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Give the legend a custom title</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">useCustomTitle</font><font color="#4000C0">=</font><font color="#0080C0">1</font>
+    <font color="#000000">legend</font><font color="#4000C0">.</font><font color="#000000">customTitle</font><font color="#4000C0">=</font><font color="#008000">&quot;my custom title&quot;</font>
+    <font color="#a02030"># modifying a legend }</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&#x27;modifying a legend error message&#x27;</font><font color="#4000C0">,</font><font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;modifying a legend exceptions&#x27;</font><font color="#4000C0">)</font>
+  <font color="#C00000">except</font> <font color="#000000">Exception</font> <font color="#C00000">as</font> <font color="#000000">inst</font><font color="#4000C0">:</font>
+    <font color="#000000">TestFOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;modifying a legend exception &quot;%s&quot;&#x27;</font><font color="#4000C0">%</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">inst</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">LINE</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">pass</font>
+  <font color="#000000">vqr_cleanup</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">using_gradient_background_colors</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">adding_a_banner</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">adding_a_time_slider</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">adding_a_logo</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">modifying_a_legend</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

@@ -1,0 +1,140 @@
+<html><body bgcolor="#e0e0e0"><head><title>quickrecipes/export.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Cyrus Harrison, Tue Sep 16 11:19:26 PDT 2025</font>
+<font color="#a02030"># </font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Justin Privitera, Fri Aug 14 15:52:42 PDT 2026</font>
+<font color="#a02030">#    Added OBJ export quickrecipe.</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">from</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font> <font color="#C00000">import</font> <font color="#000000">join</font> <font color="#C00000">as</font> <font color="#000000">pjoin</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">clean_data</font><font color="#4000C0">(</font><font color="#000000">path</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+  <font color="#000000">print</font><font color="#4000C0">(</font><font color="#000000">path</font><font color="#4000C0">)</font>
+  <font color="#C00000">if</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">isfile</font><font color="#4000C0">(</font><font color="#000000">path</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">remove</font><font color="#4000C0">(</font><font color="#000000">path</font><font color="#4000C0">)</font>
+  <font color="#C00000">elif</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">isfile</font><font color="#4000C0">(</font><font color="#000000">path</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Note: assumes passed dir is already empty</font>
+    <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">rmdir</font><font color="#4000C0">(</font><font color="#000000">path</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">export_to_vtk</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+  <font color="#000000">clean_data</font><font color="#4000C0">(</font><font color="#008000">&quot;my_vtk_export.vtk&quot;</font><font color="#4000C0">)</font>
+  <font color="#a02030"># exportToVTK {</font>
+  <font color="#a02030"># Create a Pseudocolor plot and export multiple fields</font>
+  <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+  <font color="#a02030"># optional: setup operators to modify data before export</font>
+  <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+  <font color="#000000">eatts</font> <font color="#4000C0">=</font> <font color="#000000">ExportDBAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">filename</font> <font color="#4000C0">=</font> <font color="#008000">&quot;my_vtk_export&quot;</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">db_type</font> <font color="#4000C0">=</font> <font color="#008000">&quot;VTK&quot;</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">variables</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;d&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+  <font color="#000000">ExportDatabase</font><font color="#4000C0">(</font><font color="#000000">eatts</font><font color="#4000C0">)</font>
+  <font color="#a02030"># exportToVTK }</font>
+  <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;qr_export_to_vtk&quot;</font><font color="#4000C0">,</font><font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">isfile</font><font color="#4000C0">(</font><font color="#008000">&quot;my_vtk_export.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#C00000">True</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">export_to_silo</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+  <font color="#000000">clean_data</font><font color="#4000C0">(</font><font color="#008000">&quot;my_silo_export.silo&quot;</font><font color="#4000C0">)</font>
+  <font color="#a02030"># exportToSilo {</font>
+  <font color="#a02030"># Create a Pseudocolor plot and export multiple fields</font>
+  <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+  <font color="#a02030"># optional: setup operators to modify data before export</font>
+  <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+  <font color="#000000">eatts</font> <font color="#4000C0">=</font> <font color="#000000">ExportDBAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">filename</font> <font color="#4000C0">=</font> <font color="#008000">&quot;my_silo_export&quot;</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">db_type</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Silo&quot;</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">variables</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;d&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+  <font color="#000000">ExportDatabase</font><font color="#4000C0">(</font><font color="#000000">eatts</font><font color="#4000C0">)</font>
+  <font color="#a02030"># exportToSilo }</font>
+  <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;qr_export_to_silo&quot;</font><font color="#4000C0">,</font><font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">isfile</font><font color="#4000C0">(</font><font color="#008000">&quot;my_silo_export.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#C00000">True</font><font color="#4000C0">)</font>
+  <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">export_to_blueprint</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+  <font color="#000000">clean_data</font><font color="#4000C0">(</font><font color="#008000">&quot;my_blueprint_export.cycle_000048.root&quot;</font><font color="#4000C0">)</font>
+  <font color="#a02030"># exportToBlueprint {</font>
+  <font color="#a02030"># Create a Pseudocolor plot and export multiple fields</font>
+  <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+  <font color="#a02030"># optional: setup operators to modify data before export</font>
+  <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+  <font color="#000000">eatts</font> <font color="#4000C0">=</font> <font color="#000000">ExportDBAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">filename</font> <font color="#4000C0">=</font> <font color="#008000">&quot;my_blueprint_export&quot;</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">db_type</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Blueprint&quot;</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">variables</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;d&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+  <font color="#000000">ExportDatabase</font><font color="#4000C0">(</font><font color="#000000">eatts</font><font color="#4000C0">)</font>
+  <font color="#a02030"># exportToBlueprint }</font>
+  <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;qr_export_to_blueprint&quot;</font><font color="#4000C0">,</font><font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">isfile</font><font color="#4000C0">(</font><font color="#008000">&quot;my_blueprint_export.cycle_000048.root&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#C00000">True</font><font color="#4000C0">)</font>
+  <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">export_to_csv</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+  <font color="#000000">clean_data</font><font color="#4000C0">(</font><font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#008000">&quot;my_csv_export.csv&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;element_data.csv&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+  <font color="#000000">clean_data</font><font color="#4000C0">(</font><font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#008000">&quot;my_csv_export.csv&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;vertex_data.csv&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+  <font color="#a02030"># clean up dir last </font>
+  <font color="#000000">clean_data</font><font color="#4000C0">(</font><font color="#008000">&quot;my_csv_export.csv&quot;</font><font color="#4000C0">)</font>
+  <font color="#a02030"># exportToBlueprintCSV {</font>
+  <font color="#a02030"># Create a Pseudocolor plot and export multiple fields</font>
+  <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+  <font color="#a02030"># optional: setup operators to modify data before export</font>
+  <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+  <font color="#000000">eatts</font> <font color="#4000C0">=</font> <font color="#000000">ExportDBAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">filename</font> <font color="#4000C0">=</font> <font color="#008000">&quot;my_csv_export&quot;</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">db_type</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Blueprint&quot;</font>
+  <font color="#000000">opts</font> <font color="#4000C0">=</font> <font color="#000000">GetExportOptions</font><font color="#4000C0">(</font><font color="#008000">&quot;Blueprint&quot;</font><font color="#4000C0">)</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">variables</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;d&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Operation&quot;</font><font color="#4000C0">]</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Flatten_CSV&quot;</font>
+  <font color="#000000">ExportDatabase</font><font color="#4000C0">(</font><font color="#000000">eatts</font><font color="#4000C0">,</font><font color="#000000">opts</font><font color="#4000C0">)</font>
+  <font color="#a02030"># exportToBlueprintCSV }</font>
+  <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;qr_export_to_csv&quot;</font><font color="#4000C0">,</font><font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">isdir</font><font color="#4000C0">(</font><font color="#008000">&quot;my_csv_export.csv&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#C00000">True</font><font color="#4000C0">)</font>
+  <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;qr_export_to_csv_vertex&quot;</font><font color="#4000C0">,</font><font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">isfile</font><font color="#4000C0">(</font><font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#008000">&quot;my_csv_export.csv&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;element_data.csv&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#C00000">True</font><font color="#4000C0">)</font>
+  <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;qr_export_to_csv_cell&quot;</font><font color="#4000C0">,</font><font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">isfile</font><font color="#4000C0">(</font><font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#008000">&quot;my_csv_export.csv&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;vertex_data.csv&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#C00000">True</font><font color="#4000C0">)</font>
+  <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">export_to_obj</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+  <font color="#000000">clean_data</font><font color="#4000C0">(</font><font color="#008000">&quot;my_obj_export.obj&quot;</font><font color="#4000C0">)</font>
+  <font color="#000000">clean_data</font><font color="#4000C0">(</font><font color="#008000">&quot;my_obj_export.mtl&quot;</font><font color="#4000C0">)</font>
+  <font color="#000000">clean_data</font><font color="#4000C0">(</font><font color="#008000">&quot;my_obj_export.png&quot;</font><font color="#4000C0">)</font>
+  <font color="#a02030"># exportToOBJ {</font>
+  <font color="#a02030"># Create a Pseudocolor plot and export a single field</font>
+  <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+  <font color="#a02030"># optional: setup operators to modify data before export</font>
+  <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+  <font color="#000000">eatts</font> <font color="#4000C0">=</font> <font color="#000000">ExportDBAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">db_type</font> <font color="#4000C0">=</font> <font color="#008000">&quot;WavefrontOBJ&quot;</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">variables</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+  <font color="#000000">eatts</font><font color="#4000C0">.</font><font color="#000000">filename</font> <font color="#4000C0">=</font> <font color="#008000">&quot;my_obj_export&quot;</font>
+
+  <font color="#a02030"># fetch Pseudocolor plot attributes to hand to OBJ export options</font>
+  <font color="#a02030"># (assumes your current active plot is a pseudocolor plot)</font>
+  <font color="#000000">pc_atts</font> <font color="#4000C0">=</font> <font color="#000000">GetPlotOptions</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+  <font color="#000000">opts</font> <font color="#4000C0">=</font> <font color="#000000">GetExportOptions</font><font color="#4000C0">(</font><font color="#008000">&quot;WavefrontOBJ&quot;</font><font color="#4000C0">)</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Output colors&quot;</font><font color="#4000C0">]</font>              <font color="#4000C0">=</font> <font color="#0080C0">1</font> <font color="#a02030"># turn colors on (1) or off (0)</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Color table&quot;</font><font color="#4000C0">]</font>                <font color="#4000C0">=</font> <font color="#000000">pc_atts</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#a02030"># choose a color table by name</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Number of colors&quot;</font><font color="#4000C0">]</font>           <font color="#4000C0">=</font> <font color="#0080C0">256</font> <font color="#a02030"># choose a color table resolution</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Invert color table&quot;</font><font color="#4000C0">]</font>         <font color="#4000C0">=</font> <font color="#000000">pc_atts</font><font color="#4000C0">.</font><font color="#000000">invertColorTable</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Use minimum&quot;</font><font color="#4000C0">]</font>                <font color="#4000C0">=</font> <font color="#000000">pc_atts</font><font color="#4000C0">.</font><font color="#000000">minFlag</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Minimum&quot;</font><font color="#4000C0">]</font>                    <font color="#4000C0">=</font> <font color="#000000">pc_atts</font><font color="#4000C0">.</font><font color="#000000">min</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Use color for values &lt; min&quot;</font><font color="#4000C0">]</font> <font color="#4000C0">=</font> <font color="#000000">pc_atts</font><font color="#4000C0">.</font><font color="#000000">useBelowMinColor</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Color for values &lt; min&quot;</font><font color="#4000C0">]</font>     <font color="#4000C0">=</font> <font color="#000000">pc_atts</font><font color="#4000C0">.</font><font color="#000000">belowMinColor</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Use maximum&quot;</font><font color="#4000C0">]</font>                <font color="#4000C0">=</font> <font color="#000000">pc_atts</font><font color="#4000C0">.</font><font color="#000000">maxFlag</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Maximum&quot;</font><font color="#4000C0">]</font>                    <font color="#4000C0">=</font> <font color="#000000">pc_atts</font><font color="#4000C0">.</font><font color="#000000">max</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Use color for values &gt; max&quot;</font><font color="#4000C0">]</font> <font color="#4000C0">=</font> <font color="#000000">pc_atts</font><font color="#4000C0">.</font><font color="#000000">useAboveMaxColor</font>
+  <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#008000">&quot;Color for values &gt; max&quot;</font><font color="#4000C0">]</font>     <font color="#4000C0">=</font> <font color="#000000">pc_atts</font><font color="#4000C0">.</font><font color="#000000">aboveMaxColor</font>
+
+  <font color="#000000">ExportDatabase</font><font color="#4000C0">(</font><font color="#000000">eatts</font><font color="#4000C0">,</font> <font color="#000000">opts</font><font color="#4000C0">)</font>
+  <font color="#a02030"># exportToOBJ }</font>
+  <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;qr_export_to_obj&quot;</font><font color="#4000C0">,</font><font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">isfile</font><font color="#4000C0">(</font><font color="#008000">&quot;my_obj_export.obj&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#C00000">True</font><font color="#4000C0">)</font>
+  <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;qr_export_to_obj_mtl&quot;</font><font color="#4000C0">,</font><font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">isfile</font><font color="#4000C0">(</font><font color="#008000">&quot;my_obj_export.mtl&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#C00000">True</font><font color="#4000C0">)</font>
+  <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;qr_export_to_obj_png&quot;</font><font color="#4000C0">,</font><font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">isfile</font><font color="#4000C0">(</font><font color="#008000">&quot;my_obj_export.png&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#C00000">True</font><font color="#4000C0">)</font>
+  <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">export_to_vtk</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">export_to_silo</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">export_to_blueprint</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">export_to_csv</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">export_to_obj</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

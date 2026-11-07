@@ -1,0 +1,258 @@
+<html><body bgcolor="#e0e0e0"><head><title>hybrid/field_operators.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  field_operators.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - rectilinear, curvilinear</font>
+<font color="#a02030">#              plots     - vector, contour</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  &#x27;4141, &#x27;5343, &#x27;6297, &#x27;6460, &#x27;7063, &#x27;8025</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       December 13, 2003</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Jeremy Meredith, Thu Jun 24 12:58:06 PDT 2004</font>
+<font color="#a02030">#    Set the vector origin explicitly for some cases because I changed the</font>
+<font color="#a02030">#    default to Tail.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Mon Jan  3 10:35:56 PST 2005</font>
+<font color="#a02030">#    Renamed to field_operators.  Added testing for divergence, Laplacian,</font>
+<font color="#a02030">#    and curl.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Mon Jun  6 11:28:45 PDT 2005</font>
+<font color="#a02030">#    Add tests for 2D divergence, Laplacian.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Mon Aug 15 14:19:49 PDT 2005</font>
+<font color="#a02030">#    2D curl now produces a scalar.  Change our test appropriately.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Fri Mar  3 09:01:08 PST 2006</font>
+<font color="#a02030">#    Add test for Jacobian (2D determinants).  &#x27;7063</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Mon Jun 18 09:54:09 PDT 2007</font>
+<font color="#a02030">#    Add test for dot of curl with a vector.  This is really testing the</font>
+<font color="#a02030">#    ability of macro expressions to maintain secondary variables. &#x27;8025</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Jeremy Meredith, Tue Jul 15 10:43:58 EDT 2008</font>
+<font color="#a02030">#    Changed number of vectors in vector plot to match the old behavior.</font>
+<font color="#a02030">#    (We now account for how many domains there are.)</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Mon Nov 28, 2022</font>
+<font color="#a02030">#    Remove obsolete &#x27;colorByMag&#x27; vector att with &#x27;colorByMagnitude&#x27;.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;grad_t&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;gradient(t)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;grad_t&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">vectorOrigin</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Middle</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Zonal UCD gradient.</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_01&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;grad_u&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;gradient(u)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;grad_u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">vectorOrigin</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Middle</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Nodal UCD gradient.</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_02&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;grad_d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;gradient(d)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;grad_d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">colorByMagnitude</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">vectorOrigin</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Middle</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Zonal rect-2d gradient.</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_03&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;grad_u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">colorByMagnitude</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">vectorOrigin</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Middle</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Nodal rect-2d gradient.</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_04&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;grad_d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nVectors</font> <font color="#4000C0">=</font> <font color="#0080C0">447</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">vectorOrigin</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Middle</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Zonal rect-3d gradient.</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_05&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;grad_u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">vectorOrigin</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Middle</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Nodal rect-3d gradient.</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_06&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;vel&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;mag&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;magnitude(vel)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">ThresholdAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.5</font><font color="#4000C0">)</font>
+<font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">listedVarNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;mag&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test vector with threshold (&#x27;4178)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_07&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;grad_u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">vectorOrigin</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">Middle</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nVectors</font> <font color="#4000C0">=</font> <font color="#0080C0">400</font><font color="#4000C0">*</font><font color="#0080C0">3</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;u_mag&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;magnitude(grad_u)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Isosurface&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">iso</font> <font color="#4000C0">=</font> <font color="#000000">IsosurfaceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">iso</font><font color="#4000C0">.</font><font color="#000000">contourNLevels</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">iso</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;u_mag&quot;</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">iso</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">4.5</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test vector with isosurface (&#x27;4207)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_08&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Add a contour plot just for grins to show that our isosurface operator is</font>
+<font color="#a02030"># picking up the same surface as the contour plot.</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u_mag&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">con</font> <font color="#4000C0">=</font> <font color="#000000">ContourAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">con</font><font color="#4000C0">.</font><font color="#000000">contourNLevels</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">con</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_09&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test that we can calculate the Laplacian.</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.41</font><font color="#4000C0">,</font> <font color="#0080C0">0.08</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.91</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;LP&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;abs(Laplacian(u))&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;LP&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">ContourAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">scaling</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Log</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_10&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;div&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;divergence(vel)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;div&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">ContourAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">scaling</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Log</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_11&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># Test multiple macro expressions together -- divergence and Laplacian.</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;div&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">scaling</font> <font color="#4000C0">=</font> <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">Log</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Isosurface&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">iso</font> <font color="#4000C0">=</font> <font color="#000000">IsosurfaceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">iso</font><font color="#4000C0">.</font><font color="#000000">scaling</font> <font color="#4000C0">=</font> <font color="#000000">iso</font><font color="#4000C0">.</font><font color="#000000">Log</font>
+<font color="#000000">iso</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;LP&quot;</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">iso</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_12&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;curl&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curl(vel)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curl&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">scaleByMagnitude</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_13&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;div2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;divergence(vel)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;div2&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_14&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;LP2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Laplacian(d)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;LP2&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_15&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;curl2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curl(vel)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curl2&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_16&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;jacobian&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;determinant({gradient(u), gradient(v)})&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;jacobian&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_17&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;mycurl&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curl(vel)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;mydot&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;dot(curl,vel)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mydot&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;field_op_18&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

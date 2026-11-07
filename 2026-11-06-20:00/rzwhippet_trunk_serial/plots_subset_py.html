@@ -1,0 +1,190 @@
+<html><body bgcolor="#e0e0e0"><head><title>plots/subset.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  subset.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      meshes    - 2D curvilinear, multiple domain</font>
+<font color="#a02030">#              plots     - subset</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  &#x27;6105, &#x27;6762</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       March 31, 2005</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Tue Nov 15 07:28:43 PST 2005</font>
+<font color="#a02030">#    Added test for subset plus macro expression.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Thu Mar 25 09:57:34 PDT 2010</font>
+<font color="#a02030">#    Added call(s) to DrawPlots() b/c of changes to the default plot state</font>
+<font color="#a02030">#    behavior when an operator is added.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Mon Mar 26 12:00:23 PDT 2012</font>
+<font color="#a02030">#    Add test for Subset plot + material selection</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Fri Jun  5 08:35:31 PDT 2020</font>
+<font color="#a02030">#    Added tests for point glyhphing/sizing for data that doesn&#x27;t declare</font>
+<font color="#a02030">#    itself a point mesh and for data with mixed topology.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;domains&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">5</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SubsetAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">wireframe</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">i</font> <font color="#4000C0">=</font> <font color="#000000">IsovolumeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">i</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;d&quot;</font>
+<font color="#000000">i</font><font color="#4000C0">.</font><font color="#000000">lbound</font> <font color="#4000C0">=</font> <font color="#0080C0">2.7</font>
+<font color="#000000">i</font><font color="#4000C0">.</font><font color="#000000">ubound</font> <font color="#4000C0">=</font> <font color="#0080C0">3.6</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Isovolume&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">wireframe</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">RemoveLastOperator</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">op</font> <font color="#4000C0">=</font> <font color="#000000">OnionPeelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">op</font><font color="#4000C0">.</font><font color="#000000">categoryName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;domains&quot;</font>
+<font color="#000000">op</font><font color="#4000C0">.</font><font color="#000000">subsetName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;domain3&quot;</font>
+<font color="#000000">op</font><font color="#4000C0">.</font><font color="#000000">index</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">100</font><font color="#4000C0">)</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">op</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;OnionPeel&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.7</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.3</font><font color="#4000C0">,</font> <font color="#0080C0">3.1</font><font color="#4000C0">,</font> <font color="#0080C0">3.25</font><font color="#4000C0">)</font>
+<font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># This is a different wireframe path than the other tests, because</font>
+<font color="#a02030"># we have special handling for single cell wireframes.</font>
+<font color="#a02030"># This corresponds to ticket &#x27;6105.</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">wireframe</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_test_data/2D/plt0822/Header&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;levels&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Isovolume&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;vort&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curl(vel)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">iso_atts</font> <font color="#4000C0">=</font> <font color="#000000">IsovolumeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">iso_atts</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;vort&quot;</font>
+<font color="#000000">iso_atts</font><font color="#4000C0">.</font><font color="#000000">lbound</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">10000000</font>
+<font color="#000000">iso_atts</font><font color="#4000C0">.</font><font color="#000000">ubound</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">iso_atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">RemoveLastOperator</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SILRestriction</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">mats</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">SetsInCategory</font><font color="#4000C0">(</font><font color="#008000">&quot;materials&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">mats</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">mats</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_08&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;patches&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_09&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_test_data/2D/plt0822/Header&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_amr_test_data/amr2d_wmrgtree.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;blocks(amr_mesh)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SubsetAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">wireframe</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_10&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_amr_test_data/amr2d_wmrgtree.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;point mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;blueprint_v0.3.1_test_data/braid_3d_examples_json.root&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;domains(points_mesh)&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SubsetAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">colorType</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">ColorBySingleColor</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">singleColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">170</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.605449</font><font color="#4000C0">,</font> <font color="#0080C0">0.469667</font><font color="#4000C0">,</font> <font color="#0080C0">0.642529</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.169201</font><font color="#4000C0">,</font> <font color="#0080C0">0.864818</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.472716</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_11&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">pointSizePixels</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_12&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">pointType</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">Tetrahedron</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">pointSize</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_13&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;blueprint_v0.3.1_test_data/braid_3d_examples_json.root&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/ugrid_mixed_cells.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SubsetAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">colorType</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">ColorBySingleColor</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">singleColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">170</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">pointType</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">pointSizePixels</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_14&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">pointSizePixels</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_15&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">pointType</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">Icosahedron</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">pointSize</font> <font color="#4000C0">=</font> <font color="#0080C0">0.5</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;subset_16&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/ugrid_mixed_cells.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

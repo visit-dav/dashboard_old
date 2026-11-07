@@ -1,0 +1,112 @@
+<html><body bgcolor="#e0e0e0"><head><title>queries/hohlraum.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  line_scan.py</font>
+<font color="#a02030">#  Tests:      queries     - mass distribution, chord length distribution</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  &#x27;7474 + &#x27;7476</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       August 23, 2006</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Sun Aug 27 16:52:07 PDT 2006</font>
+<font color="#a02030">#    Added testing for expected value, mass from boundary.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Dave Bremer, Fri Sep  8 11:44:22 PDT 2006</font>
+<font color="#a02030">#    Added testing for the line scan transform.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Thu Jul 14 10:44:55 PDT 2011</font>
+<font color="#a02030">#    Use named arguments.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Wed Feb 16 13:11:57 PST 2022</font>
+<font color="#a02030">#    Replaced Curve atts &#x27;cycleColors&#x27; with &#x27;curveColorSource&#x27;.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">import</font> <font color="#000000">os</font>
+
+
+<font color="#000000">ca</font><font color="#4000C0">=</font><font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ca</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">ca</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+<font color="#000000">SetDefaultPlotOptions</font><font color="#4000C0">(</font><font color="#000000">ca</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestOne</font><font color="#4000C0">(</font><font color="#000000">index</font><font color="#4000C0">,</font> <font color="#000000">filename</font><font color="#4000C0">,</font> <font color="#000000">varname</font><font color="#4000C0">,</font> <font color="#000000">meshname</font><font color="#4000C0">,</font> <font color="#000000">absvar</font><font color="#4000C0">,</font> <font color="#000000">emisvar</font><font color="#4000C0">,</font> <font color="#000000">numlines</font><font color="#4000C0">,</font> <font color="#000000">x</font><font color="#4000C0">,</font> <font color="#000000">y</font><font color="#4000C0">,</font> <font color="#000000">z</font><font color="#4000C0">,</font> <font color="#000000">radius</font><font color="#4000C0">,</font> <font color="#000000">theta</font><font color="#4000C0">,</font> <font color="#000000">phi</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Because the queries we are testing output to the file system, we need to</font>
+    <font color="#a02030"># delete previous outputs before running.  If we don&#x27;t do this, then the</font>
+    <font color="#a02030"># queries will output files to names that are continuously incrementing.</font>
+    <font color="#000000">list</font> <font color="#4000C0">=</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">listdir</font><font color="#4000C0">(</font><font color="#008000">&quot;.&quot;</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">list</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font> <font color="#4000C0">(</font><font color="#000000">list</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font> <font color="#4000C0">==</font> <font color="#008000">&quot;hf0.ult&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">unlink</font><font color="#4000C0">(</font><font color="#008000">&quot;hf0.ult&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do the queries...</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">filename</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">varname</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">params</font> <font color="#4000C0">=</font> <font color="#000000">dict</font><font color="#4000C0">(</font><font color="#000000">num_lines</font><font color="#4000C0">=</font><font color="#000000">numlines</font><font color="#4000C0">,</font> <font color="#000000">ray_center</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#000000">x</font><font color="#4000C0">,</font> <font color="#000000">y</font><font color="#4000C0">,</font> <font color="#000000">z</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">radius</font><font color="#4000C0">=</font><font color="#000000">radius</font><font color="#4000C0">,</font> <font color="#000000">theta</font><font color="#4000C0">=</font><font color="#000000">theta</font><font color="#4000C0">,</font> <font color="#000000">phi</font><font color="#4000C0">=</font><font color="#000000">phi</font><font color="#4000C0">,</font> <font color="#000000">vars</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#000000">absvar</font><font color="#4000C0">,</font> <font color="#000000">emisvar</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Hohlraum Flux&quot;</font><font color="#4000C0">,</font> <font color="#000000">params</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#a02030">#v = GetQueryOutputValue()</font>
+    <font color="#000000">test_name</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hf_%d_%d&quot;</font> <font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">index</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">test_name</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Now test the outputs</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;hf0.ult&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ReOpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;hf0.ult&quot;</font><font color="#4000C0">)</font>  <font color="#a02030"># Flush out cached version</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Hohlraum Flux&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">test1</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hf_%d_%d&quot;</font> <font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">index</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">test1</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">DefineArrayExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;a0&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;array_compose(recenter(u), recenter(v), d)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineArrayExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;e0&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;array_compose(recenter(gradient(u)[0]), recenter(gradient(u)[1]), p)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestOne</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;quadmesh2d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;a0&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;e0&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">100</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0.1</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;a0&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;e0&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DefineArrayExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;a1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;array_compose(&lt;mesh_quality/volume&gt;, &lt;mesh_quality/taper&gt;,  &lt;mesh_quality/oddy&gt;)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineArrayExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;e1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;array_compose(&lt;mesh_quality/aspect&gt;, &lt;mesh_quality/shape&gt;, &lt;mesh_quality/skew&gt;)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestOne</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;KullLite_test_data/T.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font>
+        <font color="#008000">&quot;mesh_quality/volume&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">,</font>
+        <font color="#008000">&quot;a1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;e1&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">100</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0.25</font><font color="#4000C0">,</font><font color="#0080C0">90</font><font color="#4000C0">,</font><font color="#0080C0">90</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;a1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;e1&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DefineArrayExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;a2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;array_compose(&lt;mesh_quality/mesh/jacobian&gt;, \
+                      &lt;mesh_quality/mesh/area&gt;, &lt;mesh_quality/mesh/oddy&gt;)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineArrayExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;e2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;array_compose(&lt;mesh_quality/mesh/aspect&gt;, \
+                      &lt;mesh_quality/mesh/shape&gt;, &lt;mesh_quality/mesh/skew&gt;)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestOne</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">,</font> <font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;KullLite_test_data/tagtest_rz_3.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font>
+        <font color="#008000">&quot;mesh_quality/mesh/area&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">,</font>
+        <font color="#008000">&quot;a2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;e2&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">333</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;a2&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;e2&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestOne</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">,</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;p&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">500</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">45</font><font color="#4000C0">,</font><font color="#0080C0">45</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">DefineArrayExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;a3&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;array_compose_with_bins(&lt;mesh_quality/mesh/jacobian&gt;,&quot;</font>
+                            <font color="#008000">&quot;&lt;mesh_quality/mesh/area&gt;, &lt;mesh_quality/mesh/oddy&gt;,  [0, 2, 4, 8])&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineArrayExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;e3&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;array_compose_with_bins(&lt;mesh_quality/mesh/aspect&gt;,&quot;</font>
+                            <font color="#008000">&quot;&lt;mesh_quality/mesh/shape&gt;, &lt;mesh_quality/mesh/skew&gt;, [0, 2, 4, 8])&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestOne</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">,</font> <font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;KullLite_test_data/tagtest_rz_3.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh_quality/mesh/area&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">,</font>
+        <font color="#008000">&quot;a3&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;e3&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">333</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;a3&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;e3&quot;</font><font color="#4000C0">)</font>
+
+
+
+
+
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>
