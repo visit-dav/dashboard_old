@@ -1,0 +1,217 @@
+<html><body bgcolor="#e0e0e0"><head><title>databases/PLOT3D.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#  LIMIT: 1500</font>
+<font color="#a02030">#  Test Case:  PLOT3D.py </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Kathleen Biagas</font>
+<font color="#a02030">#  Date:       Sep 5, 2014</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Kathleen Biagas, Wed Aug 26 09:21:15 PDT 2015</font>
+<font color="#a02030">#    Removed Magnitude scalars, no longer provided by reader since VisIt</font>
+<font color="#a02030">#    already automatically creates vector magnitude expressions.</font>
+<font color="#a02030">#    Added tests for time-series.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">BasicTest</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#000000">testNum</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># These are the scalars and vectors from the solution file</font>
+    <font color="#000000">scalars</font> <font color="#4000C0">=</font> <font color="#4000C0">[</font><font color="#008000">&quot;Density&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;InternalEnergy&quot;</font><font color="#4000C0">]</font>
+    <font color="#000000">vectors</font> <font color="#4000C0">=</font> <font color="#4000C0">[</font><font color="#008000">&quot;Momentum&quot;</font><font color="#4000C0">]</font>
+
+    <font color="#a02030"># These are all the reader-calculated scalars and vectors</font>
+    <font color="#000000">computedScalars</font> <font color="#4000C0">=</font> <font color="#4000C0">[</font><font color="#008000">&quot;Pressure&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Temperature&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Enthalpy&quot;</font><font color="#4000C0">,</font>
+                       <font color="#008000">&quot;StagnationEnergy&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Entropy&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Swirl&quot;</font> <font color="#4000C0">]</font>
+    <font color="#000000">computedVectors</font> <font color="#4000C0">=</font> <font color="#4000C0">[</font><font color="#008000">&quot;Velocity&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Vorticity&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;PressureGradient&quot;</font><font color="#4000C0">,</font>
+                        <font color="#008000">&quot;StrainRate&quot;</font><font color="#4000C0">]</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">scalars</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;%s_%s_%02d&quot;</font><font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font><font color="#000000">scalars</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font><font color="#4000C0">,</font><font color="#000000">testNum</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">s</font> <font color="#C00000">in</font> <font color="#000000">scalars</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">:</font><font color="#4000C0">]</font><font color="#4000C0">:</font>
+        <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+        <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;%s_%s_%02d&quot;</font><font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font><font color="#000000">s</font><font color="#4000C0">,</font><font color="#000000">testNum</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#C00000">if</font> <font color="#000000">testNum</font> <font color="#4000C0">==</font> <font color="#0080C0">2</font><font color="#4000C0">:</font>
+        <font color="#C00000">for</font> <font color="#000000">s</font> <font color="#C00000">in</font> <font color="#000000">computedScalars</font><font color="#4000C0">:</font>
+            <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+            <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+            <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;%s_%s_%02d&quot;</font><font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font><font color="#000000">s</font><font color="#4000C0">,</font><font color="#000000">testNum</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#000000">vectors</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#000000">vecAtts</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">vecAtts</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.5</font>
+    <font color="#000000">vecAtts</font><font color="#4000C0">.</font><font color="#000000">useStride</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vecAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;%s_%s_%02d&quot;</font><font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font><font color="#000000">vectors</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font><font color="#4000C0">,</font><font color="#000000">testNum</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#C00000">if</font> <font color="#000000">testNum</font> <font color="#4000C0">==</font> <font color="#0080C0">2</font><font color="#4000C0">:</font>
+        <font color="#C00000">for</font> <font color="#000000">v</font> <font color="#C00000">in</font> <font color="#000000">computedVectors</font><font color="#4000C0">:</font>
+            <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+            <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+            <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;%s_%s_%02d&quot;</font><font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font><font color="#000000">v</font><font color="#4000C0">,</font><font color="#000000">testNum</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;domains&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;%s_subsetDomains_%02d&quot;</font><font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font><font color="#000000">testNum</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Open using the MetaFile .vp3d</font>
+<font color="#C00000">def</font> <font color="#000000">TestMetaOpen</font><font color="#4000C0">(</font><font color="#000000">metaFile</font><font color="#4000C0">,</font> <font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#000000">testStart</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D_test_data/%s&quot;</font><font color="#4000C0">%</font><font color="#000000">metaFile</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">BasicTest</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">,</font> <font color="#000000">testStart</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D_test_data/%s&quot;</font><font color="#4000C0">%</font><font color="#000000">metaFile</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Open using the grid file and openOptions</font>
+<font color="#C00000">def</font> <font color="#000000">TestOpenOptions</font><font color="#4000C0">(</font><font color="#000000">gridFile</font><font color="#4000C0">,</font> <font color="#000000">testname</font><font color="#4000C0">,</font> <font color="#000000">options</font><font color="#4000C0">,</font> <font color="#000000">testStart</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#C00000">if</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">options</font><font color="#4000C0">)</font><font color="#4000C0">&gt;</font> <font color="#0080C0">0</font><font color="#4000C0">:</font>
+        <font color="#a02030"># Grab the default options</font>
+        <font color="#000000">opts</font> <font color="#4000C0">=</font> <font color="#000000">GetDefaultFileOpenOptions</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D&quot;</font><font color="#4000C0">)</font>
+        <font color="#a02030"># Set the passed options</font>
+        <font color="#C00000">for</font> <font color="#000000">k</font><font color="#4000C0">,</font><font color="#000000">v</font> <font color="#C00000">in</font> <font color="#000000">options</font><font color="#4000C0">.</font><font color="#000000">items</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#C00000">if</font> <font color="#000000">k</font> <font color="#C00000">in</font> <font color="#000000">list</font><font color="#4000C0">(</font><font color="#000000">opts</font><font color="#4000C0">.</font><font color="#000000">keys</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+                <font color="#000000">opts</font><font color="#4000C0">[</font><font color="#000000">k</font><font color="#4000C0">]</font> <font color="#4000C0">=</font> <font color="#000000">v</font>
+        <font color="#000000">SetDefaultFileOpenOptions</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D&quot;</font><font color="#4000C0">,</font> <font color="#000000">opts</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D_test_data/%s&quot;</font><font color="#4000C0">%</font><font color="#000000">gridFile</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#008000">&quot;PLOT3D_1.0&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">BasicTest</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">,</font> <font color="#000000">testStart</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D_test_data/%s&quot;</font><font color="#4000C0">%</font><font color="#000000">gridFile</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># names: [dir,  vp3dname, gridname, testname, openOptions]</font>
+<font color="#000000">names</font> <font color="#4000C0">=</font> <font color="#4000C0">[</font>
+    <font color="#4000C0">[</font><font color="#008000">&quot;BluntFin&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;blunt.vp3d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;blunt.x&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;bluntfin&quot;</font><font color="#4000C0">,</font> <font color="#4000C0">{</font><font color="#4000C0">}</font><font color="#4000C0">]</font><font color="#4000C0">,</font>
+    <font color="#4000C0">[</font><font color="#008000">&quot;DeltaWing&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;delta-40.vp3d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;delta-40.x&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;deltawing&quot;</font><font color="#4000C0">,</font> <font color="#4000C0">{</font><font color="#4000C0">}</font><font color="#4000C0">]</font><font color="#4000C0">,</font>
+    <font color="#4000C0">[</font><font color="#008000">&quot;LiquidOxygenPost&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;post.vp3d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;post.x&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;post&quot;</font><font color="#4000C0">,</font> <font color="#4000C0">{</font><font color="#4000C0">}</font><font color="#4000C0">]</font><font color="#4000C0">,</font>
+    <font color="#4000C0">[</font><font color="#008000">&quot;SpaceShuttleLaunchVehicle&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;sslv.vp3d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;grid&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;sslv&quot;</font><font color="#4000C0">,</font>
+        <font color="#4000C0">{</font><font color="#008000">&quot;Multi Grid&quot;</font><font color="#4000C0">:</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#008000">&quot;IBlanking&quot;</font><font color="#4000C0">:</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#008000">&quot;Use IBlanking If Present&quot;</font><font color="#4000C0">:</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#008000">&quot;Solution (Q) File Name&quot;</font><font color="#4000C0">:</font><font color="#008000">&quot;solution&quot;</font><font color="#4000C0">}</font><font color="#4000C0">]</font><font color="#4000C0">,</font>
+    <font color="#4000C0">[</font><font color="#008000">&quot;WingBodyTail&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;wbt.vp3d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;wbtg.bin&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;wbt&quot;</font><font color="#4000C0">,</font>
+        <font color="#4000C0">{</font><font color="#008000">&quot;Solution (Q) File Name&quot;</font><font color="#4000C0">:</font><font color="#008000">&quot;wbtr.bin&quot;</font><font color="#4000C0">,</font>
+        <font color="#008000">&quot;Multi Grid&quot;</font><font color="#4000C0">:</font><font color="#0080C0">1</font><font color="#4000C0">,</font>
+        <font color="#008000">&quot;IBlanking&quot;</font><font color="#4000C0">:</font><font color="#0080C0">1</font><font color="#4000C0">,</font>
+        <font color="#008000">&quot;Use IBlanking If Present&quot;</font><font color="#4000C0">:</font> <font color="#0080C0">0</font><font color="#4000C0">,</font>
+        <font color="#008000">&quot;File Format&quot;</font><font color="#4000C0">:</font><font color="#0080C0">1</font><font color="#4000C0">,</font>
+        <font color="#008000">&quot;Big Endian&quot;</font><font color="#4000C0">:</font><font color="#0080C0">1</font><font color="#4000C0">,</font>
+        <font color="#008000">&quot;Double Precision&quot;</font><font color="#4000C0">:</font><font color="#0080C0">0</font><font color="#4000C0">,</font>
+        <font color="#008000">&quot;3D&quot;</font><font color="#4000C0">:</font><font color="#0080C0">1</font><font color="#4000C0">}</font><font color="#4000C0">]</font><font color="#4000C0">,</font>
+<font color="#4000C0">]</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestTimeSeries</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Time Series with meta file&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetCreateMeshQualityExpressions</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetCreateTimeDerivativeExpressions</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetCreateVectorMagnitudeExpressions</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#a02030">#SetViewExtentsType(&quot;actual&quot;)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D_test_data/BluntFin/blunt_timeseries.vp3d&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D_test_data/BluntFin/blunt_timeseries.vp3d&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;plot3d_timeseries_1&quot;</font><font color="#4000C0">,</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;TD&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;time(mesh) * Density&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;TD&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Isovolume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">isoAtts</font> <font color="#4000C0">=</font> <font color="#000000">IsovolumeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">isoAtts</font><font color="#4000C0">.</font><font color="#000000">lbound</font> <font color="#4000C0">=</font> <font color="#0080C0">2000</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isoAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#v = GetView3D()</font>
+    <font color="#a02030">#v.viewNormal = (0, -1, 6.12323e-17)</font>
+    <font color="#a02030">#v.focus = (3.32801, -0.103006, 16.13)</font>
+    <font color="#a02030">#v.viewUp = (0, 6.12323e-17, 1)</font>
+    <font color="#a02030">#SetView3D(v)</font>
+
+    <font color="#a02030">#  step through time</font>
+    <font color="#C00000">for</font> <font color="#000000">t</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">)</font>
+        <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Time&quot;</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;plot3d_timeseries_1_%s&quot;</font> <font color="#4000C0">%</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D_test_data/BluntFin/blunt_timeseries.vp3d&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Time series via Read Options&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># specify sub-selection of time slices.</font>
+    <font color="#000000">opts</font> <font color="#4000C0">=</font> <font color="#4000C0">{</font><font color="#008000">&quot;Solution (Q) File Name&quot;</font> <font color="#4000C0">:</font> <font color="#008000">r&quot;TimeSeries/blunt_??3?.q&quot;</font><font color="#4000C0">,</font>
+            <font color="#008000">&quot;Solution Time field accurate&quot;</font><font color="#4000C0">:</font> <font color="#0080C0">0</font><font color="#4000C0">}</font>
+    <font color="#000000">SetDefaultFileOpenOptions</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D&quot;</font><font color="#4000C0">,</font> <font color="#000000">opts</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D_test_data/BluntFin/blunt.x&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#008000">&quot;PLOT3D_1.0&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D_test_data/BluntFin/blunt.x&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;plot3d_timeseries_2&quot;</font><font color="#4000C0">,</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;TD&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Isovolume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isoAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#SetView3D(v)</font>
+
+    <font color="#a02030">#  step through time</font>
+    <font color="#C00000">for</font> <font color="#000000">t</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">)</font>
+        <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Time&quot;</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;plot3d_timeseries_2_%s&quot;</font> <font color="#4000C0">%</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D_test_data/BluntFin/blunt.x&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">BasicTests</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Open using MetaFile .vp3d&quot;</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">f</font> <font color="#C00000">in</font> <font color="#000000">names</font><font color="#4000C0">:</font>
+        <font color="#a02030"># test opening meta file</font>
+        <font color="#000000">TestMetaOpen</font><font color="#4000C0">(</font><font color="#008000">&quot;%s/%s&quot;</font><font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">f</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font><font color="#4000C0">,</font><font color="#000000">f</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">f</font><font color="#4000C0">[</font><font color="#0080C0">3</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Open using gridfile and Open Options&quot;</font><font color="#4000C0">)</font>
+    <font color="#a02030"># save true defaults for resetting</font>
+    <font color="#000000">opts</font> <font color="#4000C0">=</font> <font color="#000000">GetDefaultFileOpenOptions</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D&quot;</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">f</font> <font color="#C00000">in</font> <font color="#000000">names</font><font color="#4000C0">:</font>
+        <font color="#a02030"># test opening grid file, possibly using OpenOptions</font>
+        <font color="#000000">TestOpenOptions</font><font color="#4000C0">(</font><font color="#008000">&quot;%s/%s&quot;</font><font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">f</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font><font color="#4000C0">,</font><font color="#000000">f</font><font color="#4000C0">[</font><font color="#0080C0">2</font><font color="#4000C0">]</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">f</font><font color="#4000C0">[</font><font color="#0080C0">3</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">f</font><font color="#4000C0">[</font><font color="#0080C0">4</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#a02030"># reset to true defaults</font>
+    <font color="#000000">SetDefaultFileOpenOptions</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D&quot;</font><font color="#4000C0">,</font> <font color="#000000">opts</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestIBlanking</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Custom tests with specific views:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D_test_data/WingNoBody/wnb.vp3d&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">View3DAtts</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.489596</font><font color="#4000C0">,</font> <font color="#0080C0">0.871773</font><font color="#4000C0">,</font> <font color="#0080C0">0.0175216</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.5</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">3.00142</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.0396695</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.00219579</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.99921</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">11.0231</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">22.0462</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">22.0462</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.0355573</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.00323714</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">66.2641</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.5</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">3.00142</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">axis3DScaleFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">axis3DScales</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">shear</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">View3DAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;wnb02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;PLOT3D_test_data/WingNoBody/wnb.vp3d&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">BasicTests</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestTimeSeries</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestIBlanking</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

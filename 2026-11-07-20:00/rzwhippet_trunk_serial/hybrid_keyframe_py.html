@@ -1,0 +1,544 @@
+<html><body bgcolor="#e0e0e0"><head><title>hybrid/keyframe.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  keyframe.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 3D structured, single domain</font>
+<font color="#a02030">#              plots     - pc, mesh</font>
+<font color="#a02030">#              operators - none</font>
+<font color="#a02030">#              selection - none</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  none</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Eric Brugger</font>
+<font color="#a02030">#  Date:       Thu Dec 19 16:02:41 PST 2002</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Brad Whitlock, Wed Apr 7 17:24:41 PST 2004</font>
+<font color="#a02030">#    I added TestSection to break up the test images a little. I also updated</font>
+<font color="#a02030">#    the code so it uses the new time slider functions instead of the</font>
+<font color="#a02030">#    deprecated animation functions.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to switch between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Wed Mar 22 16:23:12 PDT 2023</font>
+<font color="#a02030">#    Added operator keyframe tests.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#a02030"># Open a database.</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># Enable keyframe mode.</font>
+<font color="#000000">k</font> <font color="#4000C0">=</font> <font color="#000000">GetKeyframeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">k</font><font color="#4000C0">.</font><font color="#000000">enabled</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetKeyframeAttributes</font><font color="#4000C0">(</font><font color="#000000">k</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Set the number of frames to be 6.</font>
+<font color="#000000">AnimationSetNFrames</font><font color="#4000C0">(</font><font color="#0080C0">6</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create a pseudocolor plot that exists over the first</font>
+<font color="#a02030"># 6 frames of the animation.</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotFrameRange</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Set the attributes at the first and last frame.</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">min</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">max</font> <font color="#4000C0">=</font> <font color="#0080C0">0.2</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">minFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">maxFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">max</font> <font color="#4000C0">=</font> <font color="#0080C0">0.5</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create a mesh plot that exists over frames 2</font>
+<font color="#a02030"># through 4.</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;quadmesh&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetPlotFrameRange</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotDatabaseState</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">,</font> <font color="#0080C0">28</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotDatabaseState</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">,</font> <font color="#0080C0">56</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Cycle through all the frames, checking that all</font>
+<font color="#a02030"># the images are correct.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Simple 6 frame animation&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_01&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_02&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_03&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_04&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_05&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Change to frame 4, change the frame range and</font>
+<font color="#a02030"># check that all the frames are ok.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Setting plot frame range&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotFrameRange</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotDatabaseState</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotDatabaseState</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">,</font> <font color="#0080C0">28</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_07&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_08&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_09&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_10&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_11&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_12&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Set the pseudocolor attributes for frame 2 and</font>
+<font color="#a02030"># check that all the frames are ok.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Setting a plot attributes keyframe&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">max</font> <font color="#4000C0">=</font> <font color="#0080C0">0.7</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_13&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_14&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_15&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_16&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_17&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_18&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Delete the keyframe at frame 2 and check that</font>
+<font color="#a02030"># all the frames are ok.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Removing a plot attributes keyframe&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">DeletePlotKeyframe</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_19&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_20&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_21&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_22&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_23&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_24&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Delete the keyframe at frame 5 and check that</font>
+<font color="#a02030"># all the frames are ok.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Deleting another plot attributes keyframe&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeletePlotKeyframe</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_25&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_26&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_27&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_28&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_29&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_30&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Change the number of frames to 4.  Create a</font>
+<font color="#a02030"># pseudocolor plot that changes its range but</font>
+<font color="#a02030"># keeps the database state constant at 0.  Check</font>
+<font color="#a02030"># that all the frames are ok.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Decreasing number of animation frames&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AnimationSetNFrames</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotFrameRange</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">max</font> <font color="#4000C0">=</font> <font color="#0080C0">0.2</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">max</font> <font color="#4000C0">=</font> <font color="#0080C0">0.5</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+<font color="#000000">DeletePlotDatabaseKeyframe</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_31&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_32&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_33&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_34&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test copying plots to a new window.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Copying keyframed plot to a new window&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">AddWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">CopyPlotsToWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">CopyAnnotationsToWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">CopyViewToWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_35&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_36&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_37&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_38&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Take the window out of keyframe mode and</font>
+<font color="#a02030"># check that setting the plot attributes sets</font>
+<font color="#a02030"># them for all the frames.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Turning off keyframe mode&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">k</font><font color="#4000C0">.</font><font color="#000000">enabled</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetKeyframeAttributes</font><font color="#4000C0">(</font><font color="#000000">k</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetPlotDatabaseState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">minFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">maxFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_39&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_40&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_41&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_42&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Clear the window, reset the view and enable</font>
+<font color="#a02030"># keyframe mode in preparation to test view</font>
+<font color="#a02030"># keyframing.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing view keyframing&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">k</font><font color="#4000C0">.</font><font color="#000000">enabled</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetKeyframeAttributes</font><font color="#4000C0">(</font><font color="#000000">k</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Open a database.</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># Set the number of frames to be 9.</font>
+<font color="#000000">AnimationSetNFrames</font><font color="#4000C0">(</font><font color="#0080C0">9</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create a pseudocolor plot that exists over the first</font>
+<font color="#a02030"># 9 frames of the animation.</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotFrameRange</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">8</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create 5 view keyframes.</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewNormal</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetFocus</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewUp</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewAngle</font><font color="#4000C0">(</font><font color="#0080C0">30</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetParallelScale</font><font color="#4000C0">(</font><font color="#0080C0">17.3205</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetNearPlane</font><font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">34.641</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetFarPlane</font><font color="#4000C0">(</font><font color="#0080C0">34.641</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetPerspective</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewKeyframe</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewNormal</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewKeyframe</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewNormal</font><font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewKeyframe</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">6</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewNormal</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewKeyframe</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">8</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewNormal</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewKeyframe</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Render the first frame.</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Enter camera view mode and cycle through all the</font>
+<font color="#a02030"># frames, checking that all the images are correct.</font>
+<font color="#000000">ToggleCameraViewMode</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_43&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_44&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_45&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_46&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_47&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_48&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_49&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_50&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_51&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Delete the view keyframe at frame 8 and check the image.</font>
+<font color="#000000">DeleteViewKeyframe</font><font color="#4000C0">(</font><font color="#0080C0">8</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_52&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Clear all the view keyframes and check the first image.</font>
+<font color="#000000">ClearViewKeyframes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_53&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Clear the window and reset the view in preparation</font>
+<font color="#a02030"># to test moving keyframes.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Moving keyframes&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Open a database.</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># Set the number of frames to be 6.</font>
+<font color="#000000">AnimationSetNFrames</font><font color="#4000C0">(</font><font color="#0080C0">6</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create a pseudocolor plot that exists over the first</font>
+<font color="#a02030"># 6 frames of the animation.</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotFrameRange</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Set 3 keyframes.</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">min</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">max</font> <font color="#4000C0">=</font> <font color="#0080C0">0.2</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">minFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">maxFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">max</font> <font color="#4000C0">=</font> <font color="#0080C0">0.7</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">max</font> <font color="#4000C0">=</font> <font color="#0080C0">0.5</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Render all the images.</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Move the keyframe at frame 3 to 4, regenerate all</font>
+<font color="#a02030"># the frames and check a few of them.</font>
+<font color="#000000">MovePlotKeyframe</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_54&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_55&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_56&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Delete the last 2 keyframes, move the database</font>
+<font color="#a02030"># keyframe from frame 5 to 3, regenerate all</font>
+<font color="#a02030"># the frames and check a few of them.</font>
+<font color="#000000">DeletePlotKeyframe</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">DeletePlotKeyframe</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">)</font>
+
+<font color="#000000">MovePlotDatabaseKeyframe</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_57&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_58&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_59&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Delete the second database keyframe, create</font>
+<font color="#a02030"># 3 view keyframes and regenerate all the images.</font>
+<font color="#000000">DeletePlotDatabaseKeyframe</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewNormal</font><font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetFocus</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">,</font> <font color="#0080C0">0.35</font><font color="#4000C0">,</font> <font color="#0080C0">2.5</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewUp</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewAngle</font><font color="#4000C0">(</font><font color="#0080C0">30</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetParallelScale</font><font color="#4000C0">(</font><font color="#0080C0">5.6009</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetNearPlane</font><font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">11.2018</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetFarPlane</font><font color="#4000C0">(</font><font color="#0080C0">11.2018</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetPerspective</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewKeyframe</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewNormal</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewKeyframe</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewNormal</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">SetViewKeyframe</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">ToggleCameraViewMode</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Move the view keyframe at frame 2 to frame 3,</font>
+<font color="#a02030"># regenerate all the frames and check a few of them.</font>
+<font color="#000000">MoveViewKeyframe</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_60&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_61&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_62&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Clear the window and reset the view in preparation</font>
+<font color="#a02030"># to test operator keyframes.</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Operator keyframes&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Open a database.</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Set the number of frames to be 11.</font>
+<font color="#000000">AnimationSetNFrames</font><font color="#4000C0">(</font><font color="#0080C0">11</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create a pseudocolor plot that exists over the first</font>
+<font color="#a02030"># 11 frames of the animation.</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;hardyglobal&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Isosurface&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotFrameRange</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Set 3 slice keyframes.</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">slice</font> <font color="#4000C0">=</font> <font color="#000000">SliceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">slice</font><font color="#4000C0">.</font><font color="#000000">originType</font> <font color="#4000C0">=</font> <font color="#000000">slice</font><font color="#4000C0">.</font><font color="#000000">Percent</font>
+<font color="#000000">slice</font><font color="#4000C0">.</font><font color="#000000">originPercent</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">slice</font><font color="#4000C0">.</font><font color="#000000">project2d</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">slice</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">slice</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">10</font><font color="#4000C0">)</font>
+<font color="#000000">slice</font><font color="#4000C0">.</font><font color="#000000">originPercent</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">slice</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Set 2 isosurface keyframes.</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">iso</font> <font color="#4000C0">=</font> <font color="#000000">IsosurfaceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">iso</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">iso</font><font color="#4000C0">.</font><font color="#000000">contourNLevels</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">iso</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.225979</font><font color="#4000C0">,</font> <font color="#0080C0">0.625179</font><font color="#4000C0">,</font> <font color="#0080C0">0.747051</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.965293</font><font color="#4000C0">,</font> <font color="#0080C0">0.246786</font><font color="#4000C0">,</font> <font color="#0080C0">0.0854703</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Check a bunch of frames.</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_63&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_64&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_65&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">7</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_66&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">10</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_67&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Delete the slice keyframe and move the isosurface keyframe.</font>
+<font color="#000000">DeleteOperatorKeyframe</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">MoveOperatorKeyframe</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Check a bunch of frames.</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_68&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_69&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_70&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">7</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_71&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">10</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;keyframe_72&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

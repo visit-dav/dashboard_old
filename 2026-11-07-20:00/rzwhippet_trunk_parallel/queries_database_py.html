@@ -1,0 +1,1083 @@
+<html><body bgcolor="#e0e0e0"><head><title>queries/database.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ---------------------------------------------------------------------------- </font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  database.py #</font>
+<font color="#a02030">#  Tests:      queries     - Database</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  &#x27;6356</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Kathleen Bonnell </font>
+<font color="#a02030">#  Date:       July 11, 2003 </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Kathleen Bonnell, Thu Aug 28 14:34:57 PDT 2003</font>
+<font color="#a02030">#    Remove compound var name from FilledBoundary plots.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Wed Oct 29 16:06:23 PST 2003 </font>
+<font color="#a02030">#    Add PlotMinMax query. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Wed Dec  3 11:05:51 PST 2003 </font>
+<font color="#a02030">#    Add SpatialExtents query. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Wed Dec  3 13:20:04 PST 2003 </font>
+<font color="#a02030">#    Test SpatialExtents query with &#x27;actual&#x27; and &#x27;original&#x27; as args. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Mon Dec 22 16:46:27 PST 2003 </font>
+<font color="#a02030">#    Added test for SAMRAI data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Fri Feb  6 10:56:25 PST 2004 </font>
+<font color="#a02030">#    Test MinMax query with &#x27;actual&#x27; and &#x27;original&#x27; as args. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Fri Feb 20 17:05:04 PST 2004 </font>
+<font color="#a02030">#    Added NumNodes and NumZones tests.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Fri Mar  5 15:41:54 PST 2004 </font>
+<font color="#a02030">#    Added QueryCurves tests, testing &quot;Area Between Curves&quot; queries. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Jeremy Meredith, Mon Apr  5 14:19:47 PDT 2004</font>
+<font color="#a02030">#    The Curv2D query was not getting boundary data.  I added code to remove</font>
+<font color="#a02030">#    a couple materials so that it reflected the actual usage of this query.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Tue Apr 13 12:58:04 PDT 2004</font>
+<font color="#a02030">#    Rename surface area query.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Tue Apr 20 09:42:30 PDT 2004 </font>
+<font color="#a02030">#    Added QueryMultiWindow. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Wed May 19 16:31:04 PDT 2004</font>
+<font color="#a02030">#    Moved QueryMultiWindow to its own .py file. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Thu Aug 12 13:32:35 PDT 2004 </font>
+<font color="#a02030">#    Added QueryHistogram. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Wed Dec 29 07:57:35 PST 2004 </font>
+<font color="#a02030">#    Added QueryGlobalId. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Wed Feb 16 07:34:07 PST 2005</font>
+<font color="#a02030">#    Rename variables that have unsupported characters.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Fri Jul  1 08:53:41 PDT 2005</font>
+<font color="#a02030">#    Test getting a vector from the spatial extents query. [&#x27;6356]</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Wed Aug 10 15:07:50 PDT 2005 </font>
+<font color="#a02030">#    Test Weighted Variable Sum Query with a postive-values variable and</font>
+<font color="#a02030">#    a negative-values variable.  (&#x27;6453).</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Jeremy Meredith, Wed Sep  7 12:06:04 PDT 2005</font>
+<font color="#a02030">#    Allowed spaces in variable names.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Wed Feb  8 11:08:01 PST 2006 </font>
+<font color="#a02030">#    Added QueryZR_RZ. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Thu Mar 25 09:57:34 PDT 2010</font>
+<font color="#a02030">#    Added call(s) to DrawPlots() b/c of changes to the default plot state </font>
+<font color="#a02030">#    behavior when an operator is added.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Mon Aug 16 15:51:46 PDT 2010</font>
+<font color="#a02030">#    Added test for var &amp; wvar sum of an array variable.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Thu Jul 14 10:44:55 PDT 2011</font>
+<font color="#a02030">#    Use named arguments. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Thu Sep 11 11:40:25 PDT 2014</font>
+<font color="#a02030">#    Add QueryArbPoly.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#000000">RequiredDatabasePlugin</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#008000">&quot;SAMRAI&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Silo&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;VTK&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QueryRect2d</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do some database queries.</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Compactness&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Eulerian&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;2D area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">transform</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">transform</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">transform</font><font color="#4000C0">.</font><font color="#000000">scaleX</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">transform</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DefineArrayExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;array_var&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;array_compose(d,p,d,p)&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;array_var&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">+=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">+=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryRect2d&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">QueryMultiUcd3d</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do some database queries.</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Eulerian&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">estr</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Exts from vector are [%f-%f, %f-%f, %f-%f]\n&quot;</font> <font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">v</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">v</font><font color="#4000C0">[</font><font color="#0080C0">2</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">v</font><font color="#4000C0">[</font><font color="#0080C0">3</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">v</font><font color="#4000C0">[</font><font color="#0080C0">4</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">v</font><font color="#4000C0">[</font><font color="#0080C0">5</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">estr</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">silr</font><font color="#4000C0">=</font> <font color="#000000">SILRestriction</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOffAll</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOnSet</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOnSet</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+    <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOnSet</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+    <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOnSet</font><font color="#4000C0">(</font><font color="#0080C0">10</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nAFTER APPLYING SIL RESTRICTION:\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;original&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;actual&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;original&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;actual&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;original&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;actual&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryMultiUcd3d&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QueryContours</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;hardyglobal&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">ContourAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">contourNLevels</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;For 10 contours of noise.silo (hardyglobal)\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\nMinMax Actual:&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nMinMax Original:&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">contourNLevels</font> <font color="#4000C0">=</font> <font color="#0080C0">4</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font>  <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nFor 4 contours of noise.silo (hardyglobal)\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\nMinMax Actual:&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nMinMax Original:&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">contourNLevels</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font>  <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nFor 10 contours of rect3d.silo (d)\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">contourNLevels</font> <font color="#4000C0">=</font> <font color="#0080C0">4</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font>  <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nFor 4 contours of rect3d.silo (d)\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryContours&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">QueryCurv2d</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Testing database queries on curv2d.</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do some database queries.</font>
+    <font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#008000">&quot;2&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#008000">&quot;3&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Compactness&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TurnMaterialsOn</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Eulerian&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;2D area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;vel&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nMinMax Actual:&quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nMinMax Original:&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryCurv2d&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QueryCurv3d</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do some database queries.</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Eulerian&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryCurv3d&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QueryGlobe</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do some database queries.</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Eulerian&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Clip&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">clip</font> <font color="#4000C0">=</font> <font color="#000000">ClipAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">clip</font><font color="#4000C0">.</font><font color="#000000">plane1Origin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.3</font><font color="#4000C0">,</font> <font color="#0080C0">0.4</font><font color="#4000C0">)</font>
+    <font color="#000000">clip</font><font color="#4000C0">.</font><font color="#000000">plane1Normal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">clip</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nAFTER CLIPPING:\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;actual&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;vel&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nMinMax Actual:&quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nMinMax Original:&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;disp&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;MinMAx Actual:&quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;t&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;neg_t&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;-t&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;neg_t&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryGlobe&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QueryNoise</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;hardyglobal&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do some database queries.</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;For noise.silo(haryglobal)\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Eulerian&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;hgslice&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Do some database queries.</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nFor noise.silo(hgslice)\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Compactness&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Eulerian&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;airVfGradient&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nMinMax Actual:&quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nMinMax Original:&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;grad&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;MinMax Actual:&quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nMinMax Original:&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryNoise&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QuerySid97</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;sid97.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do some database queries.</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QuerySid97&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QueryBigSil</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;bigsil.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;dist&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do some database queries.</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Eulerian&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">+</font><font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryBigSil&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QueryMinMaxCurve</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/curve.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;parabolic&quot;</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">frames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">27</font><font color="#4000C0">,</font> <font color="#0080C0">56</font><font color="#4000C0">,</font> <font color="#0080C0">73</font><font color="#4000C0">,</font> <font color="#0080C0">91</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#C00000">for</font> <font color="#000000">frame</font> <font color="#C00000">in</font> <font color="#000000">frames</font><font color="#4000C0">:</font>
+        <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#000000">frame</font><font color="#4000C0">)</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;For entire curve at frame %d:&quot;</font> <font color="#4000C0">%</font><font color="#000000">frame</font>
+        <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Clip&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">clip</font> <font color="#4000C0">=</font> <font color="#000000">ClipAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">clip</font><font color="#4000C0">.</font><font color="#000000">planeInverse</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">clip</font><font color="#4000C0">.</font><font color="#000000">plane1Origin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">clip</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">frame</font> <font color="#C00000">in</font> <font color="#000000">frames</font><font color="#4000C0">:</font>
+        <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#000000">frame</font><font color="#4000C0">)</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;For clipped curve at frame %d:&quot;</font> <font color="#4000C0">%</font><font color="#000000">frame</font>
+        <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryMinMaxCurve&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QuerySAMRAI</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;samrai_test_data/sil_changes/dumps.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Primitive Var _number_0&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do some database queries.</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Eulerian&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;3D surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;SpatialExtents&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QuerySAMRAI&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QueryCurves</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># in responses to VisIt00004449, Area between 2 curves query crashes</font>
+    <font color="#a02030"># viewer if curves not from same database.</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># do some lineouts so we can test curves from same database.</font>
+    <font color="#000000">Lineout</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0.4</font><font color="#4000C0">,</font> <font color="#0080C0">1.04</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">0.4</font><font color="#4000C0">,</font> <font color="#0080C0">0.1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">Lineout</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0.02</font><font color="#4000C0">,</font> <font color="#0080C0">0.49</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">0.77</font><font color="#4000C0">,</font> <font color="#0080C0">0.49</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Area Between Curves&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;L2Norm Between Curves&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#a02030"># now add a curve from a different database, and test against </font>
+    <font color="#a02030"># previous curves.</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/c000.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;going_up&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Area Between Curves&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;L2Norm Between Curves&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Area Between Curves&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;L2Norm Between Curves&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryCurves&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QueryHistogram</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Histogram&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Integrate&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Histogram(d):  &quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Integrate&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;Histogram(p):  &quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Integrate&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;Histogram(u):  &quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;v&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Integrate&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;Histogram(v):  &quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryHistogram&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QueryGlobalId</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;global_node.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;dist&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Global Zone Center&quot;</font><font color="#4000C0">,</font> <font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">15</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Zone Center&quot;</font><font color="#4000C0">,</font> <font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">domain</font><font color="#4000C0">=</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Global Node Coords&quot;</font><font color="#4000C0">,</font> <font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">16</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Node Coords&quot;</font><font color="#4000C0">,</font> <font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#000000">domain</font><font color="#4000C0">=</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryGlobalId&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QueryZR_RZ</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;RZ UGRID:\n    &quot;</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/ugrid_RZ.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;ZR UGRID:\n    &quot;</font>
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/ugrid_ZR.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;XY UGRID:\n    &quot;</font>
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/ugrid_XY.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">translate</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">translate</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">translate</font><font color="#4000C0">.</font><font color="#000000">translateX</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">translate</font><font color="#4000C0">.</font><font color="#000000">translateY</font> <font color="#4000C0">=</font> <font color="#0080C0">17</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">translate</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;XY UGRID TRANSLATED:\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/ugrid_ZR.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;ZR UGRID TRANSLATED:\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/ugrid_RZ.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;RZ UGRID TRANSLATED:\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;RZ RGRID:\n    &quot;</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/rect_RZ.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;ZR RGRID:\n    &quot;</font>
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/rect_ZR.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;XY RGRID:\n    &quot;</font>
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/rect_XY.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">translate</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">translate</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">translate</font><font color="#4000C0">.</font><font color="#000000">translateX</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">translate</font><font color="#4000C0">.</font><font color="#000000">translateY</font> <font color="#4000C0">=</font> <font color="#0080C0">17</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">translate</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;XY RGRID TRANSLATED:\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/rect_ZR.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;ZR RGRID TRANSLATED:\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/rect_RZ.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;RZ RGRID TRANSLATED:\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;RZ POLY:\n    &quot;</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/poly_RZ.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;ZR POLY:\n    &quot;</font>
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/poly_ZR.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;XY POLY:\n    &quot;</font>
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/poly_XY.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">translate</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">translate</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">translate</font><font color="#4000C0">.</font><font color="#000000">translateX</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">translate</font><font color="#4000C0">.</font><font color="#000000">translateY</font> <font color="#4000C0">=</font> <font color="#0080C0">17</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">translate</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;XY POLY TRANSLATED:\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/poly_ZR.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;ZR POLY TRANSLATED:\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/poly_RZ.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;RZ POLY TRANSLATED:\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Weighted Variable Sum&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved volume&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n    &quot;</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Revolved surface area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryZR_RZ&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_cylindrical_test_data/poly_RZ.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">QueryArbPoly</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">SetQueryOutputToString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;arbpoly-zoohybrid.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/mesh1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;arbpoly-zoohybrid:\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;arbpoly-zoohybrid.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;poly3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;ucdmesh3d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\npoly3d:\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;poly3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;overlink_test_data/ev_0_0_100/OvlTop.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;MMESH&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nOvlTop:&quot;</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;overlink_test_data/ev_0_0_100/OvlTop.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;arbpoly.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;clipped_hex&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\narbpoly:&quot;</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">use_actual_data</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;arbpoly.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;QueryArbPoly&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">QueryMain</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">QueryBigSil</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryContours</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryCurv2d</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryCurv3d</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryGlobe</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryMultiUcd3d</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryNoise</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryRect2d</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QuerySid97</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryMinMaxCurve</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QuerySAMRAI</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryCurves</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryHistogram</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryGlobalId</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryZR_RZ</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryArbPoly</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Call the main function</font>
+<font color="#000000">TurnOnAllAnnotations</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">QueryMain</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

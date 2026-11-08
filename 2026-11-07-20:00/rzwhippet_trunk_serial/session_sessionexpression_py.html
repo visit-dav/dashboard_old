@@ -1,0 +1,27 @@
+<html><body bgcolor="#e0e0e0"><head><title>session/sessionexpression.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  sessionexpression.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 3D unstructured, single domain</font>
+<font color="#a02030">#              plots     - Pseudocolor</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Notes:      This test case creates a plot of a user-defined expression</font>
+<font color="#a02030">#              using a session file to ensure that session files containing</font>
+<font color="#a02030">#              plots of user-defined expressions work. This test case tests</font>
+<font color="#a02030">#              for a bug reported in VisIt00006070.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Tue Apr 5 14:26:56 PST 2005</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#000000">TurnOnAllAnnotations</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">RestoreSessionWithDifferentSources</font><font color="#4000C0">(</font><font color="#000000">tests_path</font><font color="#4000C0">(</font><font color="#008000">&quot;session&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;sessionexpression.session&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font>
+                                   <font color="#4000C0">(</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font>
+                                     <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;sessionexpression00&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

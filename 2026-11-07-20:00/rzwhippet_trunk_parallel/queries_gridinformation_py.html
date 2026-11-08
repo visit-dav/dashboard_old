@@ -1,0 +1,43 @@
+<html><body bgcolor="#e0e0e0"><head><title>queries/gridinformation.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ---------------------------------------------------------------------------- </font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  database.py #</font>
+<font color="#a02030">#  Tests:      Grid Information</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Wed Jan  3 16:38:02 PST 2018</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ---------------------------------------------------------------------------- </font>
+
+<font color="#000000">newline</font> <font color="#4000C0">=</font> <font color="#008000">&quot;=================================================\n&quot;</font>
+
+<font color="#000000">tests</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font>
+    <font color="#4000C0">(</font><font color="#008000">&quot;gridinformation_00&quot;</font><font color="#4000C0">,</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;radial&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font>
+    <font color="#4000C0">(</font><font color="#008000">&quot;gridinformation_01&quot;</font><font color="#4000C0">,</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;speed&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font>
+    <font color="#4000C0">(</font><font color="#008000">&quot;gridinformation_02&quot;</font><font color="#4000C0">,</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font>
+    <font color="#4000C0">(</font><font color="#008000">&quot;gridinformation_03&quot;</font><font color="#4000C0">,</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_curv3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font>
+    <font color="#4000C0">(</font><font color="#008000">&quot;gridinformation_04&quot;</font><font color="#4000C0">,</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">for</font> <font color="#000000">t</font> <font color="#C00000">in</font> <font color="#000000">tests</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">[</font><font color="#0080C0">2</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">[</font><font color="#0080C0">3</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Grid Information&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">newline</font>
+
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Grid Information&quot;</font><font color="#4000C0">,</font> <font color="#000000">get_extents</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">newline</font>
+
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Grid Information&quot;</font><font color="#4000C0">,</font> <font color="#000000">get_extents</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#000000">get_ghosttypes</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

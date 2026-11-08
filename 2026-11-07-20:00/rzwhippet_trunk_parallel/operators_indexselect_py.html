@@ -1,0 +1,765 @@
+<html><body bgcolor="#e0e0e0"><head><title>operators/indexselect.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  indexselect.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 3D curvilinear, single domain,</font>
+<font color="#a02030">#                          3D rectilinear, single domain.</font>
+<font color="#a02030">#                          2D rectilinear, single domain.</font>
+<font color="#a02030">#                          3D rectilinear, single domain.</font>
+<font color="#a02030">#              plots     - pc, mesh, subset, vector, surface</font>
+<font color="#a02030">#              operators - index select (with threshold and sphere slice)</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  none</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       October 2, 2002</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Kathleen Bonnell, Thu Aug 28 14:34:57 PDT 2003</font>
+<font color="#a02030">#    Remove compound var name from subset plots.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Wed Sep  3 09:31:25 PDT 2003</font>
+<font color="#a02030">#    Opaque mode for MeshPlot is ON by default now, so turn it off</font>
+<font color="#a02030">#    for this test.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Thu Sep  4 11:10:11 PDT 2003</font>
+<font color="#a02030">#    Change the way MeshPlot&#x27;s opaque mode is set (now an enum, not a bool).</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Wed Sep  8 11:29:10 PDT 2004 </font>
+<font color="#a02030">#    Add two new tests, testing &#x27;modulo&#x27; problems. (&#x27;3308).</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Wed Jul 20 13:32:44 PDT 2005 </font>
+<font color="#a02030">#    Add two new tests, testing &#x27;group&#x27; problems. (&#x27;6386).</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Wed Aug 10 10:13:56 PDT 2005 </font>
+<font color="#a02030">#    Add tests 27-30 which tests extracting faces along maximum and minimum</font>
+<font color="#a02030">#    boundaries of 3d data. (&#x27;6106).</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Fri Aug 19 15:45:46 PDT 2005 </font>
+<font color="#a02030">#    Add tests 31-32 which tests domain boundaries w/i a group that coincide</font>
+<font color="#a02030">#    with external boundaries of the index-selection. (&#x27;6428)  </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Mon Jan 30 16:40:30 PST 2006 </font>
+<font color="#a02030">#    Add tests 33-38 which tests point meshes.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Thu Jun  7 14:43:32 PDT 2007 </font>
+<font color="#a02030">#    IndexSelect atts have changed, make corrections. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Thu Mar 25 09:57:34 PDT 2010</font>
+<font color="#a02030">#    Added call(s) to DrawPlots() b/c of changes to the default plot state</font>
+<font color="#a02030">#    behavior when an operator is added.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Wed Jan 11 13:57:00 PST 2012</font>
+<font color="#a02030">#    Added test for Index Select of point meshes with Box operator applied.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Mon Dec 19 15:45:38 PST 2016</font>
+<font color="#a02030">#    Use FilledBoundary plot for materials instead of Subset.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eddie Rusu, Tue Apr 13 12:08:59 PDT 2021</font>
+<font color="#a02030">#    Changed Pseudocolor CurrentPlot to ActualData.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#C00000">import</font> <font color="#000000">os</font>
+
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">atts</font> <font color="#4000C0">=</font> <font color="#000000">IndexSelectAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#a02030"># Dim is an enumerated type.  0 -&gt; 1D, 1 -&gt; 2D, 2 -&gt; 3D.</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">23</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#0080C0">20</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMin</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+
+<font color="#a02030"># 3D, rectilinear, zonal var.</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.7172</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect01&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 3D, rectilinear, nodal var.</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect02&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 3D, rectilinear, mesh.</font>
+<font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">opaqueMode</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">Off</font>
+<font color="#000000">SetDefaultPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;quadmesh3d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect03&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 3D, rectilinear, subset.</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect04&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 3D, rectilinear, after a threshold</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">a2</font> <font color="#4000C0">=</font> <font color="#000000">ThresholdAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">a2</font><font color="#4000C0">.</font><font color="#000000">listedVarNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">a2</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.25</font><font color="#4000C0">)</font>
+<font color="#000000">a2</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.0</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">a2</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMin</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMax</font> <font color="#4000C0">=</font> <font color="#0080C0">20</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect05&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># 3D, curvilinear, mesh plot</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curvmesh3d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.7172</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect06&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 3D, curvilinear, PC plot</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect07&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 3D, curvilinear, with sphere slice</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;SphereSlice&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">a3</font> <font color="#4000C0">=</font> <font color="#000000">SphereSliceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">a3</font><font color="#4000C0">.</font><font color="#000000">origin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">2.5</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">13</font><font color="#4000C0">)</font>
+<font color="#000000">a3</font><font color="#4000C0">.</font><font color="#000000">radius</font> <font color="#4000C0">=</font> <font color="#0080C0">7</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">a3</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMin</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMax</font> <font color="#4000C0">=</font> <font color="#0080C0">18</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect08&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># 2D, rectilinear, mesh plot</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;quadmesh2d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#a02030"># Dim is an enumerated type.  0 -&gt; 1D, 1 -&gt; 2D, 2 -&gt; 3D.</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">25</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect09&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 2D, rectilinear, PC plot</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect10&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># 2D, curvilinear, mesh plot</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curvmesh2d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#0080C0">25</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect11&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 2D, curv, PC plot</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect12&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 2D, curv, with threshold.</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">a2</font><font color="#4000C0">.</font><font color="#000000">listedVarNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">a2</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.34</font><font color="#4000C0">)</font>
+<font color="#000000">a2</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">a2</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect13&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 2D, curv of vector</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;vel&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect14&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 2D surface of curvilinear</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Elevate&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect15&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 3D multi-rect </font>
+<font color="#a02030"># test &#x27;modulo&#x27; problems, bug: VisIt00003308</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">1000</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#0080C0">1000</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMax</font> <font color="#4000C0">=</font> <font color="#0080C0">1000</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect16&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">8</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#0080C0">8</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMin</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMax</font> <font color="#4000C0">=</font> <font color="#0080C0">8</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect17&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># bigsil </font>
+<font color="#a02030"># test &#x27;domainIndex&#x27; problems, bug: VisIt00005559</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;bigsil.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;domains&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">ThreeD</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">1000</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#0080C0">1000</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMax</font> <font color="#4000C0">=</font> <font color="#0080C0">1000</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">useWholeCollection</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">categoryName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;domains&quot;</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">subsetName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;domain2&quot;</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.653901</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.39603</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.64465</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.251385</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.917378</font><font color="#4000C0">,</font> <font color="#0080C0">0.308584</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.866025</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1.73205</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">1.73205</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect18&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># smallest domainIndex should be 1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">subsetName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;domain1&quot;</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect19&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">subsetName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;domain27&quot;</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect20&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#test whichData = OneGroup</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;blocks&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SubsetAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">wireframe</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;dist&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">ThreeD</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">categoryName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;blocks&quot;</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">subsetName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;block0&quot;</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.866025</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1.73205</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font>  <font color="#4000C0">=</font> <font color="#0080C0">1.73205</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">5.39496</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.23029</font><font color="#4000C0">,</font> <font color="#0080C0">0.259159</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect21&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">categoryName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;domains&quot;</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">subsetName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;domain1&quot;</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect22&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">categoryName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;blocks&quot;</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">subsetName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;block2&quot;</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#0080C0">19</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMin</font> <font color="#4000C0">=</font> <font color="#0080C0">7</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMax</font> <font color="#4000C0">=</font> <font color="#0080C0">8</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect23&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#008000">&quot;1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;5&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;8&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect24&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">TurnMaterialsOn</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TurnDomainsOff</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#008000">&quot;domain23&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect25&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#008000">&quot;1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;5&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;8&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect26&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">TurnMaterialsOn</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TurnDomainsOn</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 3D, rectilinear, zonal var, index-selected at max/min boundaries.</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">ThreeD</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font> <font color="#a02030"># maximum</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">40</font> <font color="#a02030"># maximum boundary</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#0080C0">40</font> <font color="#a02030"># maximum boundary</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">useWholeCollection</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">limitsMode</font> <font color="#4000C0">=</font> <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">ActualData</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect27&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect28&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># 3D, curvilinear, zonal var, index-selected at max/min boundaries.</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">ThreeD</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">limitsMode</font> <font color="#4000C0">=</font> <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">ActualData</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect29&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect30&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#&#x27;6428, boundary between domains disappear when on edge of</font>
+<font color="#a02030"># index-selected plot </font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;bigsil.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;dist&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">ThreeD</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font> <font color="#a02030">#max</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMin</font> <font color="#4000C0">=</font> <font color="#0080C0">8</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yMax</font> <font color="#4000C0">=</font> <font color="#0080C0">17</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font> <font color="#a02030">#max</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">yIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">zIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">useWholeCollection</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">categoryName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;blocks&quot;</font>
+<font color="#a02030"># middle group for this dataset, has group boundaries and internal</font>
+<font color="#a02030"># domain boundaries</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">subsetName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;block1&quot;</font>
+
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.437142</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.719538</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.539603</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.309012</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.683599</font><font color="#4000C0">,</font> <font color="#0080C0">0.661214</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect31&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Filled boundary takes different path through IndexSelect than</font>
+<font color="#a02030"># does PC, so test it too. </font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect32&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># Test point meshes</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect on Point meshes.&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/ugrid_points.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">p</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">pointType</font> <font color="#4000C0">=</font> <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">Box</font>
+<font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">pointSize</font> <font color="#4000C0">=</font> <font color="#0080C0">0.2</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">p</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.4</font><font color="#4000C0">,</font> <font color="#0080C0">9.4</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.4</font><font color="#4000C0">,</font> <font color="#0080C0">9.4</font><font color="#4000C0">)</font>
+<font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect33&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">isa</font> <font color="#4000C0">=</font> <font color="#000000">IndexSelectAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">OneD</font>
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">60</font>
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">70</font>
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isa</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect34&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isa</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect35&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isa</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect36&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">4</font>
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isa</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect37&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">89</font>
+<font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">7</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isa</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect38&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;PointVar&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#a02030"># make sure we are using default atts</font>
+<font color="#000000">isa</font> <font color="#4000C0">=</font> <font color="#000000">IndexSelectAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isa</font><font color="#4000C0">)</font>
+<font color="#000000">box</font> <font color="#4000C0">=</font> <font color="#000000">BoxAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">box</font><font color="#4000C0">.</font><font color="#000000">minx</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">5</font>
+<font color="#000000">box</font><font color="#4000C0">.</font><font color="#000000">maxx</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">box</font><font color="#4000C0">.</font><font color="#000000">miny</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">5</font>
+<font color="#000000">box</font><font color="#4000C0">.</font><font color="#000000">maxy</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">box</font><font color="#4000C0">.</font><font color="#000000">minz</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">5</font>
+<font color="#000000">box</font><font color="#4000C0">.</font><font color="#000000">maxz</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Box&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">box</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_indexselect39&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect on unstructured mesh (#18422)&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  Test IndexSelect on an unstructured line mesh, treating the cells as a</font>
+<font color="#a02030">#  1D logical index space (issue #18422).</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  This is a value-based test (no baseline image). It writes a small line</font>
+<font color="#a02030">#  mesh, applies IndexSelect in 1D mode, and verifies the resulting zone and</font>
+<font color="#a02030">#  node counts. It exercises the VTK_UNSTRUCTURED_GRID / VTK_POLY_DATA path</font>
+<font color="#a02030">#  added for #18422, including point remapping so unused points are dropped.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Shistata Subedi</font>
+<font color="#a02030">#  Date:       June 2026</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/indexselect_lines.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;cell_id&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Baseline counts for the full line mesh.</font>
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;indexselect_ugrid_base_zones&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;indexselect_ugrid_base_nodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">11</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Contiguous 1D selection of cells [xMin, xMax): cells 0..3 -&gt; 4 cells, 5 nodes.</font>
+<font color="#000000">isel1d</font> <font color="#4000C0">=</font> <font color="#000000">IndexSelectAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">OneD</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">4</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isel1d</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;indexselect_ugrid_contig_zones&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;indexselect_ugrid_contig_nodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">)</font>
+
+<font color="#000000">RemoveLastOperator</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Strided 1D selection over all cells (xMax = -1): every 2nd cell -&gt; 0,2,4,6,8.</font>
+<font color="#a02030"># 5 cells, and point remapping keeps only the 10 referenced nodes (not all 11).</font>
+<font color="#000000">isel1ds</font> <font color="#4000C0">=</font> <font color="#000000">IndexSelectAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">isel1ds</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">OneD</font>
+<font color="#000000">isel1ds</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">isel1ds</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1</font>
+<font color="#000000">isel1ds</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isel1ds</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;indexselect_ugrid_stride_zones&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;indexselect_ugrid_stride_nodes&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test ucd mesh in 2D and 3D</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;specmix_ucd.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">)</font> <font color="#a02030"># 20 x 20 zones</font>
+<font color="#000000">isel1d</font> <font color="#4000C0">=</font> <font color="#000000">IndexSelectAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">OneD</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">20</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isel1d</font><font color="#4000C0">)</font> <font color="#a02030"># select middle &quot;row&quot;</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;specmix_ucd_stride20_zones&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">20</font><font color="#4000C0">)</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">20</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">40</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isel1d</font><font color="#4000C0">)</font> <font color="#a02030"># select 2nd &quot;column&quot;</font>
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;specmix_ucd_stride1_zones&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">20</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh_3d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">isel1d</font> <font color="#4000C0">=</font> <font color="#000000">IndexSelectAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">OneD</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">20</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isel1d</font><font color="#4000C0">)</font> <font color="#a02030"># select middle &quot;row&quot;</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;specmix3d_ucd_stride20_zones&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">20</font><font color="#4000C0">)</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">20</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">40</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isel1d</font><font color="#4000C0">)</font> <font color="#a02030"># select 2nd &quot;column&quot;</font>
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;specmix3d_ucd_stride1_zones&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">20</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;specmix_ucd.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test 2D and 3D lines mesh from Silo</font>
+<font color="#a02030">#   This test file appears to not exist in silo_pdb_test_data</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_hdf5_test_data/ucd_lines2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;ucd_linesmesh2d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">isel1d</font> <font color="#4000C0">=</font> <font color="#000000">IndexSelectAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">OneD</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isel1d</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;ucd_lines2d_zones&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_hdf5_test_data/ucd_lines2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_hdf5_test_data/ucd_lines3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;ucd_linesmesh3d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">isel1d</font> <font color="#4000C0">=</font> <font color="#000000">IndexSelectAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">OneD</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isel1d</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;ucd_lines3d_zones&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_hdf5_test_data/ucd_lines3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test on a curve too</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/c053.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;parabolic&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">isel1d</font> <font color="#4000C0">=</font> <font color="#000000">IndexSelectAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">dim</font> <font color="#4000C0">=</font> <font color="#000000">isa</font><font color="#4000C0">.</font><font color="#000000">OneD</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">31</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">70</font>
+<font color="#000000">isel1d</font><font color="#4000C0">.</font><font color="#000000">xIncr</font> <font color="#4000C0">=</font> <font color="#0080C0">4</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">isel1d</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumZones&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_zones&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/c053.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

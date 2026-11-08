@@ -1,0 +1,65 @@
+<html><body bgcolor="#e0e0e0"><head><title>databases/Cale.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  Cale.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 2D, structured, single domain</font>
+<font color="#a02030">#              plots     - Pseudocolor, FilledBoundary</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Wed Oct 10 11:46:45 PDT 2007</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">def</font> <font color="#000000">test0</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Cale files&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;jet00405.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;Cale_0_00&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Materials&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;Cale_0_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;hydro&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">View2DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">10.1155</font><font color="#4000C0">,</font> <font color="#0080C0">11.6375</font><font color="#4000C0">,</font> <font color="#0080C0">3.20767</font><font color="#4000C0">,</font> <font color="#0080C0">4.82837</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">,</font> <font color="#0080C0">0.15</font><font color="#4000C0">,</font> <font color="#0080C0">0.95</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">Auto</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">xScale</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>  <font color="#a02030"># LINEAR, LOG</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">yScale</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>  <font color="#a02030"># LINEAR, LOG</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;Cale_0_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do a PC plot with mixvars.</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">GetMaterialAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">forceMIR</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetMaterialAttributes</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;den&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;Cale_0_03&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test another file.</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;vpgz.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Materials&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;Cale_0_04&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">datapath</font> <font color="#4000C0">=</font> <font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;Cale_test_data&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">test0</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+
+<font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>
