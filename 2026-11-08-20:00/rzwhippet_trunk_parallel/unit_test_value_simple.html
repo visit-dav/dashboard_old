@@ -1,0 +1,120 @@
+<SCRIPT TYPE="text/javascript">
+<!--
+function popup(mylink, name)
+{
+if (! window.focus)return true;
+var href;
+if (typeof(mylink) == 'string')
+   href=mylink;
+else
+   href=mylink.href;
+window.open(href,name,'width=500,height=500,scrollbars=no');
+return false;
+}
+//-->
+</SCRIPT>
+<html><head><title>Results for unit/test_value_simple.py</title></head>
+<body bgcolor="#a0a0f0">
+<H1>Results of VisIt Regression Test - <a href=unit_test_value_simple_py.html>unit/test_value_simple</a></H1>
+<table border>
+ <tr>
+  <td rowspan=2><b><i>Test Case</b></i></td>
+  <td colspan=2 align=center><b><i>Errors</b></i></td>
+  <td colspan=3 align=center><b><i>Images</b></i></td>
+ </tr>
+ <tr>
+  <td>%Diffs</td>
+  <td>Maximum</td>
+  <td>Baseline</td>
+  <td>Current</td>
+  <td>Diff Map</td>
+ </tr>
+
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Basic</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_basic_001</td>
+  <td colspan=5 align=left><pre> 100 .eq. 100 (prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_basic_002</td>
+  <td colspan=5 align=left><pre> 200 .ne. 100 (prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_basic_003</td>
+  <td colspan=5 align=left><pre> 100 .lt. 200 (prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_basic_004</td>
+  <td colspan=5 align=left><pre> 100 .le. 200 (prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_basic_005</td>
+  <td colspan=5 align=left><pre> 200 .le. 200 (prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_basic_006</td>
+  <td colspan=5 align=left><pre> 200 .gt. 100 (prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_basic_007</td>
+  <td colspan=5 align=left><pre> 200 .ge. 100 (prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_basic_008</td>
+  <td colspan=5 align=left><pre> 200 .ge. 200 (prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_basic_009</td>
+  <td colspan=5 align=left><pre> 100.0 .eq. 100 (prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Precision</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_prec_001</td>
+  <td colspan=5 align=left><pre> 200.0001 .eq. 200 (prec=3) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_prec_002</td>
+  <td colspan=5 align=left><pre> 200.0000000001 .eq. 200 (prec=9) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_prec_004</td>
+  <td colspan=5 align=left><pre> 200.0001 .ne. 200 (prec=9) : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>In Operator</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_in_001</td>
+  <td colspan=5 align=left><pre> 200 .in. <br>(100, 200, 300)<br>&nbsp;(prec=5, at=1) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_in_001</td>
+  <td colspan=5 align=left><pre> (1, -1) .in. <br>[(0, 0),<br>&nbsp;&nbsp;(1, 0),<br>&nbsp;&nbsp;(1, -1),<br>&nbsp;&nbsp;(0, 1)]<br>&nbsp;(prec=5, at=2) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_in_002</td>
+  <td colspan=5 align=left><pre> 35 .in. <br>(17, 18, 19, 20, 21)<br>&nbsp;(prec=2, at=3) : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Objects</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_object_001</td>
+  <td colspan=5 align=left><pre> "[1, '2', 3]" .eq. "[1, '2', 3]" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_object_002</td>
+  <td colspan=5 align=left><pre> "apple" .lt. "carrot" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">test_value_object_003</td>
+  <td colspan=5 align=left><pre> (1, 1, 4.71e-06) .lt. (1, 1, 5.01e-06)<br>&nbsp;(prec=5) : True</pre></td>
+ </tr>
+</table>
+<p>Final Return Code: 111</p>
+</body>
+</html>

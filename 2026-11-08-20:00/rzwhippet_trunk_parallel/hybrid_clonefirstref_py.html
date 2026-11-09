@@ -1,0 +1,62 @@
+<html><body bgcolor="#e0e0e0"><head><title>hybrid/clonefirstref.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  clonefirstref.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 2D, curvilinear, single domain</font>
+<font color="#a02030">#              plots     - FilledBoundary</font>
+<font color="#a02030">#              databases - PDB</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Purpose:    This test case tests the viewer&#x27;s ability to consider a window</font>
+<font color="#a02030">#              that had been referenced as unreferenced if its plot list has</font>
+<font color="#a02030">#              no active source.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Fri Feb 18 14:01:48 PST 2005</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Look at the first few lines of the string representation of the</font>
+<font color="#a02030"># WindowInformation to see the list of time sliders, etc.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Get the window information and convert it to a string.</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Only use the first 5 or so lines from the string.</font>
+    <font color="#000000">lines</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">split</font><font color="#4000C0">(</font><font color="#008000">&quot;\n&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;&quot;</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font><font color="#4000C0">(</font><font color="#000000">i</font> <font color="#4000C0">&lt;</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">lines</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">lines</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font>
+            <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetCloneWindowOnFirstRef</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetWindowLayout</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;pdb_test_data/dbB00.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;material(mesh)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;clonefirstref_00&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;clonefirstref_01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Make sure that the database and time sliders, etc got copied to window 1,</font>
+<font color="#a02030"># even though it had been &quot;referenced&quot; already. Without the fix, VisIt used</font>
+<font color="#a02030"># to complain about no database being open.</font>
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;clonefirstref_02&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;material(mesh)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;clonefirstref_03&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;clonefirstref_04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Make sure that we can move through time.</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;clonefirstref_05&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;clonefirstref_06&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

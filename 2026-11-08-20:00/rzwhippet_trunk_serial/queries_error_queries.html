@@ -1,0 +1,100 @@
+<SCRIPT TYPE="text/javascript">
+<!--
+function popup(mylink, name)
+{
+if (! window.focus)return true;
+var href;
+if (typeof(mylink) == 'string')
+   href=mylink;
+else
+   href=mylink.href;
+window.open(href,name,'width=500,height=500,scrollbars=no');
+return false;
+}
+//-->
+</SCRIPT>
+<html><head><title>Results for queries/error_queries.py</title></head>
+<body bgcolor="#a0a0f0">
+<H1>Results of VisIt Regression Test - <a href=queries_error_queries_py.html>queries/error_queries</a></H1>
+<table border>
+ <tr>
+  <td rowspan=2><b><i>Test Case</b></i></td>
+  <td colspan=2 align=center><b><i>Errors</b></i></td>
+  <td colspan=3 align=center><b><i>Images</b></i></td>
+ </tr>
+ <tr>
+  <td>%Diffs</td>
+  <td>Maximum</td>
+  <td>Baseline</td>
+  <td>Current</td>
+  <td>Diff Map</td>
+ </tr>
+
+ <tr>
+  <td bgcolor="#00ff00">Zone_Center_Curv2d_Valid_Str</td>
+  <td colspan=5 align=left><pre> "The center of  zone 10 is (0.923738, 1.81294)." .eq. "The center of  zone 10 is (0.923738, 1.81294)." : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Zone_Center_Curv2d_Valid_Val</td>
+  <td colspan=5 align=left><pre> (0.9237379878759384, 1.8129377663135529) .eq. (0.9237379878759384, 1.8129377663135529)<br>&nbsp;(prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Zone_Center_Curv2d_Invalid_Str</td>
+  <td colspan=5 align=left><pre> "The center of zone 1000000 could not be determined." .eq. "The center of zone 1000000 could not be determined." : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Zone_Center_Curv2d_Invalid_Val</td>
+  <td colspan=5 align=left><pre> "None" .eq. "None" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Node_Coords_Curv2d_Valid_Str</td>
+  <td colspan=5 align=left><pre> "The coords of  node 10 are (1, 1.73205)." .eq. "The coords of  node 10 are (1, 1.73205)." : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">None_Coords_Curv2d_Valid_Val</td>
+  <td colspan=5 align=left><pre> (1.0, 1.7320507764816284) .eq. (1.0, 1.7320507764816284)<br>&nbsp;(prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Node_Coords_Curv2d_Invalid_Str</td>
+  <td colspan=5 align=left><pre> "The coords of node 1000000 could not be determined." .eq. "The coords of node 1000000 could not be determined." : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Node_Coords_Curv2d_Invalid_Val</td>
+  <td colspan=5 align=left><pre> "None" .eq. "None" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Zone_Center_Multi_Ucd3d_Valid_Str</td>
+  <td colspan=5 align=left><pre> "The center of zone 10 (domain 5) is (0.463913, 3.91959, 6.33333)." .eq. "The center of zone 10 (domain 5) is (0.463913, 3.91959, 6.33333)." : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Zone_Center_Multi_Ucd3d_Valid_Val</td>
+  <td colspan=5 align=left><pre> (0.4639131799340248, 3.9195945262908936, 6.333332777023315) .eq. (0.4639131799340248, 3.9195945262908936, 6.333332777023315)<br>&nbsp;(prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Zone_Center_Multi_Ucd3d_Invalid_Str</td>
+  <td colspan=5 align=left><pre> "The center of zone 1000000 (domain 5) could not be determined." .eq. "The center of zone 1000000 (domain 5) could not be determined." : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Zone_Center_Multi_Ucd3d_Invalid_Val</td>
+  <td colspan=5 align=left><pre> "None" .eq. "None" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Node_Coords_Multi_Ucd3d_Valid_Str</td>
+  <td colspan=5 align=left><pre> "The coords of node 10 (domain 5) are (2.96558, 2.53285, 0)." .eq. "The coords of node 10 (domain 5) are (2.96558, 2.53285, 0)." : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">None_Coords_Multi_Ucd3d_Valid_Val</td>
+  <td colspan=5 align=left><pre> (2.9655816555023193, 2.532846450805664, 0.0) .eq. (2.9655816555023193, 2.532846450805664, 0.0)<br>&nbsp;(prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Node_Coords_Multi_Ucd3d_Invalid_Str</td>
+  <td colspan=5 align=left><pre> "The coords of node 1000000 (domain 5) could not be determined." .eq. "The coords of node 1000000 (domain 5) could not be determined." : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Node_Coords_Multi_Ucd3d_Invalid_Val</td>
+  <td colspan=5 align=left><pre> "None" .eq. "None" : True</pre></td>
+ </tr>
+</table>
+<p>Final Return Code: 111</p>
+</body>
+</html>

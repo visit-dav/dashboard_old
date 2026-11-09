@@ -1,0 +1,488 @@
+<html><body bgcolor="#e0e0e0"><head><title>plots/curve.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  MODES: serial, parallel, scalable</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  curve.py </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      Tests the curve plot</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Kathleen Bonnell </font>
+<font color="#a02030">#  Date:       August 3, 2006 </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Brad Whitlock, Tue Nov 21 10:55:24 PDT 2006</font>
+<font color="#a02030">#    Made it use enums for line style.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Thu Jun 21 11:05:58 PDT 2007</font>
+<font color="#a02030">#    Added tests for overlaying curves on 2D plots</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Fri Aug 13 16:10:56 MST 2010 </font>
+<font color="#a02030">#    Added TestPointsAndSymbols to test various points/symbol settings.</font>
+<font color="#a02030">#    Added TestTimeCue to test time-cue functionality</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Thu Sep 12 09:08:00 PDT 2013</font>
+<font color="#a02030">#    Added TestPolar to test new polar conversion capability.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Tue Jul 15 14:16:33 MST 2014</font>
+<font color="#a02030">#    Added TestScale, which demonstrates the need to scale curves with values</font>
+<font color="#a02030">#    greater than 1e37 or less than 1e-37.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Wed Aug 28 09:04:00 MST 2019</font>
+<font color="#a02030">#    Turn off cycling of colors for all tests.  Set the colors individually</font>
+<font color="#a02030">#    to match current baseline results.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Thu Feb 17 07:40:34 PST 2022</font>
+<font color="#a02030">#    Replace &#x27;color&#x27; with &#x27;curveColor&#x27; for CurveAttributes.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">def</font> <font color="#000000">Test1</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/distribution.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DefineCurveExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;logED&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;log10(&lt;Exponential Distribution&gt;)&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DefineCurveExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;logLap&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;log10(&lt;Laplace Distribution&gt;)&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Exponential Distribution&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_1_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;logED&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_1_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;Laplace Distribution&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_1_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;logLap&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_1_04&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetViewCurve</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">19.3832</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">19.3626</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">8.71826</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">8.71234</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_1_05&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;Log Normal Distribution&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_1_06&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">120</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">,</font> <font color="#0080C0">150</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.13181</font><font color="#4000C0">,</font> <font color="#0080C0">1.14079</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.346122</font><font color="#4000C0">,</font> <font color="#0080C0">0.350033</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_1_07&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/distribution.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">TestOverlayCurves</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Overlay curves on 2D plots&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># put up some 2D plots</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;ucd2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>    <font color="#a02030"># id=0</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;ucdmesh2d&quot;</font><font color="#4000C0">)</font>   <font color="#a02030"># id=1</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ta</font><font color="#4000C0">=</font><font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ta</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font><font color="#4000C0">=</font><font color="#0080C0">1</font>
+    <font color="#000000">ta</font><font color="#4000C0">.</font><font color="#000000">translateY</font><font color="#4000C0">=</font><font color="#0080C0">2</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">ta</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveA.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;ol_curveA&quot;</font><font color="#4000C0">)</font>  <font color="#a02030"># id=2</font>
+    <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_2_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveB.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;ol_curveB&quot;</font><font color="#4000C0">)</font>  <font color="#a02030"># id=3</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_2_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveC.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;ol_curveC&quot;</font><font color="#4000C0">)</font>  <font color="#a02030"># id=4</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_2_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># testing hiding/unhiding the 2D plots</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#a02030">#Test(&quot;curve_2_04&quot;)</font>
+    <font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_2_05&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_2_06&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># test hiding some curves</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">,</font><font color="#0080C0">3</font><font color="#4000C0">,</font><font color="#0080C0">4</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_2_07&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_2_08&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_2_09&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_2_10&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;ucd2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveA.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveB.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveC.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">TestPointsAndSymbols</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Points and Symbols&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveA.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;ol_curveA&quot;</font><font color="#4000C0">)</font>
+    <font color="#a02030">#points and lines</font>
+    <font color="#000000">curve</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">showLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">showPoints</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curve</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetViewCurve</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">5.5</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">3.5</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#stride the points</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">pointStride</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curve</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#Dynamic fill </font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">pointFillMode</font> <font color="#4000C0">=</font> <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">Dynamic</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curve</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#change density</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">symbolDensity</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curve</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_04&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#Symbol </font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">symbol</font> <font color="#4000C0">=</font> <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">TriangleDown</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curve</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_05&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#Zoom </font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_06&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#Symbol </font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">5.5</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">3.5</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">symbol</font> <font color="#4000C0">=</font> <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">Plus</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curve</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_07&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#Static with symbols</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">pointFillMode</font> <font color="#4000C0">=</font> <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">Static</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">pointStride</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">symbol</font> <font color="#4000C0">=</font> <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">Circle</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curve</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_08&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#Remove lines</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">showLines</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">symbol</font> <font color="#4000C0">=</font> <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">X</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curve</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_09&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#Remove lines</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">pointFillMode</font> <font color="#4000C0">=</font> <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">Dynamic</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">symbolDensity</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">symbol</font> <font color="#4000C0">=</font> <font color="#000000">curve</font><font color="#4000C0">.</font><font color="#000000">TriangleUp</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curve</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_10&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveB.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;ol_curveB&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c2</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c2</font><font color="#4000C0">.</font><font color="#000000">showLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">c2</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">c2</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">c2</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c2</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ta2</font><font color="#4000C0">=</font><font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ta2</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font><font color="#4000C0">=</font><font color="#0080C0">1</font>
+    <font color="#000000">ta2</font><font color="#4000C0">.</font><font color="#000000">translateX</font><font color="#4000C0">=</font><font color="#4000C0">-</font><font color="#0080C0">0.35</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">ta2</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_11&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">c2</font><font color="#4000C0">.</font><font color="#000000">showLines</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">c2</font><font color="#4000C0">.</font><font color="#000000">showPoints</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">c2</font><font color="#4000C0">.</font><font color="#000000">pointFillMode</font> <font color="#4000C0">=</font> <font color="#000000">c2</font><font color="#4000C0">.</font><font color="#000000">Dynamic</font>
+    <font color="#000000">c2</font><font color="#4000C0">.</font><font color="#000000">symbol</font> <font color="#4000C0">=</font> <font color="#000000">c2</font><font color="#4000C0">.</font><font color="#000000">Circle</font>
+    <font color="#000000">c2</font><font color="#4000C0">.</font><font color="#000000">symbolDensity</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c2</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_12&quot;</font><font color="#4000C0">)</font>
+
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveC.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;ol_curveC&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c3</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c3</font><font color="#4000C0">.</font><font color="#000000">showLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">c3</font><font color="#4000C0">.</font><font color="#000000">showPoints</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">c3</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">c2</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">c3</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c3</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ta3</font><font color="#4000C0">=</font><font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ta3</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font><font color="#4000C0">=</font><font color="#0080C0">1</font>
+    <font color="#000000">ta3</font><font color="#4000C0">.</font><font color="#000000">translateX</font><font color="#4000C0">=</font><font color="#0080C0">0.25</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">ta3</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_3_13&quot;</font><font color="#4000C0">)</font>
+
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveA.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveB.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveB.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">TestTimeCue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Time Cue&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveC.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;ol_curveC&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">showLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">showPoints</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">doBallTimeCue</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">timeCueBallSize</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">ballTimeCueColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetViewCurve</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.25</font><font color="#4000C0">,</font> <font color="#0080C0">10.25</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.25</font><font color="#4000C0">,</font> <font color="#0080C0">15.25</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SuppressQueryOutputOn</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;NumNodes&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">n</font> <font color="#4000C0">=</font> <font color="#000000">int</font><font color="#4000C0">(</font><font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">n</font><font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">timeForTimeCue</font> <font color="#4000C0">=</font> <font color="#000000">i</font>
+        <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;curve_4_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">i</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">doLineTimeCue</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">lineTimeCueColor</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">ballTimeCueColor</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;curve_4_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">n</font><font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">lineTimeCueWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;curve_4_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">n</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">n</font> <font color="#4000C0">=</font> <font color="#000000">n</font><font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">doCropTimeCue</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;curve_4_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">n</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/ol_curveC.curve&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestPolar</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Polar&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/rose_theta_r_rads.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;rose&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">showLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">doLineTimeCue</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">doCropTimeCue</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;polar_curve_01&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">polarToCartesian</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">polarCoordinateOrder</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Theta_R</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">angleUnits</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Radians</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;polar_curve_02&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/rose_theta_r_rads.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/rose_r_theta_rads.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;rose&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">showLabels</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">doLineTimeCue</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">doCropTimeCue</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;polar_curve_03&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">polarToCartesian</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">polarCoordinateOrder</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">R_Theta</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">angleUnits</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Radians</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;polar_curve_04&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/rose_r_theta_rads.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/spiral_r_theta_deg.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;spiral&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">polarToCartesian</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;polar_curve_05&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">polarToCartesian</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">polarCoordinateOrder</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">R_Theta</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">angleUnits</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Degrees</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;polar_curve_06&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/spiral_r_theta_deg.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/circle.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;circle&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">polarToCartesian</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;polar_curve_07&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">polarToCartesian</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">polarCoordinateOrder</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Theta_R</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">angleUnits</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Degrees</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;polar_curve_08&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/circle.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestScale</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Scale&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/need_scale.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;toobig&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">40</font><font color="#4000C0">,</font> <font color="#0080C0">165</font><font color="#4000C0">,</font> <font color="#0080C0">165</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_scale_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font><font color="#0080C0">1</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleX</font><font color="#4000C0">=</font><font color="#0080C0">1e-15</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleY</font><font color="#4000C0">=</font><font color="#0080C0">1e-15</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleZ</font><font color="#4000C0">=</font><font color="#0080C0">1e-15</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_scale_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">RemoveLastOperator</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;toosmall&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_scale_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleX</font><font color="#4000C0">=</font><font color="#0080C0">1e+15</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleY</font><font color="#4000C0">=</font><font color="#0080C0">1e+15</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleZ</font><font color="#4000C0">=</font><font color="#0080C0">1e+15</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_scale_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/need_scale.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">Main</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">Test1</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestOverlayCurves</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPointsAndSymbols</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestTimeCue</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPolar</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestScale</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Main</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

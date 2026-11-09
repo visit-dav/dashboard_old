@@ -1,0 +1,275 @@
+<html><body bgcolor="#e0e0e0"><head><title>operators/threshold.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  threshold.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 3D unstructured, single domain,</font>
+<font color="#a02030">#                          3D rectilinear, multiple domain,</font>
+<font color="#a02030">#                          2D curvilinear, multiple domain</font>
+<font color="#a02030">#              plots     - pc, mesh, subset, contour</font>
+<font color="#a02030">#              operators - threshold</font>
+<font color="#a02030">#              selection - none</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  &#x27;6590, &#x27;7631</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       July 24, 2002</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Kathleen Bonnell, Thu Sep  5 10:55:47 PDT 2002</font>
+<font color="#a02030">#    Changed the variable format for SubsetPlots, to reflect new interface</font>
+<font color="#a02030">#    which allows subsets of groups.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Thu May  8 12:50:50 PDT 2003</font>
+<font color="#a02030">#    Remove some code for setting the view when changing to a new data set</font>
+<font color="#a02030">#    since visit should automatically adjust the view by default.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Thu Aug 28 14:34:57 PDT 2003</font>
+<font color="#a02030">#    Remove compound var name from subset plots.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Thu Sep 15 16:31:31 PDT 2005</font>
+<font color="#a02030">#    Added testing for points only mode (&#x27;6590).</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark Blair, Fri May 19 17:36:00 PDT 2006</font>
+<font color="#a02030">#    Modified all tests, added new tests, for multi-variable mode.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Sat Jan 27 13:03:55 PST 2007</font>
+<font color="#a02030">#    Test points only with material selection on (&#x27;7631).</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Thu Mar 25 09:57:34 PDT 2010</font>
+<font color="#a02030">#    Added call(s) to DrawPlots() b/c of changes to the default plot state</font>
+<font color="#a02030">#    behavior when an operator is added.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Mon Dec 19 15:45:38 PST 2016</font>
+<font color="#a02030">#    Use FilledBoundary plot for materials instead of Subset.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewNormal</font><font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.528889</font><font color="#4000C0">,</font> <font color="#0080C0">0.367702</font><font color="#4000C0">,</font> <font color="#0080C0">0.7649</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetViewUp</font><font color="#4000C0">(</font><font color="#0080C0">0.176641</font><font color="#4000C0">,</font> <font color="#0080C0">0.929226</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.324558</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetParallelScale</font><font color="#4000C0">(</font><font color="#0080C0">17.3205</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">SetPerspective</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Normal PC threshold for globe.</font>
+<font color="#a02030">#</font>
+<font color="#000000">thresh</font> <font color="#4000C0">=</font> <font color="#000000">ThresholdAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">outputMeshType</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">zonePortions</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">thresh</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_thresh01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Normal PC threshold for globe, but now change the zone inclusion criteria.</font>
+<font color="#a02030">#</font>
+<font color="#000000">RemoveAllOperators</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">outputMeshType</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">zonePortions</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">thresh</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_thresh02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Normal PC plot of globe, thresholding by a variable different than the</font>
+<font color="#a02030"># PC coloring variable.</font>
+<font color="#a02030">#</font>
+<font color="#000000">RemoveAllOperators</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">outputMeshType</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">zonePortions</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">140</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">340</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">listedVarNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;t&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">thresh</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_thresh03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Contour lines by one variable, thresholding by another.  Multi-block,</font>
+<font color="#a02030"># curvilinear, 2D.</font>
+<font color="#a02030">#</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">outputMeshType</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">zonePortions</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.7</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.9</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">listedVarNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;v&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">thresh</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_thresh04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Material plot, thresholded by a scalar variable.  Multi-block,</font>
+<font color="#a02030"># curvilinear, 2D.</font>
+<font color="#a02030">#</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">outputMeshType</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">zonePortions</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.4</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.0</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">listedVarNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">thresh</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_thresh05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Mesh plot and PC plot, both thresholded by the same variable and zone</font>
+<font color="#a02030"># inclusion criteria.  Then change the output mesh type to a point mesh.</font>
+<font color="#a02030"># Multi-block, rectilinear, 3D.</font>
+<font color="#a02030">#</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">outputMeshType</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">zonePortions</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.4</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.0</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">listedVarNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">thresh</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_thresh06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">outputMeshType</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">thresh</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_thresh07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Normal PC plot of globe, thresholding by two variables different than the</font>
+<font color="#a02030"># PC coloring variable.</font>
+<font color="#a02030">#</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">outputMeshType</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">zonePortions</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">140</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">340</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">listedVarNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;t&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;dx&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">thresh</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_thresh08&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Contour lines by one variable, thresholding by that variable and another,</font>
+<font color="#a02030"># using two different zone inclusion criteria.  Multi-block, curvilinear, 2D.</font>
+<font color="#a02030">#</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">zonePortions</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.7</font><font color="#4000C0">,</font> <font color="#0080C0">0.7</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.7</font><font color="#4000C0">,</font> <font color="#0080C0">0.9</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">listedVarNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;u&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;v&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">thresh</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_thresh09&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Material plot, thresholded by two scalar variables.  Multi-block,</font>
+<font color="#a02030"># curvilinear, 2D.</font>
+<font color="#a02030">#</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">zonePortions</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.4</font><font color="#4000C0">,</font> <font color="#0080C0">0.25</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.0</font><font color="#4000C0">,</font> <font color="#0080C0">0.45</font><font color="#4000C0">)</font>
+<font color="#000000">thresh</font><font color="#4000C0">.</font><font color="#000000">listedVarNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;u&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">thresh</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_thresh10&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">ThresholdAtts</font> <font color="#4000C0">=</font> <font color="#000000">ThresholdAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ThresholdAtts</font><font color="#4000C0">.</font><font color="#000000">outputMeshType</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">ThresholdAtts</font><font color="#4000C0">.</font><font color="#000000">listedVarNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">ThresholdAtts</font><font color="#4000C0">.</font><font color="#000000">zonePortions</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">ThresholdAtts</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">ThresholdAtts</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1e+37</font><font color="#4000C0">)</font>
+<font color="#000000">ThresholdAtts</font><font color="#4000C0">.</font><font color="#000000">defaultVarName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;u&quot;</font>
+<font color="#000000">ThresholdAtts</font><font color="#4000C0">.</font><font color="#000000">defaultVarIsScalar</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">ThresholdAtts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_thresh11&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># See that the points go away when you turn off the materials.</font>
+<font color="#000000">sil</font> <font color="#4000C0">=</font> <font color="#000000">SILRestriction</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">sil</font><font color="#4000C0">.</font><font color="#000000">SetsInCategory</font><font color="#4000C0">(</font><font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">sil</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">[</font><font color="#0080C0">2</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+<font color="#000000">sil</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">[</font><font color="#0080C0">3</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">sil</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_thresh12&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

@@ -1,0 +1,155 @@
+<html><body bgcolor="#e0e0e0"><head><title>operators/box.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  box.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 3D point, single domain,</font>
+<font color="#a02030">#                          3D rectilinear, multiple domain.</font>
+<font color="#a02030">#                          3D unstructured, single domain.</font>
+<font color="#a02030">#              plots     - pc, vector, contour, vector</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  3160</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       March 26, 2003</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Kathleen Bonnell, Thu Aug 28 14:34:57 PDT 2003</font>
+<font color="#a02030">#    Remove compound var name from subset plots.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Wed Jun  4 08:56:08 PDT 2008</font>
+<font color="#a02030">#    Test facelist filter after applying a box.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Mon Dec 19 15:45:38 PST 2016</font>
+<font color="#a02030">#    Use FilledBoundary plot for materials instead of Subset.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#a02030"># 3D, rectilinear.  Multi-block  Tests ghost zones as well.</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;bigsil.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">atts</font> <font color="#4000C0">=</font> <font color="#000000">BoxAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">amount</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">minx</font> <font color="#4000C0">=</font> <font color="#0080C0">0.4</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">maxx</font> <font color="#4000C0">=</font> <font color="#0080C0">0.7</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">miny</font> <font color="#4000C0">=</font> <font color="#0080C0">0.1</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">maxy</font> <font color="#4000C0">=</font> <font color="#0080C0">0.9</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">minz</font> <font color="#4000C0">=</font> <font color="#0080C0">0.4</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">maxz</font> <font color="#4000C0">=</font> <font color="#0080C0">1.7</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;dist&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Box&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.79</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.035</font><font color="#4000C0">,</font> <font color="#0080C0">0.61</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.765</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">0.25</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">1.73</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_box01&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># 3D, unstructured</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Box&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">minx</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">maxx</font> <font color="#4000C0">=</font> <font color="#4000C0">+</font><font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">miny</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">maxy</font> <font color="#4000C0">=</font> <font color="#4000C0">+</font><font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">minz</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">maxz</font> <font color="#4000C0">=</font> <font color="#4000C0">+</font><font color="#0080C0">5</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.56</font><font color="#4000C0">,</font> <font color="#0080C0">0.81</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.14</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.66</font><font color="#4000C0">,</font> <font color="#0080C0">0.55</font><font color="#4000C0">,</font> <font color="#0080C0">0.49</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">11</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_box02&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">amount</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_box03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">14</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;airVfGradient&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">vec</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vec</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">minx</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">maxx</font> <font color="#4000C0">=</font> <font color="#4000C0">+</font><font color="#0080C0">5</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">miny</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">10</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">maxy</font> <font color="#4000C0">=</font> <font color="#4000C0">+</font><font color="#0080C0">10</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">minz</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">10</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">maxz</font> <font color="#4000C0">=</font> <font color="#4000C0">+</font><font color="#0080C0">10</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Box&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_box04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;hardyglobal&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Box&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_box05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;PointMesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">mesh</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">mesh</font><font color="#4000C0">.</font><font color="#000000">pointType</font> <font color="#4000C0">=</font> <font color="#000000">mesh</font><font color="#4000C0">.</font><font color="#000000">Box</font>
+<font color="#000000">mesh</font><font color="#4000C0">.</font><font color="#000000">pointSizeVar</font> <font color="#4000C0">=</font> <font color="#008000">&quot;PointVar&quot;</font>
+<font color="#000000">mesh</font><font color="#4000C0">.</font><font color="#000000">pointSizeVarEnabled</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">mesh</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Box&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_box06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># This final test should be blank.  The box operator was crashing with</font>
+<font color="#a02030"># point meshes that fell outside the box previously.  (&#x27;3160)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">minx</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">30</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">maxx</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">20</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_box07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># If we apply the box operator to a rectilinear grid, it can change</font>
+<font color="#a02030"># the &quot;Extents&quot;, which can screw up the facelist filter.  Test that</font>
+<font color="#a02030"># no one has undone the fix from Paul Selby.</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Box&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">minx</font> <font color="#4000C0">=</font> <font color="#0080C0">0.2</font>
+<font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">maxx</font> <font color="#4000C0">=</font> <font color="#0080C0">1.0</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">1.4</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ops_box08&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>
