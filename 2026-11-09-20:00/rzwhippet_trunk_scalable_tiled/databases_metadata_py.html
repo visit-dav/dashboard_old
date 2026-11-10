@@ -1,0 +1,118 @@
+<html><body bgcolor="#e0e0e0"><head><title>databases/metadata.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  metadata.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      Getting a usable metadata object from the viewer.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Wed Mar 14 16:40:31 PST 2007</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Tue Aug 19, 2025</font>
+<font color="#a02030">#    Antialiasing is now multi-modal. Use FXAA for antialiasing as MSAA</font>
+<font color="#a02030">#    doesn&#x27;t work in the build configuration that is used for testing.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">def</font> <font color="#000000">test0</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Getting metadata&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get metadata for various test datasets.</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;metadata_0_00&quot;</font><font color="#4000C0">,</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get the metadata for the first time step</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave*.silo database&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;metadata_0_01&quot;</font><font color="#4000C0">,</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get the metadata for the 17th time step where new variables appear</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave*.silo database&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font> <font color="#0080C0">17</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;metadata_0_02&quot;</font><font color="#4000C0">,</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get something with species and default plots.</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;samrai_test_data/mats-par3/dumps.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;metadata_0_03&quot;</font><font color="#4000C0">,</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get something with label variables</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;shapefile_test_data/alameda/tgr06001lkA.shp&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;metadata_0_04&quot;</font><font color="#4000C0">,</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">MakeSafe</font><font color="#4000C0">(</font><font color="#000000">varname</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">ret</font> <font color="#4000C0">=</font> <font color="#000000">varname</font><font color="#4000C0">.</font><font color="#000000">replace</font><font color="#4000C0">(</font><font color="#008000">&quot;/&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;_&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ret</font> <font color="#4000C0">=</font> <font color="#000000">ret</font><font color="#4000C0">.</font><font color="#000000">replace</font><font color="#4000C0">(</font><font color="#008000">&quot;(&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;[&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ret</font> <font color="#4000C0">=</font> <font color="#000000">ret</font><font color="#4000C0">.</font><font color="#000000">replace</font><font color="#4000C0">(</font><font color="#008000">&quot;)&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;]&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ret</font> <font color="#4000C0">=</font> <font color="#000000">ret</font><font color="#4000C0">.</font><font color="#000000">replace</font><font color="#4000C0">(</font><font color="#008000">&quot;:&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;_&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ret</font> <font color="#4000C0">=</font> <font color="#000000">ret</font><font color="#4000C0">.</font><font color="#000000">replace</font><font color="#4000C0">(</font><font color="#008000">&quot;,&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;_&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ret</font> <font color="#4000C0">=</font> <font color="#000000">ret</font><font color="#4000C0">.</font><font color="#000000">replace</font><font color="#4000C0">(</font><font color="#008000">&quot;;&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;_&quot;</font><font color="#4000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">ret</font>
+
+<font color="#C00000">def</font> <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Use the metadata to plot the variables.&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test all of the scalars.</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">.</font><font color="#000000">GetNumScalars</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">md</font><font color="#4000C0">.</font><font color="#000000">GetScalars</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">name</font><font color="#4000C0">)</font>
+        <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">testName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;metadata_1_scalar_&quot;</font> <font color="#4000C0">+</font> <font color="#000000">MakeSafe</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">.</font><font color="#000000">GetScalars</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">name</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">)</font>
+        <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test all of the vectors.</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">.</font><font color="#000000">GetNumVectors</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#000000">md</font><font color="#4000C0">.</font><font color="#000000">GetVectors</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">name</font><font color="#4000C0">)</font>
+        <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">testName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;metadata_1_vector_&quot;</font> <font color="#4000C0">+</font> <font color="#000000">MakeSafe</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">.</font><font color="#000000">GetVectors</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">name</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">)</font>
+        <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test all of the expressions</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">.</font><font color="#000000">exprList</font><font color="#4000C0">.</font><font color="#000000">GetNumExpressions</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">expr</font> <font color="#4000C0">=</font> <font color="#000000">md</font><font color="#4000C0">.</font><font color="#000000">exprList</font><font color="#4000C0">.</font><font color="#000000">GetExpressions</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font>
+        <font color="#C00000">if</font> <font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">type</font> <font color="#4000C0">==</font> <font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">ScalarMeshVar</font><font color="#4000C0">:</font>
+            <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">name</font><font color="#4000C0">)</font>
+        <font color="#C00000">elif</font> <font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">type</font> <font color="#4000C0">==</font> <font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">VectorMeshVar</font><font color="#4000C0">:</font>
+            <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">name</font><font color="#4000C0">)</font>
+            <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+            <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">useStride</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+            <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">stride</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+            <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+        <font color="#C00000">elif</font> <font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">type</font> <font color="#4000C0">==</font> <font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">TensorMeshVar</font><font color="#4000C0">:</font>
+            <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Tensor&quot;</font><font color="#4000C0">,</font> <font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">name</font><font color="#4000C0">)</font>
+            <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">TensorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+            <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">useStride</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+            <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">stride</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+            <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">)</font>
+        <font color="#C00000">elif</font> <font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">type</font> <font color="#4000C0">==</font> <font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">ArrayMeshVar</font><font color="#4000C0">:</font>
+            <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">name</font><font color="#4000C0">)</font>
+        <font color="#C00000">else</font><font color="#4000C0">:</font>
+            <font color="#000000">print</font><font color="#4000C0">(</font><font color="#008000">&quot;Add support for plotting expression: &quot;</font><font color="#4000C0">,</font> <font color="#000000">expr</font><font color="#4000C0">)</font>
+        <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">testName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;metadata_1_expr_&quot;</font> <font color="#4000C0">+</font> <font color="#000000">MakeSafe</font><font color="#4000C0">(</font><font color="#000000">expr</font><font color="#4000C0">.</font><font color="#000000">name</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">testName</font><font color="#4000C0">)</font>
+        <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Draw antialiased lines</font>
+    <font color="#000000">r</font> <font color="#4000C0">=</font> <font color="#000000">GetRenderingAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#a02030"># use FXAA since MSAA doesn&#x27;t work in our testing mode</font>
+    <font color="#000000">r</font><font color="#4000C0">.</font><font color="#000000">antialiasing</font> <font color="#4000C0">=</font> <font color="#000000">r</font><font color="#4000C0">.</font><font color="#000000">FXAA</font>
+    <font color="#000000">SetRenderingAttributes</font><font color="#4000C0">(</font><font color="#000000">r</font><font color="#4000C0">)</font>
+
+    <font color="#000000">test0</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

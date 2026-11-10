@@ -1,0 +1,143 @@
+<html><body bgcolor="#e0e0e0"><head><title>operators/clip.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  clip.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 2D rectilinear, 2D curvilinear,</font>
+<font color="#a02030">#                          3D rectilinear, 3D curvilinear,</font>
+<font color="#a02030">#                          3D unstructured</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  7470, 7195</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       September 1, 2006</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Wed Sep  6 16:56:27 PDT 2006</font>
+<font color="#a02030">#    Test clip operator with no plane and no sphere (this was crashing the</font>
+<font color="#a02030">#    engine due to a memory problem) [&#x27;7195]</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Alister Maguire, Fri Nov 13 14:07:54 PST 2020</font>
+<font color="#a02030">#    Added a test for the crinkle clip.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestOne</font><font color="#4000C0">(</font><font color="#000000">filename</font><font color="#4000C0">,</font> <font color="#000000">index</font><font color="#4000C0">,</font> <font color="#000000">zonal_var</font><font color="#4000C0">,</font> <font color="#000000">nodal_var</font><font color="#4000C0">,</font> <font color="#000000">radius</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+   <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">filename</font><font color="#4000C0">)</font>
+   <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">ClipAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+   <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">funcType</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Sphere</font>
+   <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">radius</font> <font color="#4000C0">=</font> <font color="#000000">radius</font>
+   <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">sphereInverse</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+   <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">zonal_var</font><font color="#4000C0">)</font>
+   <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Clip&quot;</font><font color="#4000C0">)</font>
+   <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+   <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+   <font color="#000000">name</font> <font color="#4000C0">=</font> <font color="#008000">&quot;clip%02d&quot;</font> <font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">index</font><font color="#4000C0">+</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+   <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">name</font><font color="#4000C0">)</font>
+   <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#000000">nodal_var</font><font color="#4000C0">)</font>
+   <font color="#000000">name</font> <font color="#4000C0">=</font> <font color="#008000">&quot;clip%02d&quot;</font> <font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">index</font><font color="#4000C0">+</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+   <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">name</font><font color="#4000C0">)</font>
+   <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">funcType</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Plane</font>
+   <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane1Origin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+   <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane1Normal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+   <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+   <font color="#000000">name</font> <font color="#4000C0">=</font> <font color="#008000">&quot;clip%02d&quot;</font> <font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">index</font><font color="#4000C0">+</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+   <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">name</font><font color="#4000C0">)</font>
+   <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#000000">zonal_var</font><font color="#4000C0">)</font>
+   <font color="#000000">name</font> <font color="#4000C0">=</font> <font color="#008000">&quot;clip%02d&quot;</font> <font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">index</font><font color="#4000C0">+</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+   <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">name</font><font color="#4000C0">)</font>
+   <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestOne</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">*</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">TestOne</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">*</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">TestOne</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">*</font><font color="#0080C0">2</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">TestOne</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">*</font><font color="#0080C0">3</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">TestOne</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">*</font><font color="#0080C0">4</font><font color="#4000C0">,</font> <font color="#008000">&quot;t&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test doing a clip where there are no planes selected.  This has caused</font>
+<font color="#a02030"># a crash [&#x27;7195].</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font> <font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Clip&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">ClipAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">funcType</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Plane</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane1Status</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane2Status</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane3Status</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">test_idx</font> <font color="#4000C0">=</font> <font color="#0080C0">20</font>
+<font color="#000000">name</font> <font color="#4000C0">=</font> <font color="#008000">&quot;clip%02d&quot;</font> <font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">test_idx</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">name</font><font color="#4000C0">)</font>
+<font color="#000000">test_idx</font> <font color="#4000C0">+=</font> <font color="#0080C0">1</font>
+
+<font color="#a02030"># Test accurate vs. fast.</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">ClipAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">funcType</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Plane</font>  <font color="#a02030"># Plane, Sphere</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane1Status</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane2Status</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane3Status</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane1Origin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">2.37883</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane2Origin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">2.37883</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane3Origin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">2.37883</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane1Normal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane2Normal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">plane3Normal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">planeInverse</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">center</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">radius</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">sphereInverse</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Clip&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.0548192</font><font color="#4000C0">,</font> <font color="#0080C0">0.0422395</font><font color="#4000C0">,</font> <font color="#0080C0">0.997602</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.427242</font><font color="#4000C0">,</font> <font color="#0080C0">3.08232</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.155563</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.195041</font><font color="#4000C0">,</font> <font color="#0080C0">0.979406</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.0521867</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">4.21585</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.5981</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.5981</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.0372553</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;clip_globe_fast&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">quality</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Accurate</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;clip_globe_accurate&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test the crinkle clip.</font>
+<font color="#a02030">#</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Clip&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">ClipAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">crinkleClip</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;crinkle_clip_globe&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

@@ -1,0 +1,242 @@
+<html><body bgcolor="#e0e0e0"><head><title>queries/pickNamedArgs.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ---------------------------------------------------------------------------- </font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  pickNamedArgs.py #</font>
+<font color="#a02030">#  Tests:      queries     - Pick using named-arguments</font>
+<font color="#a02030">#                            Pick using query results as arguments</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  1781</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Kathleen Biagas</font>
+<font color="#a02030">#  Date:       July 11, 2014 </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Kathleen Biagas, Tue Jul 22 11:51:27 MST 2014</font>
+<font color="#a02030">#    Added Pick_ByGlobalId.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Wed Aug 28 09:04:00 MST 2019</font>
+<font color="#a02030">#    Turn off cycling of colors for all Curve plot tests.  Set the colors</font>
+<font color="#a02030">#    individually to match current baseline results.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ---------------------------------------------------------------------------- </font>
+
+<font color="#C00000">def</font> <font color="#000000">TimePick</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># to demonstrate the effect of changing time options, use timestep for x axis.</font>
+    <font color="#000000">q</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOverTimeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">q</font><font color="#4000C0">.</font><font color="#000000">timeType</font> <font color="#4000C0">=</font> <font color="#000000">q</font><font color="#4000C0">.</font><font color="#000000">Timestep</font>
+    <font color="#000000">SetQueryOverTimeAttributes</font><font color="#4000C0">(</font><font color="#000000">q</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Controlling which time steps are queried, showing defaults used</font>
+    <font color="#a02030">#     stride     =&gt; int    default: 1</font>
+    <font color="#a02030">#     start_time =&gt; int    default: 0 (min time index)</font>
+    <font color="#a02030">#     end_time   =&gt; int    default: max time index, as determined from DB</font>
+
+    <font color="#a02030"># Controlling the plot type when multiple vars are queried</font>
+    <font color="#a02030">#     curve_plot_type: 0 (Single Y Axis), or  1 (Multiple Y Axes) default: 0</font>
+
+    <font color="#a02030"># Which is used for subsequent timesteps, the coordinate or the element?</font>
+    <font color="#a02030">#     preserve_coord:  0 (use the element)  or 1 (use the coordinate)</font>
+
+    <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetDefaultPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+
+    <font color="#000000">vars</font> <font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;v&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;direction_magnitude&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">PickByNode</font><font color="#4000C0">(</font><font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">8837</font><font color="#4000C0">,</font> <font color="#000000">vars</font><font color="#4000C0">=</font><font color="#000000">vars</font><font color="#4000C0">,</font> <font color="#000000">do_time</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#000000">preserve_coord</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#000000">curve_plot_type</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;TimePick_NamedArgs_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># this test and NamedArgs_03 using curve type 1 should return same values</font>
+    <font color="#000000">PFirstYVal</font> <font color="#4000C0">=</font>  <font color="#0080C0">0.019999999552965164</font>
+    <font color="#000000">VFirstYVal</font> <font color="#4000C0">=</font>  <font color="#0080C0">0.0010749432258307394</font>
+
+    <font color="#000000">firstYVal</font><font color="#4000C0">=</font><font color="#000000">GetPlotInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">[</font><font color="#008000">&quot;Curves&quot;</font><font color="#4000C0">]</font><font color="#4000C0">[</font><font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">]</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve type 0, pressure first value&quot;</font><font color="#4000C0">,</font> <font color="#000000">firstYVal</font><font color="#4000C0">,</font> <font color="#000000">PFirstYVal</font><font color="#4000C0">,</font> <font color="#0080C0">14</font><font color="#4000C0">)</font>
+    <font color="#000000">firstYVal</font><font color="#4000C0">=</font><font color="#000000">GetPlotInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">[</font><font color="#008000">&quot;Curves&quot;</font><font color="#4000C0">]</font><font color="#4000C0">[</font><font color="#008000">&quot;v&quot;</font><font color="#4000C0">]</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve type 0, v first value&quot;</font><font color="#4000C0">,</font> <font color="#000000">firstYVal</font><font color="#4000C0">,</font>  <font color="#000000">VFirstYVal</font><font color="#4000C0">,</font> <font color="#0080C0">14</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetDefaultPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">PickByNode</font><font color="#4000C0">(</font><font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">8837</font><font color="#4000C0">,</font> <font color="#000000">vars</font><font color="#4000C0">=</font><font color="#000000">vars</font><font color="#4000C0">,</font> <font color="#000000">do_time</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#000000">preserve_coord</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#000000">curve_plot_type</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#000000">start_time</font><font color="#4000C0">=</font><font color="#0080C0">15</font><font color="#4000C0">,</font> <font color="#000000">end_time</font><font color="#4000C0">=</font><font color="#0080C0">50</font><font color="#4000C0">,</font> <font color="#000000">stride</font><font color="#4000C0">=</font><font color="#0080C0">7</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;TimePick_NamedArgs_01&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetDefaultPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># different way for specifying time options, result should be same as previopus:</font>
+    <font color="#000000">time_opt</font> <font color="#4000C0">=</font> <font color="#4000C0">{</font><font color="#008000">&#x27;stride&#x27;</font><font color="#4000C0">:</font><font color="#0080C0">7</font><font color="#4000C0">,</font> <font color="#008000">&#x27;start_time&#x27;</font><font color="#4000C0">:</font> <font color="#0080C0">15</font><font color="#4000C0">,</font> <font color="#008000">&#x27;end_time&#x27;</font><font color="#4000C0">:</font><font color="#0080C0">50</font><font color="#4000C0">}</font>
+    <font color="#000000">PickByNode</font><font color="#4000C0">(</font><font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">8837</font><font color="#4000C0">,</font> <font color="#000000">vars</font><font color="#4000C0">=</font><font color="#000000">vars</font><font color="#4000C0">,</font> <font color="#000000">do_time</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#000000">preserve_coord</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">time_options</font><font color="#4000C0">=</font><font color="#000000">time_opt</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;TimePick_NamedArgs_02&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">PickByNode</font><font color="#4000C0">(</font><font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">8837</font><font color="#4000C0">,</font> <font color="#000000">vars</font><font color="#4000C0">=</font><font color="#000000">vars</font><font color="#4000C0">,</font> <font color="#000000">do_time</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#000000">preserve_coord</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#000000">curve_plot_type</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;TimePick_NamedArgs_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># these should be the same as TimePick_NamedArgs_00</font>
+    <font color="#000000">firstYVal</font><font color="#4000C0">=</font><font color="#000000">GetPlotInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">[</font><font color="#008000">&quot;Curves&quot;</font><font color="#4000C0">]</font><font color="#4000C0">[</font><font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">]</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve type 1, pressure first value&quot;</font><font color="#4000C0">,</font> <font color="#000000">firstYVal</font><font color="#4000C0">,</font> <font color="#000000">PFirstYVal</font><font color="#4000C0">,</font> <font color="#0080C0">14</font><font color="#4000C0">)</font>
+    <font color="#000000">firstYVal</font><font color="#4000C0">=</font><font color="#000000">GetPlotInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">[</font><font color="#008000">&quot;Curves&quot;</font><font color="#4000C0">]</font><font color="#4000C0">[</font><font color="#008000">&quot;v&quot;</font><font color="#4000C0">]</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve type 1, v first value&quot;</font><font color="#4000C0">,</font> <font color="#000000">firstYVal</font><font color="#4000C0">,</font>  <font color="#000000">VFirstYVal</font><font color="#4000C0">,</font> <font color="#0080C0">14</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">PickByNode</font><font color="#4000C0">(</font><font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">8837</font><font color="#4000C0">,</font> <font color="#000000">vars</font><font color="#4000C0">=</font><font color="#000000">vars</font><font color="#4000C0">,</font> <font color="#000000">do_time</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#000000">preserve_coord</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#000000">curve_plot_type</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#000000">stride</font><font color="#4000C0">=</font><font color="#0080C0">10</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;TimePick_NamedArgs_04&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">PickUsingQueryResults</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">ResetPickLetter</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Material&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">31</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Make it easier to get coordinate values</font>
+    <font color="#000000">SetQueryOutputToValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Pick using results of Node Coords query:\n&quot;</font>
+
+    <font color="#000000">node_8837_coords</font> <font color="#4000C0">=</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Node Coords&quot;</font><font color="#4000C0">,</font> <font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">8837</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Now test that NodePick using those coords will return the correct node id</font>
+    <font color="#a02030"># Utilizes named args: coord (a tuple containing spatial coordinates)</font>
+
+    <font color="#000000">pick_out</font> <font color="#4000C0">=</font> <font color="#000000">NodePick</font><font color="#4000C0">(</font><font color="#000000">coord</font><font color="#4000C0">=</font><font color="#000000">node_8837_coords</font><font color="#4000C0">)</font>
+    <font color="#C00000">if</font> <font color="#000000">pick_out</font><font color="#4000C0">[</font><font color="#008000">&#x27;node_id&#x27;</font><font color="#4000C0">]</font> <font color="#4000C0">==</font> <font color="#0080C0">8837</font><font color="#4000C0">:</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;    NodePick with coordinate succeeded.\n&quot;</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;    NodePick with coordinate failed to return correct node id.\n&quot;</font>
+
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Pick using results of Zone Center query:\n&quot;</font>
+    <font color="#a02030"># select a zone that is incident to node 8837</font>
+    <font color="#000000">adjacent_zone</font> <font color="#4000C0">=</font> <font color="#000000">pick_out</font><font color="#4000C0">[</font><font color="#008000">&#x27;incident_zones&#x27;</font><font color="#4000C0">]</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font>
+    <font color="#a02030"># Get it&#x27;s coords and try a pick</font>
+    <font color="#000000">adjacent_zone_coords</font> <font color="#4000C0">=</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Zone Center&quot;</font><font color="#4000C0">,</font> <font color="#000000">element</font><font color="#4000C0">=</font><font color="#000000">adjacent_zone</font><font color="#4000C0">)</font>
+    <font color="#000000">pick_out</font> <font color="#4000C0">=</font> <font color="#000000">ZonePick</font><font color="#4000C0">(</font><font color="#000000">coord</font><font color="#4000C0">=</font><font color="#000000">adjacent_zone_coords</font><font color="#4000C0">)</font>
+    <font color="#C00000">if</font> <font color="#000000">pick_out</font><font color="#4000C0">[</font><font color="#008000">&#x27;zone_id&#x27;</font><font color="#4000C0">]</font> <font color="#4000C0">==</font> <font color="#000000">adjacent_zone</font><font color="#4000C0">:</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;    ZonePick with coordinate succeeded.\n&quot;</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;    ZonePick with coordinate failed to return correct node id\n&quot;</font>
+
+    <font color="#a02030"># Now, does Pick report that our original node id is incident to the picked zone?</font>
+    <font color="#C00000">if</font> <font color="#0080C0">8837</font> <font color="#C00000">in</font> <font color="#000000">pick_out</font><font color="#4000C0">[</font><font color="#008000">&#x27;incident_nodes&#x27;</font><font color="#4000C0">]</font><font color="#4000C0">:</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;    ZonePick correctly reported incident node\n&quot;</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;    ZonePick failed to correctly report incident node\n&quot;</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#a02030"># d is zonal quantity, so picks will be by-zone</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change query output type for parse-ability of MinMax results</font>
+    <font color="#000000">SetQueryOutputToObject</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do a MinMax query, and use the results to drive a pick.</font>
+    <font color="#000000">res</font> <font color="#4000C0">=</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nQuery for MinMax of &#x27;d&#x27;: \n&quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;Pick using results of MinMax Query:\n\n&quot;</font>
+
+    <font color="#a02030"># Pick using MinMax results</font>
+    <font color="#a02030"># Utilizes named args: </font>
+    <font color="#a02030">#     domain (an integer), </font>
+    <font color="#a02030">#     element (an integer representing node id or zone id depending on the type of Pick)</font>
+    <font color="#000000">pick_out</font> <font color="#4000C0">=</font> <font color="#000000">PickByZone</font><font color="#4000C0">(</font><font color="#000000">domain</font><font color="#4000C0">=</font><font color="#000000">res</font><font color="#4000C0">[</font><font color="#008000">&#x27;min_domain&#x27;</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">element</font><font color="#4000C0">=</font><font color="#000000">res</font><font color="#4000C0">[</font><font color="#008000">&#x27;min_element_num&#x27;</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;Pick for zone at &#x27;d&#x27; minimum: \n&quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetPickOutput</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">pick_out</font> <font color="#4000C0">=</font> <font color="#000000">PickByZone</font><font color="#4000C0">(</font><font color="#000000">domain</font><font color="#4000C0">=</font><font color="#000000">res</font><font color="#4000C0">[</font><font color="#008000">&#x27;max_domain&#x27;</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">element</font><font color="#4000C0">=</font><font color="#000000">res</font><font color="#4000C0">[</font><font color="#008000">&#x27;max_element_num&#x27;</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;Pick for zone at &#x27;d&#x27; maximum: \n&quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetPickOutput</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;Pick_UsingQueryResults&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetPickLetter</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+
+<font color="#C00000">def</font> <font color="#000000">doGlobalPicks</font><font color="#4000C0">(</font><font color="#000000">centering</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Global node pick on %s_centered data:\n\n&quot;</font> <font color="#4000C0">%</font><font color="#000000">centering</font>
+    <font color="#000000">d</font> <font color="#4000C0">=</font> <font color="#000000">PickByGlobalNode</font><font color="#4000C0">(</font><font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">246827</font><font color="#4000C0">)</font>
+    <font color="#a02030"># use json.dumps for dictionary object, makes for easier parsing</font>
+    <font color="#a02030"># of diffs when there are errors</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;dictionary output:\n&quot;</font> <font color="#4000C0">+</font> <font color="#000000">json</font><font color="#4000C0">.</font><font color="#000000">dumps</font><font color="#4000C0">(</font><font color="#000000">d</font><font color="#4000C0">,</font><font color="#000000">indent</font><font color="#4000C0">=</font><font color="#0080C0">2</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;string output: &quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetPickOutput</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\nGlobal zone pick on %s_centered data:\n\n&quot;</font> <font color="#4000C0">%</font><font color="#000000">centering</font>
+    <font color="#000000">d</font> <font color="#4000C0">=</font> <font color="#000000">PickByGlobalZone</font><font color="#4000C0">(</font><font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">237394</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;dictionary output:\n&quot;</font> <font color="#4000C0">+</font> <font color="#000000">json</font><font color="#4000C0">.</font><font color="#000000">dumps</font><font color="#4000C0">(</font><font color="#000000">d</font><font color="#4000C0">,</font><font color="#000000">indent</font><font color="#4000C0">=</font><font color="#0080C0">2</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;string output: &quot;</font> <font color="#4000C0">+</font> <font color="#000000">GetPickOutput</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#C00000">return</font> <font color="#000000">s</font>
+
+<font color="#C00000">def</font> <font color="#000000">PickByGlobalElement</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;global_node.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;dist&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">p</font> <font color="#4000C0">=</font> <font color="#000000">GetPickAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">showGlobalIds</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPickAttributes</font><font color="#4000C0">(</font><font color="#000000">p</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;NOT SHOWING GLOBAL IDS\n\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">doGlobalPicks</font><font color="#4000C0">(</font><font color="#008000">&quot;node&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#  Repeat, showing global ids</font>
+    <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">showGlobalIds</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetPickAttributes</font><font color="#4000C0">(</font><font color="#000000">p</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;SHOWING GLOBAL IDS\n\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">doGlobalPicks</font><font color="#4000C0">(</font><font color="#008000">&quot;node&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">showGlobalIds</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPickAttributes</font><font color="#4000C0">(</font><font color="#000000">p</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># now use a zone-centered var</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;NOT SHOWING GLOBAL IDS\n\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">doGlobalPicks</font><font color="#4000C0">(</font><font color="#008000">&quot;zone&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#  Repeat, showing global ids</font>
+    <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">showGlobalIds</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetPickAttributes</font><font color="#4000C0">(</font><font color="#000000">p</font><font color="#4000C0">)</font>
+
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;SHOWING GLOBAL IDS\n\n&quot;</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">doGlobalPicks</font><font color="#4000C0">(</font><font color="#008000">&quot;zone&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;Pick_ByGlobalElement&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#a02030"># cleanup</font>
+    <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">showGlobalIds</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPickAttributes</font><font color="#4000C0">(</font><font color="#000000">p</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetPickLetter</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">TimePick</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">PickUsingQueryResults</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">PickByGlobalElement</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

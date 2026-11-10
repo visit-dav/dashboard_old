@@ -1,0 +1,113 @@
+<html><body bgcolor="#e0e0e0"><head><title>rendering/volume.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  volume.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 3D unstructured, one domain </font>
+<font color="#a02030">#              plots     - volume </font>
+<font color="#a02030">#              operators - none</font>
+<font color="#a02030">#              selection - yes </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Mark C. Miller </font>
+<font color="#a02030">#  Date:       01Jul03</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Brad Whitlock, Wed Dec 15 09:36:51 PDT 2004</font>
+<font color="#a02030">#    I changed the flag that&#x27;s used to make it do software rendering.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Mon Jul 11 14:07:16 PDT 2005</font>
+<font color="#a02030">#    Added test for rectilinear grids with ghost zones and hardware rendering</font>
+<font color="#a02030">#    [&#x27;5712].</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Wed Jul 13 10:31:08 PDT 2005</font>
+<font color="#a02030">#    Delete wireframe plot, since that exposes &#x27;6380.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Jeremy Meredith, Wed Sep  7 12:06:04 PDT 2005</font>
+<font color="#a02030">#    Allowed spaces in variable names.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Wed Aug 25 14:25:13 PDT 2010</font>
+<font color="#a02030">#    SIL id shift (from 4 to 5) due to changes in SIL generation.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Wed Sep 28 11:48:16 PDT 2011</font>
+<font color="#a02030">#    Zoom in a little so we have more pixels covered.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Wed Nov 29 10:52:22 PST 2023</font>
+<font color="#a02030">#    Skip volume_30 in scalable,parallel,icet mode as it crashes.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Tue May  7 13:56:23 PDT 2024</font>
+<font color="#a02030">#    Move volume_10-volume_16 to volume_rect_singleDomain.py.</font>
+<font color="#a02030">#    Move volume_20-volume_24 to volume_rect_multiDomain.py.</font>
+<font color="#a02030">#    Move volume_30-volume_34 to volume_multiDomain_missingData.py.</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">Samrai</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;samrai_test_data/sil_changes/dumps.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+    <font color="#a02030"># &#x27;6380.  The wireframe is not composited correctly when in SR mode.</font>
+    <font color="#a02030"># So delete the wireframe and we should get the same picture in SR and</font>
+    <font color="#a02030"># non-SR.  When &#x27;6380 is fixed, the DeleteAllPlots() call below should be</font>
+    <font color="#a02030"># removed and the baseline should be reset.</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Primitive Var _number_0&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">volAtts</font> <font color="#4000C0">=</font> <font color="#000000">VolumeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">volAtts</font><font color="#4000C0">.</font><font color="#000000">rendererType</font> <font color="#4000C0">=</font>  <font color="#000000">volAtts</font><font color="#4000C0">.</font><font color="#000000">Serial</font>
+    <font color="#000000">volAtts</font><font color="#4000C0">.</font><font color="#000000">smoothData</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">volAtts</font><font color="#4000C0">.</font><font color="#000000">useColorVarMin</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">volAtts</font><font color="#4000C0">.</font><font color="#000000">colorVarMin</font> <font color="#4000C0">=</font> <font color="#0080C0">22</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">volAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.369824</font><font color="#4000C0">,</font> <font color="#0080C0">0.535308</font><font color="#4000C0">,</font> <font color="#0080C0">0.759391</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.022009</font><font color="#4000C0">,</font> <font color="#0080C0">0.812062</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.583155</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;volume_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;samrai_test_data/sil_changes/dumps.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">globe</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;t&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">silr</font><font color="#4000C0">=</font><font color="#000000">SILRestriction</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">=</font><font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">0.507832</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.301407</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.807007</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.831783</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.415313</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.368309</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">2.</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># test the serial volume render</font>
+    <font color="#000000">volAtts</font> <font color="#4000C0">=</font> <font color="#000000">VolumeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">volAtts</font><font color="#4000C0">.</font><font color="#000000">rendererType</font> <font color="#4000C0">=</font> <font color="#000000">volAtts</font><font color="#4000C0">.</font><font color="#000000">Serial</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">volAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;volume_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># test software volume render</font>
+    <font color="#000000">volAtts</font> <font color="#4000C0">=</font> <font color="#000000">VolumeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">volAtts</font><font color="#4000C0">.</font><font color="#000000">rendererType</font> <font color="#4000C0">=</font> <font color="#000000">volAtts</font><font color="#4000C0">.</font><font color="#000000">Composite</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">volAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;volume_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">Samrai</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">globe</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

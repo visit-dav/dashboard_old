@@ -1,0 +1,125 @@
+<html><body bgcolor="#e0e0e0"><head><title>hybrid/locktime.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  MODES: serial</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  multiwindowcorrelation.py </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      Tests database correlations when there are multiple windows.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Mon Mar 22 15:59:24 PST 2004</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Brad Whitlock, Fri Apr 1 15:01:13 PST 2005</font>
+<font color="#a02030">#    Added a function to check the database correlation list.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">def</font> <font color="#000000">GetTruncatedWindowInformationString</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Get the window information and convert it to a string.</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Only use the first 5 or so lines from the string.</font>
+    <font color="#000000">lines</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">split</font><font color="#4000C0">(</font><font color="#008000">&quot;\n&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;&quot;</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font><font color="#4000C0">(</font><font color="#000000">i</font> <font color="#4000C0">&lt;</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">lines</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">lines</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font>
+            <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#C00000">return</font> <font color="#000000">s</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">tsLength</font> <font color="#4000C0">=</font> <font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">testString</font> <font color="#4000C0">=</font> <font color="#008000">&quot;%s has %d states\n&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">GetActiveTimeSlider</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">tsLength</font><font color="#4000C0">)</font>
+    <font color="#000000">testString</font> <font color="#4000C0">=</font> <font color="#000000">testString</font> <font color="#4000C0">+</font> <font color="#000000">GetTruncatedWindowInformationString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">,</font> <font color="#000000">testString</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Tests the time slider length and the correlation list.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">TestLengthAndCorrelationList</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">tsLength</font> <font color="#4000C0">=</font> <font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;%s has %d states\n&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">GetActiveTimeSlider</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">tsLength</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">GetTruncatedWindowInformationString</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n\n&quot;</font>
+
+    <font color="#000000">names</font> <font color="#4000C0">=</font> <font color="#000000">GetDatabaseCorrelationNames</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">name</font> <font color="#C00000">in</font> <font color="#000000">names</font><font color="#4000C0">:</font>
+        <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">GetDatabaseCorrelation</font><font color="#4000C0">(</font><font color="#000000">name</font><font color="#4000C0">)</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create a plot of DB A.</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;pdb_test_data/dbA00.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;material(mesh)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_00&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create a second window and create plot of DB B.</font>
+<font color="#000000">CloneWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;pdb_test_data/dbB00.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;material(mesh)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">InvertBackgroundColor</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_02&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Set the database correlation options to control how we create automatic</font>
+<font color="#a02030"># correlations. When we lock the windows together, VisIt will create a</font>
+<font color="#a02030"># correlation for the databases in both windows because the windows do not</font>
+<font color="#a02030"># have a common database. I&#x27;m setting the correlation options here because </font>
+<font color="#a02030"># I want a StretchedIndexCorrelation correlation to be created.</font>
+<font color="#a02030">#</font>
+<font color="#000000">StretchedIndexCorrelation</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetDatabaseCorrelationOptions</font><font color="#4000C0">(</font><font color="#000000">StretchedIndexCorrelation</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Lock time for window 2 and window 1. This will create a correlation between</font>
+<font color="#a02030"># the databases in both windows.</font>
+<font color="#a02030">#</font>
+<font color="#000000">ToggleLockTime</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">ToggleLockTime</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestLengthAndCorrelationList</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">17</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_05&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_07&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_08&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">7</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_09&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_10&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_11&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_12&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Now let&#x27;s delete the correlation that was created. It will be have the same</font>
+<font color="#a02030"># name as the active time slider.</font>
+<font color="#a02030">#</font>
+<font color="#000000">DeleteDatabaseCorrelation</font><font color="#4000C0">(</font><font color="#000000">GetActiveTimeSlider</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">TestLengthAndCorrelationList</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_13&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Now try moving the time slider state for DB B, since that&#x27;s the active time</font>
+<font color="#a02030"># slider for window 2, which is the active window right now.</font>
+<font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">15</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_14&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_15&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Make sure that window 1 did not change.</font>
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_16&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;locktime_17&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

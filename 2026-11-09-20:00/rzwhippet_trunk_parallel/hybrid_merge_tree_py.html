@@ -1,0 +1,64 @@
+<html><body bgcolor="#e0e0e0"><head><title>hybrid/merge_tree.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  merge_tree.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Cyrus Harrison</font>
+<font color="#a02030">#  Date:       Friday October 28, 2016</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifiations:</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#000000">test_dbs</font> <font color="#4000C0">=</font> <font color="#4000C0">{</font> <font color="#008000">&quot;rect2d&quot;</font> <font color="#4000C0">:</font> <font color="#4000C0">{</font><font color="#008000">&quot;var&quot;</font><font color="#4000C0">:</font>  <font color="#008000">&quot;d&quot;</font><font color="#4000C0">,</font>
+                         <font color="#008000">&quot;path&quot;</font><font color="#4000C0">:</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">}</font> <font color="#4000C0">,</font>
+             <font color="#008000">&quot;noise2d&quot;</font> <font color="#4000C0">:</font> <font color="#4000C0">{</font><font color="#008000">&quot;var&quot;</font><font color="#4000C0">:</font> <font color="#008000">&quot;shepardglobal&quot;</font><font color="#4000C0">,</font>
+                          <font color="#008000">&quot;path&quot;</font> <font color="#4000C0">:</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">}</font> <font color="#4000C0">,</font>
+
+             <font color="#008000">&quot;noise3d&quot;</font> <font color="#4000C0">:</font> <font color="#4000C0">{</font><font color="#008000">&quot;var&quot;</font><font color="#4000C0">:</font> <font color="#008000">&quot;shepardglobal&quot;</font><font color="#4000C0">,</font>
+                          <font color="#008000">&quot;path&quot;</font><font color="#4000C0">:</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">}</font>
+           <font color="#4000C0">}</font>
+
+<font color="#C00000">for</font> <font color="#000000">db_name</font><font color="#4000C0">,</font><font color="#000000">db_info</font> <font color="#C00000">in</font> <font color="#000000">list</font><font color="#4000C0">(</font><font color="#000000">test_dbs</font><font color="#4000C0">.</font><font color="#000000">items</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">test_db_file</font> <font color="#4000C0">=</font> <font color="#000000">db_info</font><font color="#4000C0">[</font><font color="#008000">&quot;path&quot;</font><font color="#4000C0">]</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">test_db_file</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># test merge tree, split tree and local threshold exprs</font>
+
+    <font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;mtree&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;merge_tree(%s)&quot;</font> <font color="#4000C0">%</font> <font color="#000000">db_info</font><font color="#4000C0">[</font><font color="#008000">&quot;var&quot;</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mtree&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">db_name</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_mtree&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;stree&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;split_tree(%s)&quot;</font> <font color="#4000C0">%</font> <font color="#000000">db_info</font><font color="#4000C0">[</font><font color="#008000">&quot;var&quot;</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;stree&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">db_name</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_stree&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;localt_mt&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;local_threshold(%s,mtree)&quot;</font> <font color="#4000C0">%</font> <font color="#000000">db_info</font><font color="#4000C0">[</font><font color="#008000">&quot;var&quot;</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;localt_mt&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">db_name</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_localt_mt&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;localt_st&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;local_threshold(%s,stree)&quot;</font> <font color="#4000C0">%</font> <font color="#000000">db_info</font><font color="#4000C0">[</font><font color="#008000">&quot;var&quot;</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;localt_st&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">db_name</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_localt_st&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">test_db_file</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

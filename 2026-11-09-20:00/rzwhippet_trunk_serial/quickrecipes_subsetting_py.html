@@ -1,0 +1,67 @@
+<html><body bgcolor="#e0e0e0"><head><title>quickrecipes/subsetting.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Mark C. Miller, Fri Aug 26 14:31:48 PDT 2022</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Get some utils shared across many .py files used for quick recipes.</font>
+<font color="#a02030">#</font>
+<font color="#000000">Source</font><font color="#4000C0">(</font><font color="#000000">tests_path</font><font color="#4000C0">(</font><font color="#008000">&#x27;quickrecipes&#x27;</font><font color="#4000C0">,</font><font color="#008000">&#x27;vqr_utils.py.inc&#x27;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">turning_off_domains</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+  <font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># turning off domains {</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;~juanita/silo/stuff/multi_rect2d.silo&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turning off every other domain</font>
+    <font color="#000000">d</font> <font color="#4000C0">=</font> <font color="#000000">GetDomains</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">i</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#C00000">for</font> <font color="#000000">dom</font> <font color="#C00000">in</font> <font color="#000000">d</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font> <font color="#000000">i</font><font color="#4000C0">%</font><font color="#0080C0">2</font><font color="#4000C0">:</font>
+            <font color="#000000">TurnDomainsOff</font><font color="#4000C0">(</font><font color="#000000">dom</font><font color="#4000C0">)</font>
+        <font color="#000000">i</font> <font color="#4000C0">+=</font> <font color="#0080C0">1</font>
+
+    <font color="#a02030"># Turn all domains off</font>
+    <font color="#000000">TurnDomainsOff</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn on domains 3,5,7</font>
+    <font color="#000000">TurnDomainsOn</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#000000">d</font><font color="#4000C0">[</font><font color="#0080C0">3</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">d</font><font color="#4000C0">[</font><font color="#0080C0">5</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#000000">d</font><font color="#4000C0">[</font><font color="#0080C0">7</font><font color="#4000C0">]</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># turning off domains }</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&#x27;turning off domains error message&#x27;</font><font color="#4000C0">,</font><font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;turning off domains exceptions&#x27;</font><font color="#4000C0">)</font>
+  <font color="#C00000">except</font> <font color="#000000">Exception</font> <font color="#C00000">as</font> <font color="#000000">inst</font><font color="#4000C0">:</font>
+    <font color="#000000">TestFOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;turning off domains exception &quot;%s&quot;&#x27;</font><font color="#4000C0">%</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">inst</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">LINE</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">pass</font>
+  <font color="#000000">vqr_cleanup</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">turning_off_materials</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+  <font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># turning off materials {</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;~juanita/silo/stuff/multi_rect2d.silo&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Get the material names </font>
+    <font color="#000000">GetMaterials</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#a02030"># GetMaterials() will return a tuple of material names such as</font>
+    <font color="#a02030">#     (&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;)</font>
+    <font color="#a02030"># Turn off material with name &quot;2&quot;</font>
+    <font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#008000">&quot;2&quot;</font><font color="#4000C0">)</font>
+    <font color="#a02030"># turning off materials }</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&#x27;turning off materials error message&#x27;</font><font color="#4000C0">,</font><font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;turning off materials exceptions&#x27;</font><font color="#4000C0">)</font>
+  <font color="#C00000">except</font> <font color="#000000">Exception</font> <font color="#C00000">as</font> <font color="#000000">inst</font><font color="#4000C0">:</font>
+    <font color="#000000">TestFOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;turning off domains exception &quot;%s&quot;&#x27;</font><font color="#4000C0">%</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">inst</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">LINE</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">pass</font>
+  <font color="#000000">vqr_cleanup</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">turning_off_domains</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">turning_off_materials</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>
