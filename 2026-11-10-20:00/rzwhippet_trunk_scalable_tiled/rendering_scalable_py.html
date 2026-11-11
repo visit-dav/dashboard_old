@@ -1,0 +1,396 @@
+<html><body bgcolor="#e0e0e0"><head><title>rendering/scalable.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  scalable.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 3D unstructured, multiple domains</font>
+<font color="#a02030">#              plots     - pc, mesh </font>
+<font color="#a02030">#              operators - slice </font>
+<font color="#a02030">#              selection - some of the domains </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  &#x27;3359</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Mark C. Miller </font>
+<font color="#a02030">#  Date:       01Jul03</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Tue May 11 20:21:24 PDT 2004</font>
+<font color="#a02030">#    Changed scalable rendering controls to use activation mode</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Tue May 25 14:29:40 PDT 2004</font>
+<font color="#a02030">#    Added code to test automatic tranitions into and out of SR mode</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Thu Jan  6 14:23:01 PST 2005</font>
+<font color="#a02030">#    Added code to test multiple windows and auto SR transitions</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Bonnell, Mon Jan 23 21:02:56 PST 2006 </font>
+<font color="#a02030">#    Added tests &#x27;08-10, testing auto-opaque mesh and sr mode.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to switch between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Fri Aug 15 10:19:33 PDT 2014</font>
+<font color="#a02030">#    Modified the script to use srun to launch the parallel engine on edge.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Wed Oct 29 12:08:54 PDT 2014</font>
+<font color="#a02030">#    Changed the parallel job launching logic to use srun on surface instead</font>
+<font color="#a02030">#    of edge.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Mon Dec 15 17:22:38 PST 2014</font>
+<font color="#a02030">#    Only close the compute engine if it is not parallel.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Fri Jul  7 13:41:36 PDT 2017</font>
+<font color="#a02030">#    Don&#x27;t run this test if the parallel engine doesn&#x27;t exist.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Tue Feb 8 2022</font>
+<font color="#a02030">#    Use run_dir for location of saving windows, it is cleaned up on exit.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Wed Nov  1 13:46:08 PDT 2023</font>
+<font color="#a02030">#    Updated the list of hosts where srun was used to launch a parallel</font>
+<font color="#a02030">#    compute engine.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Mon Dec  1 14:34:33 PST 2025</font>
+<font color="#a02030">#    Added a case for dane</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Tue Jan 27, 2026</font>
+<font color="#a02030">#    Added a case for rzwhippet until #20776 is addressed.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">platform</font><font color="#4000C0">.</font><font color="#000000">startswith</font><font color="#4000C0">(</font><font color="#008000">&quot;win&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">exists</font><font color="#4000C0">(</font><font color="#000000">visit_bin_path</font><font color="#4000C0">(</font><font color="#008000">&quot;..&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;exe&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;engine_par&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#0080C0">121</font><font color="#4000C0">)</font>
+<font color="#C00000">else</font><font color="#4000C0">:</font>
+    <font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">exists</font><font color="#4000C0">(</font><font color="#000000">visit_bin_path</font><font color="#4000C0">(</font><font color="#008000">&quot;engine_par.exe&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#0080C0">121</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># sleep is needed to allow viewer to complete update of window information</font>
+<font color="#a02030"># before it is queried here</font>
+<font color="#C00000">import</font> <font color="#000000">time</font>
+<font color="#000000">sleepTime</font><font color="#4000C0">=</font><font color="#0080C0">1</font>
+
+<font color="#a02030"># Turn on scalable rendering</font>
+<font color="#000000">ra</font> <font color="#4000C0">=</font> <font color="#000000">GetRenderingAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Always</font>
+<font color="#C00000">if</font> <font color="#008000">&quot;useCompression&quot;</font> <font color="#C00000">in</font> <font color="#000000">dir</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">compressionActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Always</font>
+<font color="#000000">SetRenderingAttributes</font><font color="#4000C0">(</font><font color="#000000">ra</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Close the compute engine, if it is not already parallel.</font>
+<font color="#000000">engines</font> <font color="#4000C0">=</font> <font color="#000000">GetEngineList</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#C00000">if</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">engines</font><font color="#4000C0">)</font> <font color="#4000C0">&gt;</font> <font color="#0080C0">0</font><font color="#4000C0">:</font>
+    <font color="#000000">props</font> <font color="#4000C0">=</font> <font color="#000000">GetEngineProperties</font><font color="#4000C0">(</font><font color="#000000">engines</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#C00000">if</font> <font color="#000000">props</font><font color="#4000C0">.</font><font color="#000000">numProcessors</font> <font color="#4000C0">&lt;</font> <font color="#0080C0">2</font><font color="#4000C0">:</font>
+        <font color="#000000">CloseComputeEngine</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#a02030"># explicitly open a parallel engine, if possible</font>
+        <font color="#a02030"># if it fails, the OpenDatabase will start a serial engine</font>
+        <font color="#C00000">import</font> <font color="#000000">socket</font>
+        <font color="#C00000">if</font> <font color="#008000">&quot;dane&quot;</font> <font color="#C00000">in</font> <font color="#000000">socket</font><font color="#4000C0">.</font><font color="#000000">gethostname</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#C00000">or</font> \
+           <font color="#008000">&quot;rzwhippet&quot;</font> <font color="#C00000">in</font> <font color="#000000">socket</font><font color="#4000C0">.</font><font color="#000000">gethostname</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#000000">haveParallelEngine</font> <font color="#4000C0">=</font> <font color="#000000">OpenComputeEngine</font><font color="#4000C0">(</font><font color="#008000">&quot;localhost&quot;</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#008000">&quot;-l&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;srun&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;-np&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+        <font color="#C00000">else</font><font color="#4000C0">:</font>
+            <font color="#000000">haveParallelEngine</font> <font color="#4000C0">=</font> <font color="#000000">OpenComputeEngine</font><font color="#4000C0">(</font><font color="#008000">&quot;localhost&quot;</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#008000">&quot;-np&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">silr</font><font color="#4000C0">=</font><font color="#000000">SILRestriction</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOffAll</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOnSet</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOnSet</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOnSet</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOnSet</font><font color="#4000C0">(</font><font color="#0080C0">10</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">)</font>
+
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">view</font><font color="#4000C0">=</font><font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewUp</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;scalable_01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># rotate and draw them again</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewUp</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Make sure mesh plot doesn&#x27;t dissappear after a rotate</font>
+<font color="#a02030"># (&#x27;3359)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;scalable_02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Pan and zoom</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">0.75</font>
+<font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.25</font><font color="#4000C0">,</font> <font color="#0080C0">0.25</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;scalable_03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Make sure hide behavior still works</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;scalable_04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;scalable_05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># reset the SIL restriction for the succeeding SR auto mode tests</font>
+<font color="#a02030"># tests to make sure the ERI actor doesn&#x27;t leave stale image data around</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOnAll</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;scalable_06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># accumulate results of SR mode changes here</font>
+<font color="#000000">srModeHistory</font><font color="#4000C0">=</font><font color="#008000">&quot;&quot;</font>
+
+<font color="#a02030"># function to save temporary windows used to force renders</font>
+<font color="#C00000">def</font> <font color="#000000">MySaveWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">swa</font> <font color="#4000C0">=</font> <font color="#000000">GetSaveWindowAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">fileName</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">TestEnv</font><font color="#4000C0">.</font><font color="#000000">params</font><font color="#4000C0">[</font><font color="#008000">&quot;run_dir&quot;</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#008000">&quot;scalable_tmp.png&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">format</font> <font color="#4000C0">=</font> <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">PNG</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">family</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetSaveWindowAttributes</font><font color="#4000C0">(</font><font color="#000000">swa</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#a02030"># required to force render</font>
+
+<font color="#a02030"># function to examine current SR mode of window</font>
+<font color="#C00000">def</font> <font color="#000000">CheckSRMode</font><font color="#4000C0">(</font><font color="#000000">winID</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+   <font color="#C00000">global</font> <font color="#000000">srModeHistory</font>
+   <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+   <font color="#000000">MySaveWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#a02030"># required to force render</font>
+   <font color="#000000">time</font><font color="#4000C0">.</font><font color="#000000">sleep</font><font color="#4000C0">(</font><font color="#000000">sleepTime</font><font color="#4000C0">)</font>
+   <font color="#000000">wi</font><font color="#4000C0">=</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+   <font color="#C00000">if</font> <font color="#000000">wi</font><font color="#4000C0">.</font><font color="#000000">usingScalableRendering</font> <font color="#4000C0">==</font> <font color="#0080C0">1</font><font color="#4000C0">:</font>
+       <font color="#000000">srModeHistory</font><font color="#4000C0">+=</font><font color="#008000">&quot;window %d:SR is ON\n&quot;</font><font color="#4000C0">%</font><font color="#000000">winID</font>
+   <font color="#C00000">else</font><font color="#4000C0">:</font>
+       <font color="#000000">srModeHistory</font><font color="#4000C0">+=</font><font color="#008000">&quot;window %d:SR is off\n&quot;</font><font color="#4000C0">%</font><font color="#000000">winID</font>
+
+<font color="#a02030"># function to force window into specified SR mode and confirm it </font>
+<font color="#C00000">def</font> <font color="#000000">ForceSRMode</font><font color="#4000C0">(</font><font color="#000000">mode</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+   <font color="#C00000">global</font> <font color="#000000">srModeHistory</font>
+   <font color="#C00000">if</font> <font color="#000000">mode</font><font color="#4000C0">:</font>
+       <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Always</font>
+   <font color="#C00000">else</font><font color="#4000C0">:</font>
+       <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Never</font>
+   <font color="#000000">SetRenderingAttributes</font><font color="#4000C0">(</font><font color="#000000">ra</font><font color="#4000C0">)</font>
+   <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+   <font color="#000000">time</font><font color="#4000C0">.</font><font color="#000000">sleep</font><font color="#4000C0">(</font><font color="#000000">sleepTime</font><font color="#4000C0">)</font>
+   <font color="#000000">wi</font><font color="#4000C0">=</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+   <font color="#000000">srModeHistory</font><font color="#4000C0">+=</font><font color="#008000">&quot;force SR mode %d\n&quot;</font><font color="#4000C0">%</font><font color="#000000">wi</font><font color="#4000C0">.</font><font color="#000000">usingScalableRendering</font>
+
+<font color="#000000">ForceSRMode</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># test an individual plot taking poly count above threshold</font>
+<font color="#a02030"># with proc 0&#x27;s data alone</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Auto</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">2000</font>
+<font color="#000000">SetRenderingAttributes</font><font color="#4000C0">(</font><font color="#000000">ra</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">time</font><font color="#4000C0">.</font><font color="#000000">sleep</font><font color="#4000C0">(</font><font color="#000000">sleepTime</font><font color="#4000C0">)</font>
+<font color="#000000">wi</font><font color="#4000C0">=</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">srModeHistory</font><font color="#4000C0">+=</font><font color="#008000">&quot;single plot, proc 0 &gt;threshold %d\n&quot;</font><font color="#4000C0">%</font><font color="#000000">wi</font><font color="#4000C0">.</font><font color="#000000">usingScalableRendering</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">ForceSRMode</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># test an individual plot taking poly count above threshold with</font>
+<font color="#a02030"># data from proc 2 (or above)</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Auto</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">5000</font>
+<font color="#000000">SetRenderingAttributes</font><font color="#4000C0">(</font><font color="#000000">ra</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">time</font><font color="#4000C0">.</font><font color="#000000">sleep</font><font color="#4000C0">(</font><font color="#000000">sleepTime</font><font color="#4000C0">)</font>
+<font color="#000000">wi</font><font color="#4000C0">=</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">srModeHistory</font><font color="#4000C0">+=</font><font color="#008000">&quot;single plot, proc &gt;0 &gt;threshold %d\n&quot;</font><font color="#4000C0">%</font><font color="#000000">wi</font><font color="#4000C0">.</font><font color="#000000">usingScalableRendering</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">ForceSRMode</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># test a addition and deletion causing to go above threshold and then</font>
+<font color="#a02030"># back below</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Auto</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">15000</font>
+<font color="#000000">SetRenderingAttributes</font><font color="#4000C0">(</font><font color="#000000">ra</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">time</font><font color="#4000C0">.</font><font color="#000000">sleep</font><font color="#4000C0">(</font><font color="#000000">sleepTime</font><font color="#4000C0">)</font>
+<font color="#000000">wi</font><font color="#4000C0">=</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">srModeHistory</font><font color="#4000C0">+=</font><font color="#008000">&quot;two plots, first &lt;threshold %d\n&quot;</font><font color="#4000C0">%</font><font color="#000000">wi</font><font color="#4000C0">.</font><font color="#000000">usingScalableRendering</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">time</font><font color="#4000C0">.</font><font color="#000000">sleep</font><font color="#4000C0">(</font><font color="#000000">sleepTime</font><font color="#4000C0">)</font>
+<font color="#000000">wi</font><font color="#4000C0">=</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">srModeHistory</font><font color="#4000C0">+=</font><font color="#008000">&quot;two plots, second &gt;threshold %d\n&quot;</font><font color="#4000C0">%</font><font color="#000000">wi</font><font color="#4000C0">.</font><font color="#000000">usingScalableRendering</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">MySaveWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#a02030"># force engine to render</font>
+<font color="#000000">time</font><font color="#4000C0">.</font><font color="#000000">sleep</font><font color="#4000C0">(</font><font color="#000000">sleepTime</font><font color="#4000C0">)</font>
+<font color="#000000">wi</font><font color="#4000C0">=</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">srModeHistory</font><font color="#4000C0">+=</font><font color="#008000">&quot;delete 2nd, &lt;threshold %d\n&quot;</font><font color="#4000C0">%</font><font color="#000000">wi</font><font color="#4000C0">.</font><font color="#000000">usingScalableRendering</font>
+
+<font color="#000000">ForceSRMode</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># test setting auto threshold below current count</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Auto</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">3000</font>
+<font color="#000000">SetRenderingAttributes</font><font color="#4000C0">(</font><font color="#000000">ra</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">time</font><font color="#4000C0">.</font><font color="#000000">sleep</font><font color="#4000C0">(</font><font color="#000000">sleepTime</font><font color="#4000C0">)</font>
+<font color="#000000">wi</font><font color="#4000C0">=</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">srModeHistory</font><font color="#4000C0">+=</font><font color="#008000">&quot;auto threshold set &lt; plot %d\n&quot;</font><font color="#4000C0">%</font><font color="#000000">wi</font><font color="#4000C0">.</font><font color="#000000">usingScalableRendering</font>
+
+<font color="#000000">ForceSRMode</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># test setting auto threshold above current count</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Auto</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">30000</font>
+<font color="#000000">SetRenderingAttributes</font><font color="#4000C0">(</font><font color="#000000">ra</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#a02030"># save window is required to force the re-draw that causes engine to</font>
+<font color="#a02030"># decide SR mode is no longer necessary</font>
+<font color="#000000">MySaveWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">time</font><font color="#4000C0">.</font><font color="#000000">sleep</font><font color="#4000C0">(</font><font color="#000000">sleepTime</font><font color="#4000C0">)</font>
+<font color="#000000">wi</font><font color="#4000C0">=</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">srModeHistory</font><font color="#4000C0">+=</font><font color="#008000">&quot;auto threshold set &gt; plot %d\n&quot;</font><font color="#4000C0">%</font><font color="#000000">wi</font><font color="#4000C0">.</font><font color="#000000">usingScalableRendering</font>
+
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;SRModeHistory&quot;</font><font color="#4000C0">,</font><font color="#000000">srModeHistory</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">srModeHistory</font><font color="#4000C0">=</font><font color="#008000">&quot;&quot;</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Do some testing with multiple windows</font>
+<font color="#a02030">#</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Multiple Windows&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Auto</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">14000</font>
+<font color="#000000">SetRenderingAttributes</font><font color="#4000C0">(</font><font color="#000000">ra</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CheckSRMode</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+<font color="#000000">CloneWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CheckSRMode</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;w&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CheckSRMode</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CheckSRMode</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">,</font><font color="#0080C0">3</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CheckSRMode</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">CheckSRMode</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;multiWindow_SRModeHistory&quot;</font><font color="#4000C0">,</font><font color="#000000">srModeHistory</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># test unhiding mesh to make sure it doesn&#x27;t go opaque (&#x27;5947)</font>
+<font color="#a02030">#</font>
+<font color="#000000">DeleteWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Always</font>
+<font color="#000000">SetRenderingAttributes</font><font color="#4000C0">(</font><font color="#000000">ra</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;dx&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">MySaveWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#a02030"># force a render</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">MySaveWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#a02030"># force a render</font>
+<font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;scalable_07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing Mesh plot&#x27;s opaque flag in SR mode&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curvmesh2d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">opaqueMode</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">Auto</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;scalable_08&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;scalable_09&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">Pick</font><font color="#4000C0">(</font><font color="#0080C0">164</font><font color="#4000C0">,</font> <font color="#0080C0">136</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;scalable_10&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Glyphed Plot Causing SR Transitions&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">srModeHistory</font><font color="#4000C0">=</font><font color="#008000">&quot;&quot;</font>
+<font color="#000000">ForceSRMode</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Auto</font>
+<font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">30000</font>
+<font color="#000000">SetRenderingAttributes</font><font color="#4000C0">(</font><font color="#000000">ra</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;galaxy0000.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;vx&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CheckSRMode</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;glyphedPlot_SRModeHistory&quot;</font><font color="#4000C0">,</font><font color="#000000">srModeHistory</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># this section causes a crash, comment out until fixed.</font>
+<font color="#a02030">#TestSection(&quot;Stereo Modes&quot;)</font>
+
+<font color="#a02030">#ra.scalableActivationMode = ra.Always</font>
+<font color="#a02030">#ra.stereoRendering = 1</font>
+<font color="#a02030">#ra.stereoType = ra.RedBlue</font>
+<font color="#a02030">#SetRenderingAttributes(ra)</font>
+
+<font color="#a02030">#OpenDatabase(silo_data_path(&quot;multi_rect3d.silo&quot;))</font>
+
+<font color="#a02030">#AddPlot(&quot;Mesh&quot;,&quot;mesh1&quot;)</font>
+
+<font color="#a02030"># make the eye separation as noticable as possible</font>
+<font color="#a02030">#ResetView()</font>
+<font color="#a02030">#v = GetView3D()</font>
+<font color="#a02030">#v.eyeAngle = 5</font>
+<font color="#a02030">#v.viewNormal=(0.707, 0, 0.707)</font>
+<font color="#a02030">#SetView3D(v)</font>
+<font color="#a02030">#DrawPlots()</font>
+
+<font color="#a02030">#Test(&quot;scalable_11&quot;)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

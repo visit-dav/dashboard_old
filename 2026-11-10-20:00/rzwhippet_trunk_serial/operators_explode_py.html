@@ -1,0 +1,580 @@
+<html><body bgcolor="#e0e0e0"><head><title>operators/explode.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  explode.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 3D rectilinear, single domain, </font>
+<font color="#a02030">#                           multi domain</font>
+<font color="#a02030">#                          3D unstructured, single domain</font>
+<font color="#a02030">#                          3D curvilinear, single domain</font>
+<font color="#a02030">#                          2D unstructured, single domain</font>
+<font color="#a02030">#              plots     - filled boundary, pseudocolor</font>
+<font color="#a02030">#              operators - explode</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Alister Maguire</font>
+<font color="#a02030">#  Date: Tue Jan  2 15:07:06 PST 2018</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#      Alister Maguire, Wed Jan 17 15:28:46 PST 2018</font>
+<font color="#a02030">#      Added tests of multi-domain data.    </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#      Alister Maguire, Mon Jan 22 11:00:51 PST 2018</font>
+<font color="#a02030">#      Changed explosion factors to account of scale update. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#      Alister Maguire, Wed Feb 14 16:07:51 PST 2018</font>
+<font color="#a02030">#      Updated tests with multiple explosions to be perfomed</font>
+<font color="#a02030">#      by a single operator.   </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#      Alister Maguire, Tue Feb 20 16:22:05 PST 2018</font>
+<font color="#a02030">#      Added a 2d test with no materials. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#      Alister Maguire, Wed May  2 12:54:43 PDT 2018</font>
+<font color="#a02030">#      Added tests for recentering. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#      Alister Maguire, Tue Sep 18 14:57:03 PDT 2018</font>
+<font color="#a02030">#      Added tests for exploding domains. </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#      Alister Maguire, Mon Sep 24 13:32:04 PDT 2018</font>
+<font color="#a02030">#      Added a test for handling repeat labels. </font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">unstructured_explosions</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.0758172</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.984828</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.156097</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.01047</font><font color="#4000C0">,</font> <font color="#0080C0">0.155753</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.987741</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">0.826446</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">axis3DScaleFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">axis3DScales</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">shear</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">View3DAtts</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Explode&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">mainAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Explode one material by a plane</font>
+    <font color="#000000">atts1</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">Plane</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">planePoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">planeNorm</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;4&quot;</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">.8</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">Impact</font>
+    <font color="#000000">mainAtts</font><font color="#4000C0">.</font><font color="#000000">AddExplosions</font><font color="#4000C0">(</font><font color="#000000">atts1</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mainAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_globe_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Explode second material by plane</font>
+    <font color="#000000">atts2</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">Plane</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">planePoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">planeNorm</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;3&quot;</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">.8</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">Impact</font>
+    <font color="#000000">mainAtts</font><font color="#4000C0">.</font><font color="#000000">AddExplosions</font><font color="#4000C0">(</font><font color="#000000">atts2</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mainAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_globe_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Explode third material by plane</font>
+    <font color="#000000">atts3</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">Plane</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">planePoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">planeNorm</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;1&quot;</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">.3</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">Impact</font>
+    <font color="#000000">mainAtts</font><font color="#4000C0">.</font><font color="#000000">AddExplosions</font><font color="#4000C0">(</font><font color="#000000">atts3</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mainAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_globe_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Explode material by point</font>
+    <font color="#000000">atts4</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts4</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">atts4</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+    <font color="#000000">atts4</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">atts4</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts4</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;2&quot;</font>
+    <font color="#000000">atts4</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts4</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">.1</font>
+    <font color="#000000">atts4</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">atts4</font><font color="#4000C0">.</font><font color="#000000">Impact</font>  <font color="#a02030"># Impact, Scatter</font>
+    <font color="#000000">mainAtts</font><font color="#4000C0">.</font><font color="#000000">AddExplosions</font><font color="#4000C0">(</font><font color="#000000">atts4</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mainAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_globe_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">curvilinear_explosions</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;v&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Explode&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.706303</font><font color="#4000C0">,</font> <font color="#0080C0">0.44773</font><font color="#4000C0">,</font> <font color="#0080C0">0.548338</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">3.41092</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.262178</font><font color="#4000C0">,</font> <font color="#0080C0">0.884949</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.384874</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.0459</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">0.926446</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">3.41092</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">axis3DScaleFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">axis3DScales</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">shear</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">View3DAtts</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Explode by cylinder without radius </font>
+    <font color="#000000">ExplodeAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Cylinder</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cylinderPoint1</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">5</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">20</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cylinderPoint2</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;1&quot;</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cylinderRadius</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Impact</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explodeAllCells</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">ExplodeAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_ucd3d_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Explode by plane</font>
+    <font color="#000000">ExplodeAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Plane</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">planePoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">,</font> <font color="#0080C0">20</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">planeNorm</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;4&quot;</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Impact</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explodeAllCells</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">ExplodeAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_ucd3d_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Explode all cells by point (impact)</font>
+    <font color="#000000">ExplodeAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;1&quot;</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Impact</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explodeAllCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">ExplodeAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_ucd3d_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Explode all cells by point (impact)</font>
+    <font color="#000000">ExplodeAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;1&quot;</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Impact</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explodeAllCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">ExplodeAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_ucd3d_04&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Explode all cells by point (scatter)</font>
+    <font color="#000000">ExplodeAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;1&quot;</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Scatter</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explodeAllCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">ExplodeAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_ucd3d_05&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Explode material by point (scatter)</font>
+    <font color="#000000">ExplodeAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;1&quot;</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1.5</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Scatter</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explodeAllCells</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">ExplodeAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_ucd3d_06&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Explode material by point</font>
+    <font color="#000000">ExplodeAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">3</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;1&quot;</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cylinderRadius</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1.5</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Scatter</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explodeAllCells</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">ExplodeAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_ucd3d_07&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Explode all cells by cylinder with radius</font>
+    <font color="#000000">ExplodeAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Cylinder</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cylinderPoint1</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cylinderPoint2</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cylinderRadius</font> <font color="#4000C0">=</font> <font color="#0080C0">4</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">.4</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">Impact</font>
+    <font color="#000000">ExplodeAtts</font><font color="#4000C0">.</font><font color="#000000">explodeAllCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">ExplodeAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_ucd3d_08&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">rectilinear_explosions</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">RecenterView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Explode&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">mainAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">atts1</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;7&quot;</font>
+    <font color="#000000">mainAtts</font><font color="#4000C0">.</font><font color="#000000">AddExplosions</font><font color="#4000C0">(</font><font color="#000000">atts1</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mainAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">atts2</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;5&quot;</font>
+    <font color="#000000">mainAtts</font><font color="#4000C0">.</font><font color="#000000">AddExplosions</font><font color="#4000C0">(</font><font color="#000000">atts2</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mainAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_rect3d_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">multi_rectilinear_explosions</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">RecenterView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Explode&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">mainAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">atts1</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;2&quot;</font>
+    <font color="#000000">mainAtts</font><font color="#4000C0">.</font><font color="#000000">AddExplosions</font><font color="#4000C0">(</font><font color="#000000">atts1</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mainAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">atts2</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;3&quot;</font>
+    <font color="#000000">mainAtts</font><font color="#4000C0">.</font><font color="#000000">AddExplosions</font><font color="#4000C0">(</font><font color="#000000">atts2</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mainAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_multi_rect3d_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">multi_tire</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;tire.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Materials&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">RecenterView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">View3DAtts</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.0</font><font color="#4000C0">,</font> <font color="#0080C0">0.0</font><font color="#4000C0">,</font> <font color="#0080C0">0.0</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">8.0</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">0.5</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">0.5</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">0.826446</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">axis3DScaleFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">axis3DScales</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">shear</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">View3DAtts</font><font color="#4000C0">)</font>
+
+
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Explode&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">mainAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># If domains are being treated correctly, this</font>
+    <font color="#a02030"># should not produce an explosion. </font>
+    <font color="#000000">atts1</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">500</font>
+    <font color="#000000">atts1</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;1 Rubber&quot;</font>
+    <font color="#000000">mainAtts</font><font color="#4000C0">.</font><font color="#000000">AddExplosions</font><font color="#4000C0">(</font><font color="#000000">atts1</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mainAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_tire_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">atts2</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">Plane</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">planePoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">planeNorm</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">atts2</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;1 Rubber&quot;</font>
+    <font color="#000000">mainAtts</font><font color="#4000C0">.</font><font color="#000000">AddExplosions</font><font color="#4000C0">(</font><font color="#000000">atts2</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mainAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_tire_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">atts3</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">cellExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">60</font><font color="#4000C0">)</font>
+    <font color="#000000">atts3</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;2 Steel&quot;</font>
+    <font color="#000000">mainAtts</font><font color="#4000C0">.</font><font color="#000000">AddExplosions</font><font color="#4000C0">(</font><font color="#000000">atts3</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mainAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_tire_02&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TwoDimNoMat</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;quad_disk.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;sphElevD_on_mesh&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">RecenterView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Explode&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">atts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">explodeAllCells</font>  <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">Scatter</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_quad_disk_00&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestRecenter</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Recentering is enabled when exploding all cells,</font>
+    <font color="#a02030"># and it allows a cell to be displaced even when </font>
+    <font color="#a02030"># its center lies on an explode origin. </font>
+    <font color="#a02030">#</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;arbpoly-zoohybrid.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/z1&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">RecenterView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Explode&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Test when a cell center lies on an explode</font>
+    <font color="#a02030"># cylinder with radius 0. </font>
+    <font color="#a02030">#</font>
+    <font color="#000000">atts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">explodeAllCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font>   <font color="#4000C0">=</font> <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">Cylinder</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">cylinderPoint1</font>  <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">.5</font><font color="#4000C0">,</font> <font color="#0080C0">.5</font><font color="#4000C0">)</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">cylinderPoint2</font>  <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">.5</font><font color="#4000C0">,</font> <font color="#0080C0">.5</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;recenter_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Test when a cell center lies on an explode</font>
+    <font color="#a02030"># point.</font>
+    <font color="#a02030">#</font>
+    <font color="#000000">atts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">explodeAllCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font>   <font color="#4000C0">=</font> <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font>  <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">.5</font><font color="#4000C0">,</font> <font color="#0080C0">.5</font><font color="#4000C0">,</font> <font color="#0080C0">.5</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;recenter_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Test when a cell center lies on an explode</font>
+    <font color="#a02030"># plane.</font>
+    <font color="#a02030">#</font>
+    <font color="#000000">atts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">explodeAllCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font>   <font color="#4000C0">=</font> <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">Plane</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">planePoint</font>      <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.5</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">atts</font><font color="#4000C0">.</font><font color="#000000">planeNorm</font>       <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">atts</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;recenter_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">TestDomainExplode</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;domains(mesh1)&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">RecenterView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Test exploding full mesh domains. </font>
+    <font color="#a02030">#</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Explode&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">expAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1.2</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;15&quot;</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">Impact</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">expAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_domains_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;domains(mesh1_front)&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Test exploding a subset of mesh domains. </font>
+    <font color="#a02030">#</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Explode&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">expAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1.2</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;8&quot;</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">Impact</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">expAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_domains_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestRepeatMatLabels</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Under certain circumstances, the explode operator</font>
+    <font color="#a02030"># will recieve repeat labels that need to be condensed. </font>
+    <font color="#a02030"># Make sure we can handle this. </font>
+    <font color="#a02030">#</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;tire.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Materials&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">RecenterView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># First, add a reflect operator, which will create</font>
+    <font color="#a02030"># repeat labels if used on multi domain data.  </font>
+    <font color="#a02030">#</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Reflect&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Test exploding full mesh domains. </font>
+    <font color="#a02030">#</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Explode&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">expAtts</font> <font color="#4000C0">=</font> <font color="#000000">ExplodeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">explosionType</font> <font color="#4000C0">=</font> <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">materialExplosionFactor</font> <font color="#4000C0">=</font> <font color="#0080C0">1.2</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">material</font> <font color="#4000C0">=</font> <font color="#008000">&quot;1 Rubber&quot;</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">explodeMaterialCells</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">explosionPattern</font> <font color="#4000C0">=</font> <font color="#000000">expAtts</font><font color="#4000C0">.</font><font color="#000000">Impact</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">expAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;explode_repeat_labels_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">Main</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">unstructured_explosions</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">curvilinear_explosions</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">rectilinear_explosions</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">multi_rectilinear_explosions</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">multi_tire</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TwoDimNoMat</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestRecenter</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestDomainExplode</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestRepeatMatLabels</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">Main</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

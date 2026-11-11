@@ -1,0 +1,78 @@
+<html><body bgcolor="#e0e0e0"><head><title>quickrecipes/working_with_dbs.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Mark C. Miller, Fri Aug 26 14:31:48 PDT 2022</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Get some utils shared across many .py files used for quick recipes.</font>
+<font color="#a02030">#</font>
+<font color="#000000">Source</font><font color="#4000C0">(</font><font color="#000000">tests_path</font><font color="#4000C0">(</font><font color="#008000">&#x27;quickrecipes&#x27;</font><font color="#4000C0">,</font><font color="#008000">&#x27;vqr_utils.py.inc&#x27;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">opening_a_database</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+  <font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># opening a database {</font>
+    <font color="#a02030"># Open a database (no time specified defaults to time state 0)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;/Users/amina/data/pdb_test_data/allinone00.pdb&quot;</font><font color="#4000C0">)</font>
+    <font color="#a02030"># opening a database }</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&#x27;opening a database error message&#x27;</font><font color="#4000C0">,</font><font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;opening a database no exceptions&#x27;</font><font color="#4000C0">)</font>
+  <font color="#C00000">except</font> <font color="#000000">Exception</font> <font color="#C00000">as</font> <font color="#000000">inst</font><font color="#4000C0">:</font>
+    <font color="#000000">TestFOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;opening a database exception &quot;%s&quot;&#x27;</font><font color="#4000C0">%</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">inst</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">LINE</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">pass</font>
+  <font color="#000000">vqr_cleanup</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">opening_a_database_at_specific_time</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+  <font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># opening a database at specific time {</font>
+    <font color="#a02030"># Open a database at a specific time state to pick up transient variables</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;/Users/amina/data/pdb_test_data/allinone00.pdb&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">17</font><font color="#4000C0">)</font>
+    <font color="#a02030"># opening a database at specific time }</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&#x27;opening a database at specific time error message&#x27;</font><font color="#4000C0">,</font><font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;opening a database at specific time no exceptions&#x27;</font><font color="#4000C0">)</font>
+  <font color="#C00000">except</font> <font color="#000000">Exception</font> <font color="#C00000">as</font> <font color="#000000">inst</font><font color="#4000C0">:</font>
+    <font color="#000000">TestFOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;opening a database at specific time exception &quot;%s&quot;&#x27;</font><font color="#4000C0">%</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">inst</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">LINE</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">pass</font>
+  <font color="#000000">vqr_cleanup</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">opening_a_virtual_database</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+  <font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># opening a virtual database {</font>
+    <font color="#a02030"># Opening just one file, the first, in series wave0000.silo, wave0010.silo, ...</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;~juanita/silo/stuff/wave0000.silo&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Opening a virtual database representing all available states.</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;~juanita/silo/stuff/wave*.silo database&quot;</font><font color="#4000C0">)</font>
+    <font color="#a02030"># opening a virtual database }</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&#x27;opening a virtual database error message&#x27;</font><font color="#4000C0">,</font><font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;opening a virtual database no exceptions&#x27;</font><font color="#4000C0">)</font>
+  <font color="#C00000">except</font> <font color="#000000">Exception</font> <font color="#C00000">as</font> <font color="#000000">inst</font><font color="#4000C0">:</font>
+    <font color="#000000">TestFOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;opening a virtual database exception &quot;%s&quot;&#x27;</font><font color="#4000C0">%</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">inst</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">LINE</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">pass</font>
+  <font color="#000000">vqr_cleanup</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">opening_a_remote_database</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+  <font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># opening a remote database {</font>
+    <font color="#a02030"># Opening a file on a remote computer by giving a host name</font>
+    <font color="#a02030"># Also, open the database to a later time slice (17)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;thunder:~juanita/silo/stuff/wave.visit&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">17</font><font color="#4000C0">)</font>
+    <font color="#a02030"># opening a remote database }</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&#x27;opening a remote database error message&#x27;</font><font color="#4000C0">,</font><font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestPOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;opening a remote database no exceptions&#x27;</font><font color="#4000C0">)</font>
+  <font color="#C00000">except</font> <font color="#000000">Exception</font> <font color="#C00000">as</font> <font color="#000000">inst</font><font color="#4000C0">:</font>
+    <font color="#000000">TestFOA</font><font color="#4000C0">(</font><font color="#008000">&#x27;opening a remote database exception &quot;%s&quot;&#x27;</font><font color="#4000C0">%</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">inst</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">LINE</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">pass</font>
+  <font color="#000000">vqr_cleanup</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">opening_a_database</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">opening_a_database_at_specific_time</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">opening_a_virtual_database</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">opening_a_remote_database</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

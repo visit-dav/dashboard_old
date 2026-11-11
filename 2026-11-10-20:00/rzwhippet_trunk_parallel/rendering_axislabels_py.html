@@ -1,0 +1,141 @@
+<html><body bgcolor="#e0e0e0"><head><title>rendering/axislabels.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  MODES: serial, parallel, scalable</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  axislabels.py </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      Tests the axis labels</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Eric Brugger</font>
+<font color="#a02030">#  Date:       Fri Dec 17 16:19:49 PST 2021</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestLog2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/distribution.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">swa</font> <font color="#4000C0">=</font> <font color="#000000">SaveWindowAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">width</font> <font color="#4000C0">=</font> <font color="#0080C0">600</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">height</font> <font color="#4000C0">=</font> <font color="#0080C0">600</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">screenCapture</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+
+    <font color="#000000">a</font> <font color="#4000C0">=</font> <font color="#000000">GetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">axes2D</font><font color="#4000C0">.</font><font color="#000000">visible</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetViewCurve</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainScale</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeScale</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">LOG</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Exponential Distribution&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_00&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.601123657864678</font><font color="#4000C0">,</font> <font color="#0080C0">18.12971869918699</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">7.130672752885499</font><font color="#4000C0">,</font> <font color="#0080C0">0.04760456234965804</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_01&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.638075437299828</font><font color="#4000C0">,</font> <font color="#0080C0">17.16667047862213</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">10.48436074884018</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">3.306083433605024</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_02&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">8.812882729839023</font><font color="#4000C0">,</font> <font color="#0080C0">26.61762864576098</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">14.58885955523007</font><font color="#4000C0">,</font> <font color="#0080C0">0.7984153727848649</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_03&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">37.04643791101395</font><font color="#4000C0">,</font> <font color="#0080C0">54.85118382693591</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">26.85053625423488</font><font color="#4000C0">,</font> <font color="#0080C0">13.06009207178967</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_04&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">72.49874837389116</font><font color="#4000C0">,</font> <font color="#0080C0">90.30349428981312</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">42.2472784051628</font><font color="#4000C0">,</font> <font color="#0080C0">28.4568342227176</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_05&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">135.3046789498164</font><font color="#4000C0">,</font> <font color="#0080C0">153.1094248657384</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">69.52354632680284</font><font color="#4000C0">,</font> <font color="#0080C0">55.73310214435764</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_06&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">2.563824255463072</font><font color="#4000C0">,</font> <font color="#0080C0">8.936313157343124</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">4.113141545611167</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">1.345604897058017</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_07&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">2.581093873083343</font><font color="#4000C0">,</font> <font color="#0080C0">8.953582774963396</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">3.296916569328953</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.5293799207758031</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_08&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.4742005234102636</font><font color="#4000C0">,</font> <font color="#0080C0">6.846689425290313</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">3.235890402877946</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.4683537543247966</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_09&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.6728011260433816</font><font color="#4000C0">,</font> <font color="#0080C0">7.045290027923435</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">2.461620916030798</font><font color="#4000C0">,</font> <font color="#0080C0">0.3059157325223497</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_10&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">3.883839369631302</font><font color="#4000C0">,</font> <font color="#0080C0">7.405413441872227</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">2.289688582041886</font><font color="#4000C0">,</font> <font color="#0080C0">2.613171410605579</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_11&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">5.087720394381069</font><font color="#4000C0">,</font> <font color="#0080C0">8.572275507538203</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">2.632794183897802</font><font color="#4000C0">,</font> <font color="#0080C0">3.299666407205631</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_12&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">4.680511844459359</font><font color="#4000C0">,</font> <font color="#0080C0">8.979484057459912</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1.569922247785004</font><font color="#4000C0">,</font> <font color="#0080C0">4.362538343318429</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_13&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># The curve doesn&#x27;t intersect the window.</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1.565282256005422</font><font color="#4000C0">,</font> <font color="#0080C0">0.4651890936507914</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1.046155226469858</font><font color="#4000C0">,</font> <font color="#0080C0">1.927977691841728</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_14&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># The curve doesn&#x27;t intersect the window.</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.7831595313488587</font><font color="#4000C0">,</font> <font color="#0080C0">2.813630881005071</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.07581375463087496</font><font color="#4000C0">,</font> <font color="#0080C0">0.9576362200027442</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_15&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.1079984801721102</font><font color="#4000C0">,</font> <font color="#0080C0">1.494837732720581</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.7549194057961169</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.1526227967039314</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_16&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">7.150150811017356</font><font color="#4000C0">,</font> <font color="#0080C0">9.18062216067357</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">3.893382901287159</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">3.01156043591529</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_17&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">domainCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">8.915537392097869</font><font color="#4000C0">,</font> <font color="#0080C0">10.94600874175408</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">rangeCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">4.898933596142739</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">4.017111130770868</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewCurve</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;AxisLabelsLog2D_18&quot;</font><font color="#4000C0">,</font> <font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curve_test_data/distribution.ultra&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">Main</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestLog2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Main</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

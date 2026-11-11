@@ -1,0 +1,73 @@
+<html><body bgcolor="#e0e0e0"><head><title>hybrid/mir.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  mir.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 2D, 3D, structured, unstructured, single domain</font>
+<font color="#a02030">#              plots     - FilledBoundary</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Jeremy Meredith</font>
+<font color="#a02030">#  Date:       March 24, 2010</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestOneMode</font><font color="#4000C0">(</font><font color="#000000">file</font><font color="#4000C0">,</font> <font color="#000000">mat</font><font color="#4000C0">,</font> <font color="#000000">name</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">SetMaterialAttributes</font><font color="#4000C0">(</font><font color="#000000">mat</font><font color="#4000C0">)</font>
+    <font color="#000000">ReOpenDatabase</font><font color="#4000C0">(</font><font color="#000000">file</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">name</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">TestOneFile</font><font color="#4000C0">(</font><font color="#000000">isRectilinear</font><font color="#4000C0">,</font> <font color="#000000">file</font><font color="#4000C0">,</font> <font color="#000000">matname</font><font color="#4000C0">,</font> <font color="#000000">prefix</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">file</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#000000">matname</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v3</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v3</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.3</font><font color="#4000C0">,</font> <font color="#0080C0">0.4</font><font color="#4000C0">,</font> <font color="#0080C0">0.8</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v3</font><font color="#4000C0">)</font>
+
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MaterialAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">algorithm</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">EquiT</font>
+    <font color="#000000">TestOneMode</font><font color="#4000C0">(</font><font color="#000000">file</font><font color="#4000C0">,</font> <font color="#000000">m</font><font color="#4000C0">,</font> <font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_equi_t&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">algorithm</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">EquiZ</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">iterationEnabled</font> <font color="#4000C0">=</font> <font color="#C00000">False</font>
+    <font color="#000000">TestOneMode</font><font color="#4000C0">(</font><font color="#000000">file</font><font color="#4000C0">,</font> <font color="#000000">m</font><font color="#4000C0">,</font> <font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_equi_z&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">algorithm</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">EquiZ</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">iterationEnabled</font> <font color="#4000C0">=</font> <font color="#C00000">True</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">numIterations</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">iterationDamping</font> <font color="#4000C0">=</font> <font color="#0080C0">0.4</font>
+    <font color="#000000">TestOneMode</font><font color="#4000C0">(</font><font color="#000000">file</font><font color="#4000C0">,</font> <font color="#000000">m</font><font color="#4000C0">,</font> <font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_equi_z_i5&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">iterationEnabled</font> <font color="#4000C0">=</font> <font color="#C00000">False</font>
+
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">algorithm</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">PLIC</font>
+    <font color="#000000">TestOneMode</font><font color="#4000C0">(</font><font color="#000000">file</font><font color="#4000C0">,</font> <font color="#000000">m</font><font color="#4000C0">,</font> <font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_plic&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">algorithm</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">Isovolume</font>
+    <font color="#000000">TestOneMode</font><font color="#4000C0">(</font><font color="#000000">file</font><font color="#4000C0">,</font> <font color="#000000">m</font><font color="#4000C0">,</font> <font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_isovol&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Discrete currently only works on rectilinear</font>
+    <font color="#C00000">if</font> <font color="#000000">isRectilinear</font><font color="#4000C0">:</font>
+        <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">algorithm</font> <font color="#4000C0">=</font> <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">Discrete</font>
+        <font color="#a02030"># Discrete is stochastic, we can&#x27;t test it reliably</font>
+        <font color="#a02030">#TestOneMode(file, m, prefix + &quot;_discrete&quot;)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">file</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Curvilinear, 2D&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestOneFile</font><font color="#4000C0">(</font><font color="#C00000">False</font><font color="#4000C0">,</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;specmix_quad.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font> <font color="#008000">&quot;Material&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mir_curv2d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Unstructured, 2D&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestOneFile</font><font color="#4000C0">(</font><font color="#C00000">False</font><font color="#4000C0">,</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;specmix_ucd.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font> <font color="#008000">&quot;Material&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mir_ucd2d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Rectilinear, 2D&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestOneFile</font><font color="#4000C0">(</font><font color="#C00000">True</font><font color="#4000C0">,</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mir_rect2d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Rectilinear, 3D&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestOneFile</font><font color="#4000C0">(</font><font color="#C00000">True</font><font color="#4000C0">,</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mir_rect3d&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

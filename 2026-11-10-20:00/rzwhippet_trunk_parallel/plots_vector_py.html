@@ -1,0 +1,244 @@
+<html><body bgcolor="#e0e0e0"><head><title>plots/vector.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  vector.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      vector    - 3D rectilinear, unstructured single domain</font>
+<font color="#a02030">#              plots     - vector, plus interactions with some operators.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  &#x27;4954</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       June 2, 2004</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Jeremy Meredith, Thu Jun 24 12:58:06 PDT 2004</font>
+<font color="#a02030">#    Set the vector origin explicitly for some cases because I changed the</font>
+<font color="#a02030">#    default to Tail.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Jeremy Meredith, Tue Jul  8 12:54:58 EDT 2008</font>
+<font color="#a02030">#    Added test for new limit to original cells/nodes only.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Thu Mar 25 09:57:34 PDT 2010</font>
+<font color="#a02030">#    Added call(s) to DrawPlots() b/c of changes to the default plot state </font>
+<font color="#a02030">#    behavior when an operator is added.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Tue Nov 29 10:41:39 PST 2022</font>
+<font color="#a02030">#    Replace obsolte &#x27;colorByMag&#x27; vector att with &#x27;colorByMagnitude&#x27;.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;vel&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">vector_atts</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">autoScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vector_atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.453335</font><font color="#4000C0">,</font> <font color="#0080C0">0.442704</font><font color="#4000C0">,</font> <font color="#0080C0">0.773628</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.256972</font><font color="#4000C0">,</font> <font color="#0080C0">0.895999</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.362148</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">34.641</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">34.641</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.3354</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test that we can thin the vector field correctly.</font>
+<font color="#a02030">#</font>
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">vectorOrigin</font> <font color="#4000C0">=</font> <font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">Middle</font>
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">nVectors</font> <font color="#4000C0">=</font> <font color="#0080C0">1005</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vector_atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">nVectors</font> <font color="#4000C0">=</font> <font color="#0080C0">50</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vector_atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">useStride</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">stride</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vector_atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">stride</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vector_atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">stride</font> <font color="#4000C0">=</font> <font color="#0080C0">50</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vector_atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test some rendering portions of the vector plot.</font>
+<font color="#a02030">#</font>
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">useStride</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">nVectors</font> <font color="#4000C0">=</font> <font color="#0080C0">400</font>
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">scale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.5</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vector_atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">headOn</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vector_atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_08&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">headOn</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">colorByMagnitude</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">vectorColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vector_atts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_09&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test zonal vectors.</font>
+<font color="#a02030">#</font>
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">colorByMagnitude</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vector_atts</font><font color="#4000C0">)</font>
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;disp&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_10&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test that we can have other plots in the same window as the vector plot.</font>
+<font color="#a02030">#</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;mag&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;magnitude(disp)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mag&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Isovolume&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">iso_atts</font> <font color="#4000C0">=</font> <font color="#000000">IsovolumeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">iso_atts</font><font color="#4000C0">.</font><font color="#000000">lbound</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">iso_atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_11&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test that vector plots still work when restricted to a slice, etc.</font>
+<font color="#a02030">#</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;v1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;{ vel[0]*coord(quadmesh3d)[0], vel[1]*coord(quadmesh3d)[1], vel[2]*coord(quadmesh3d)[2] }&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;mag2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;magnitude(v1)&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;v1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">vector_atts</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">vector_atts</font><font color="#4000C0">.</font><font color="#000000">autoScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vector_atts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.450822</font><font color="#4000C0">,</font> <font color="#0080C0">0.819923</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.352824</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.868253</font><font color="#4000C0">,</font> <font color="#0080C0">0.311093</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.386468</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.866025</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1.73205</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">1.73205</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.3354</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_12&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">iso_surf_atts</font> <font color="#4000C0">=</font> <font color="#000000">IsosurfaceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">iso_surf_atts</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;mag2&quot;</font>
+<font color="#000000">iso_surf_atts</font><font color="#4000C0">.</font><font color="#000000">contourMethod</font> <font color="#4000C0">=</font> <font color="#000000">iso_surf_atts</font><font color="#4000C0">.</font><font color="#000000">Value</font>
+<font color="#000000">iso_surf_atts</font><font color="#4000C0">.</font><font color="#000000">contourValue</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2</font><font color="#4000C0">)</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">iso_surf_atts</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Isosurface&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_13&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">RemoveLastOperator</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">slice_atts</font> <font color="#4000C0">=</font> <font color="#000000">SliceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">slice_atts</font><font color="#4000C0">.</font><font color="#000000">originType</font> <font color="#4000C0">=</font> <font color="#000000">slice_atts</font><font color="#4000C0">.</font><font color="#000000">Point</font>
+<font color="#000000">slice_atts</font><font color="#4000C0">.</font><font color="#000000">originPoint</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">slice_atts</font><font color="#4000C0">.</font><font color="#000000">normal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">slice_atts</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_14&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">slice_atts</font><font color="#4000C0">.</font><font color="#000000">project2d</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">slice_atts</font><font color="#4000C0">.</font><font color="#000000">normal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">slice_atts</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.00395109</font><font color="#4000C0">,</font> <font color="#0080C0">0.999884</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.0147199</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.987418</font><font color="#4000C0">,</font> <font color="#0080C0">0.00157403</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.158122</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.866025</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1.73205</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">1.73205</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.3354</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_15&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test the &quot;limit vectors to original node/cell&quot; option</font>
+<font color="#a02030">#</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cvel&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;recenter(vel)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;vel&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Boundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;quadmesh2d&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">vec</font><font color="#4000C0">=</font><font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">useStride</font><font color="#4000C0">=</font><font color="#0080C0">1</font>
+<font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">stride</font><font color="#4000C0">=</font><font color="#0080C0">1</font>
+<font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">scale</font><font color="#4000C0">=</font><font color="#0080C0">0.1</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">.3</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">1.3</font><font color="#4000C0">)</font>
+<font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vec</font><font color="#4000C0">)</font>
+<font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#008000">&quot;3&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;7&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;8&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">origOnly</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vec</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_16&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">origOnly</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vec</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_17&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;cvel&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">origOnly</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vec</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_18&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">origOnly</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vec</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;vector_19&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

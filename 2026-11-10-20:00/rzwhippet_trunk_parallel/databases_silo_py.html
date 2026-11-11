@@ -1,0 +1,808 @@
+<html><body bgcolor="#e0e0e0"><head><title>databases/silo.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  silo.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      multi-part silo files</font>
+<font color="#a02030">#              operators - slice</font>
+<font color="#a02030">#              operators - onion peel</font>
+<font color="#a02030">#              selection - by domains</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Mark C. Miller</font>
+<font color="#a02030">#  Date:       March 8, 2004</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defects:    4335/4337.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Kathleen Bonnell, Tue Mar  9 08:48:14 PST 2004</font>
+<font color="#a02030">#    Turned off databaseInfo annotation, Used TurnOffDomains instead of</font>
+<font color="#a02030">#    SIL sets to get correct domain turned off, reordered DrawPlots for</font>
+<font color="#a02030">#    test 3 so that we get same results in parallel.  For OnionPeel, use</font>
+<font color="#a02030">#    SetDefaultOperatorOptions so that options are applied.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Thu Jun 24 09:59:12 PDT 2004</font>
+<font color="#a02030">#    Add tests for quads that are stored as hexes in a ucd mesh. [&#x27;4335/&#x27;4337]</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Wed Mar 9 09:15:30 PDT 2005</font>
+<font color="#a02030">#    Removed deprecated functions.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Tue Jun 28 17:28:56 PDT 2005</font>
+<font color="#a02030">#    Added tests mimicing Ale3d&#x27;s history variables</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Dec 13 18:32:20 PST 2006</font>
+<font color="#a02030">#    Added time invariant mesh tests</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Feb  7 20:23:22 PST 2007</font>
+<font color="#a02030">#    Modified code to set SIL Restriction for mesh1_dup to be independent</font>
+<font color="#a02030">#    of the file structure. Added test for multivar that spans multiple</font>
+<font color="#a02030">#    multimeshes; it should fail.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Jeremy Meredith, Tue Jul 15 10:43:58 EDT 2008</font>
+<font color="#a02030">#    Changed number of vectors in vector plot to match the old behavior.</font>
+<font color="#a02030">#    (We now account for how many domains there are.)</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Thu Jan 22 16:27:54 PST 2009</font>
+<font color="#a02030">#    Modified tests of defvars using mag and vec to make them less sensitive</font>
+<font color="#a02030">#    to differences in platform. The mag test was computing a vector magnitude</font>
+<font color="#a02030">#    whose range was very, very tiny. Switching that to sum fixes that</font>
+<font color="#a02030">#    problem. The vector plot was simply generating way to many vectors that</font>
+<font color="#a02030">#    were being drawn on top of each other. I changed it to use a moderately</font>
+<font color="#a02030">#    large prime as the stride.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Mon Sep 28 20:58:24 PDT 2009</font>
+<font color="#a02030">#    Added tests for AMR data from Silo file using MRG Trees.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Tom Fogal, Wed Dec 16 13:11:19 MST 2009</font>
+<font color="#a02030">#    Fixed a path to a data file.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Fri Jan 22 17:30:29 PST 2010</font>
+<font color="#a02030">#    I replaced OpenDatabase with FindAnd... variant for largefile.silo</font>
+<font color="#a02030">#    to deal with data we don&#x27;t keep in repo.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Thu Mar 25 09:57:34 PDT 2010</font>
+<font color="#a02030">#    Added call(s) to DrawPlots() b/c of changes to the default plot state</font>
+<font color="#a02030">#    behavior when an operator is added.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Tue Feb 28 00:36:09 PST 2012</font>
+<font color="#a02030">#    Added a slew of tests for hybrid zoo and arbitrary polygonal/polyhedral</font>
+<font color="#a02030">#    meshes and variables defined upon them.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Thurs May 23 14:09:15 MST 2013</font>
+<font color="#a02030">#    Don&#x27;t run certain tests on Windows that cause a crash.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Thurs Jun 6 11:04:13 PDT 2013</font>
+<font color="#a02030">#    Re-enable tests 42,44, and 45 on Windows, now that crash has been fixed.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Edward Rusu, Tues Oct 2 8:20:24 PDT 2018</font>
+<font color="#a02030">#    Added tests for ghost_zone/node_labels in the silo files.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Wed Aug 28 09:04:00 MST 2019</font>
+<font color="#a02030">#    Turn off cycling of colors for all Curve plot tests.  Set the colors</font>
+<font color="#a02030">#    individually to match current baseline results.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Mon Nov 28, 2022</font>
+<font color="#a02030">#    Remove obsolete &#x27;colorByMag&#x27; vector att with &#x27;colorByMagnitude&#x27;.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Tue July 11, 2023</font>
+<font color="#a02030">#    Don&#x27;t allow tests using wave_1file.visit to run on Windows, as they</font>
+<font color="#a02030">#    involve symlinks. Symink access on the testing machine is disallowed.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Fri July 28, 2023</font>
+<font color="#a02030">#    Allow test_26 involving largefile.silo to run on Windows.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#000000">TurnOffAllAnnotations</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#a02030"># defines global object &#x27;a&#x27;</font>
+
+<font color="#a02030"># Turn off sets by name</font>
+<font color="#C00000">def</font> <font color="#000000">TurnOffSetsByName</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">,</font> <font color="#000000">cat</font><font color="#4000C0">,</font> <font color="#000000">names</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">sets</font> <font color="#4000C0">=</font> <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">SetsInCategory</font><font color="#4000C0">(</font><font color="#000000">cat</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">s</font> <font color="#C00000">in</font> <font color="#000000">sets</font><font color="#4000C0">:</font>
+        <font color="#000000">setname</font> <font color="#4000C0">=</font> <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">SetName</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+        <font color="#C00000">try</font><font color="#4000C0">:</font>
+            <font color="#C00000">if</font> <font color="#000000">setname</font> <font color="#C00000">in</font> <font color="#000000">names</font><font color="#4000C0">:</font>
+                <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+        <font color="#C00000">except</font><font color="#4000C0">:</font>
+            <font color="#C00000">if</font> <font color="#000000">setname</font> <font color="#4000C0">==</font> <font color="#000000">names</font><font color="#4000C0">:</font>
+                <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multipart_multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test simple read and display of a variable</font>
+<font color="#a02030">#</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">=</font><font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.296198</font><font color="#4000C0">,</font> <font color="#0080C0">0.813798</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test an intercept slice (that can use</font>
+<font color="#a02030"># spatial extents tree if we have it)</font>
+<font color="#a02030">#</font>
+<font color="#000000">sliceAtts</font><font color="#4000C0">=</font><font color="#000000">SliceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">sliceAtts</font><font color="#4000C0">.</font><font color="#000000">originType</font><font color="#4000C0">=</font><font color="#000000">sliceAtts</font><font color="#4000C0">.</font><font color="#000000">Intercept</font>
+<font color="#000000">sliceAtts</font><font color="#4000C0">.</font><font color="#000000">originIntercept</font><font color="#4000C0">=</font><font color="#0080C0">5</font>
+<font color="#000000">sliceAtts</font><font color="#4000C0">.</font><font color="#000000">axisType</font><font color="#4000C0">=</font><font color="#000000">sliceAtts</font><font color="#4000C0">.</font><font color="#000000">ZAxis</font>
+<font color="#000000">sliceAtts</font><font color="#4000C0">.</font><font color="#000000">project2d</font><font color="#4000C0">=</font><font color="#0080C0">0</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">sliceAtts</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_02&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># test selection down to just 1 domain</font>
+<font color="#a02030">#</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TurnDomainsOff</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TurnDomainsOn</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#008000">&quot;domain11&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_03&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test an onion peel</font>
+<font color="#a02030">#</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;p&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">op</font> <font color="#4000C0">=</font> <font color="#000000">OnionPeelAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">op</font><font color="#4000C0">.</font><font color="#000000">categoryName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;domains&quot;</font>
+<font color="#000000">op</font><font color="#4000C0">.</font><font color="#000000">subsetName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;domain11&quot;</font>
+<font color="#000000">op</font><font color="#4000C0">.</font><font color="#000000">index</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">op</font><font color="#4000C0">.</font><font color="#000000">logical</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">op</font><font color="#4000C0">.</font><font color="#000000">adjacencyType</font> <font color="#4000C0">=</font> <font color="#000000">op</font><font color="#4000C0">.</font><font color="#000000">Face</font>
+<font color="#000000">op</font><font color="#4000C0">.</font><font color="#000000">requestedLayer</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">op</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;OnionPeel&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># we just hide the plots to keep camera</font>
+<font color="#000000">HideActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Do some os work to create what VisIt will see as a</font>
+<font color="#a02030"># &#x27;virtual&#x27; database of multi-part silo files by</font>
+<font color="#a02030"># creating appropriately named links</font>
+<font color="#a02030">#</font>
+
+<font color="#a02030">#TODO BROKEN:</font>
+<font color="#a02030"># Cyrus: I tried to change this, from prev code</font>
+<font color="#a02030"># b/c symlinks won&#x27;t work on Windows.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># also silo paths in multipart_multi_ucd3d, don&#x27;t point to</font>
+<font color="#a02030"># gorfo files,they won&#x27;t work out of the data dir</font>
+<font color="#a02030"># (and we shouldn&#x27;t be modifying the data dir !)</font>
+
+<font color="#a02030"># KSB: Added copy of original file, and removed silo_data_path from</font>
+<font color="#a02030"># shutil copy so that this will work.</font>
+<font color="#a02030"># All the copies are made into the run_dir by default, which gets cleaned</font>
+<font color="#a02030"># up unless --no-cleanup is used.</font>
+
+<font color="#a02030"># remove any gorfos</font>
+<font color="#C00000">for</font> <font color="#000000">f</font> <font color="#C00000">in</font> <font color="#000000">glob</font><font color="#4000C0">.</font><font color="#000000">glob</font><font color="#4000C0">(</font><font color="#008000">&quot;gorfo_*&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">remove</font><font color="#4000C0">(</font><font color="#000000">f</font><font color="#4000C0">)</font>
+
+<font color="#000000">i</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+
+
+<font color="#C00000">for</font> <font color="#000000">filename</font> <font color="#C00000">in</font> <font color="#000000">glob</font><font color="#4000C0">.</font><font color="#000000">glob</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multipart_multi_ucd3d*.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># copy the original file because the silo files have relatives paths</font>
+    <font color="#000000">shutil</font><font color="#4000C0">.</font><font color="#000000">copy</font><font color="#4000C0">(</font><font color="#000000">filename</font><font color="#4000C0">,</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">basename</font><font color="#4000C0">(</font><font color="#000000">filename</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#C00000">if</font> <font color="#000000">filename</font><font color="#4000C0">.</font><font color="#000000">endswith</font><font color="#4000C0">(</font><font color="#008000">&quot;multipart_multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">shutil</font><font color="#4000C0">.</font><font color="#000000">copy</font><font color="#4000C0">(</font><font color="#000000">filename</font><font color="#4000C0">,</font><font color="#008000">&quot;gorfo_1000&quot;</font><font color="#4000C0">)</font>
+        <font color="#000000">shutil</font><font color="#4000C0">.</font><font color="#000000">copy</font><font color="#4000C0">(</font><font color="#000000">filename</font><font color="#4000C0">,</font><font color="#008000">&quot;gorfo_2000&quot;</font><font color="#4000C0">)</font>
+        <font color="#000000">shutil</font><font color="#4000C0">.</font><font color="#000000">copy</font><font color="#4000C0">(</font><font color="#000000">filename</font><font color="#4000C0">,</font><font color="#008000">&quot;gorfo_3000&quot;</font><font color="#4000C0">)</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#000000">shutil</font><font color="#4000C0">.</font><font color="#000000">copy</font><font color="#4000C0">(</font><font color="#000000">filename</font><font color="#4000C0">,</font><font color="#008000">&quot;gorfo_1000.%d&quot;</font> <font color="#4000C0">%</font><font color="#000000">i</font><font color="#4000C0">)</font>
+        <font color="#000000">shutil</font><font color="#4000C0">.</font><font color="#000000">copy</font><font color="#4000C0">(</font><font color="#000000">filename</font><font color="#4000C0">,</font><font color="#008000">&quot;gorfo_2000.%d&quot;</font> <font color="#4000C0">%</font><font color="#000000">i</font><font color="#4000C0">)</font>
+        <font color="#000000">shutil</font><font color="#4000C0">.</font><font color="#000000">copy</font><font color="#4000C0">(</font><font color="#000000">filename</font><font color="#4000C0">,</font><font color="#008000">&quot;gorfo_3000.%d&quot;</font> <font color="#4000C0">%</font><font color="#000000">i</font><font color="#4000C0">)</font>
+    <font color="#000000">i</font> <font color="#4000C0">=</font> <font color="#000000">i</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test opening a &#x27;virtual&#x27; database of multi-part silo files</font>
+<font color="#a02030"># at something other than its first timestep</font>
+<font color="#a02030">#</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;gorfo_* database&quot;</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># go to the next frame</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_06&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;exterior_faces&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_08&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test something akin to Ale3d&#x27;s history variables</font>
+<font color="#a02030"># Note: time state 0 is purposely corrupted with</font>
+<font color="#a02030"># all empty domains. So we go from 1 to end and</font>
+<font color="#a02030"># back around to 1 purposely avoiding 0</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;hist_ucd3d_* database&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;d_dup&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Build a sil restriction</font>
+<font color="#a02030">#</font>
+<font color="#000000">silr</font><font color="#4000C0">=</font><font color="#000000">SILRestriction</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">Wholes</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+   <font color="#C00000">if</font> <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">SetName</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font> <font color="#4000C0">==</font> <font color="#008000">&quot;mesh1_dup&quot;</font><font color="#4000C0">:</font>
+       <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">+</font><font color="#0080C0">11</font><font color="#4000C0">)</font>
+       <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">+</font><font color="#0080C0">12</font><font color="#4000C0">)</font>
+       <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">+</font><font color="#0080C0">22</font><font color="#4000C0">)</font>
+       <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">+</font><font color="#0080C0">23</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_09&quot;</font><font color="#4000C0">)</font>
+
+<font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">-</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%02d&quot;</font><font color="#4000C0">%</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">+</font><font color="#0080C0">10</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderSetState</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_18&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test defvar object</font>
+<font color="#a02030">#</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;sum&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_20&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;vec&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">vec</font> <font color="#4000C0">=</font> <font color="#000000">VectorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">useStride</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">stride</font> <font color="#4000C0">=</font> <font color="#0080C0">41</font>
+<font color="#000000">vec</font><font color="#4000C0">.</font><font color="#000000">colorByMagnitude</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">vec</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_21&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;nmats&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_22&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test curves from silo</font>
+<font color="#a02030">#</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">a</font><font color="#4000C0">=</font><font color="#000000">GetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">axes2D</font><font color="#4000C0">.</font><font color="#000000">visible</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;line&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_23&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;wave&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_24&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;log&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_25&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test objects existing past 2Gig limit in a &gt;2 Gig file</font>
+<font color="#a02030"># Large File Support. Because file is large, it is NOT</font>
+<font color="#a02030"># part of the repo. We create a sym-link to it from the</font>
+<font color="#a02030"># data dir.</font>
+<font color="#a02030">#</font>
+
+<font color="#4000C0">(</font><font color="#000000">err</font><font color="#4000C0">,</font> <font color="#000000">dbname</font><font color="#4000C0">)</font> <font color="#4000C0">=</font> <font color="#000000">FindAndOpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;largefile.silo&quot;</font><font color="#4000C0">)</font>
+<font color="#C00000">if</font> <font color="#4000C0">(</font><font color="#000000">err</font> <font color="#4000C0">!=</font> <font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">AddSkipCase</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_26&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_26&quot;</font><font color="#4000C0">)</font>
+<font color="#C00000">else</font><font color="#4000C0">:</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;sincurve&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;coscurve&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_26&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">dbname</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test time invariant mesh</font>
+<font color="#a02030">#</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d_ti_* database&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">=</font><font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.296198</font><font color="#4000C0">,</font> <font color="#0080C0">0.813798</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">silr</font><font color="#4000C0">=</font><font color="#000000">SILRestriction</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">36</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_27&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_28&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test that multivars that span multimeshes are correctly</font>
+<font color="#a02030"># invalidated by VisIt</font>
+<font color="#a02030">#</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d_ti_* database&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;d_split&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_29&quot;</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test that we get correct SIL behavior for a database</font>
+<font color="#a02030"># with a varying SIL and TreatAllDBsAsTimeVarying turned</font>
+<font color="#a02030"># on</font>
+<font color="#a02030">#</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;histne_ucd3d_* database&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d_dup&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_30&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_31&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTreatAllDBsAsTimeVarying</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_32&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_33&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderPreviousState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderPreviousState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TimeSliderPreviousState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_34&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test a database with some odd multi-block structure</font>
+<font color="#a02030">#</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;histne_ucd3d_* database&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetTreatAllDBsAsTimeVarying</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_pdb_test_data/odd_multi.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;cyc_00000/den&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_35&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test a database in which all timesteps are in one file</font>
+<font color="#a02030">#</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_pdb_test_data/odd_multi.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">platform</font><font color="#4000C0">.</font><font color="#000000">startswith</font><font color="#4000C0">(</font><font color="#008000">&quot;win&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># files listed in the .visit file (eg wave_1file.silo:cycle_xxx)</font>
+    <font color="#a02030"># are symlinks to wave_1file.silo and symlink access is disallowed</font>
+    <font color="#a02030"># on the windows testing machine.</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave_1file.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;quadmesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_36&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TimeSliderSetState</font><font color="#4000C0">(</font><font color="#0080C0">23</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_37&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TimeSliderNextState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_38&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TimeSliderPreviousState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TimeSliderPreviousState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TimeSliderPreviousState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TimeSliderPreviousState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TimeSliderPreviousState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TimeSliderPreviousState</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_39&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave_1file.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Silo AMR w/Mrgtrees&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TurnOffAllAnnotations</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_amr_test_data/amr2d_wmrgtree.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;amr_mesh_wmrgtree&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">=</font><font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.368424</font><font color="#4000C0">,</font> <font color="#0080C0">0.412063</font><font color="#4000C0">,</font> <font color="#0080C0">0.265434</font><font color="#4000C0">,</font> <font color="#0080C0">0.310012</font><font color="#4000C0">)</font>
+<font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_40&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;Density_wmrgtree&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_41&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">silr</font><font color="#4000C0">=</font><font color="#000000">SILRestriction</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">SetsInCategory</font><font color="#4000C0">(</font><font color="#008000">&quot;levels&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TurnOffSetsByName</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">,</font> <font color="#008000">&quot;levels&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;level2&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_42&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_amr_test_data/amr2d_wmrgtree.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_amr_test_data/amr3d_wmrgtree.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;foo_wmrgtree&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">ca</font><font color="#4000C0">=</font><font color="#000000">ContourAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ca</font><font color="#4000C0">.</font><font color="#000000">contourValue</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">60</font><font color="#4000C0">,</font><font color="#4000C0">)</font>
+<font color="#000000">ca</font><font color="#4000C0">.</font><font color="#000000">contourMethod</font> <font color="#4000C0">=</font> <font color="#000000">ca</font><font color="#4000C0">.</font><font color="#000000">Value</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">ca</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">=</font><font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.2066</font><font color="#4000C0">,</font> <font color="#0080C0">0.104372</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">6.03355</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_43&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">silr</font><font color="#4000C0">=</font><font color="#000000">SILRestriction</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TurnOffSetsByName</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">,</font> <font color="#008000">&quot;levels&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;level2&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_44&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TurnOffSetsByName</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">,</font> <font color="#008000">&quot;levels&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;level1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_45&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_amr_test_data/amr2d_wmrgtree.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Variables defined on material subsets&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">sa</font> <font color="#4000C0">=</font> <font color="#000000">SliceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">sa</font><font color="#4000C0">.</font><font color="#000000">originType</font> <font color="#4000C0">=</font> <font color="#000000">sa</font><font color="#4000C0">.</font><font color="#000000">Percent</font>
+<font color="#000000">sa</font><font color="#4000C0">.</font><font color="#000000">originPercent</font> <font color="#4000C0">=</font> <font color="#0080C0">50</font>
+<font color="#000000">sa</font><font color="#4000C0">.</font><font color="#000000">axisType</font> <font color="#4000C0">=</font> <font color="#000000">sa</font><font color="#4000C0">.</font><font color="#000000">ZAxis</font>
+<font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#0080C0">46</font>
+<font color="#C00000">for</font> <font color="#000000">varname</font> <font color="#C00000">in</font> <font color="#4000C0">(</font><font color="#008000">&quot;p_on_mats_2&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;d_on_mats_1_3&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;m1vf_on_mats_1&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;m2vf_on_mats_2&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;m3vf_on_mats_3&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">varname</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">sa</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetViewExtentsType</font><font color="#4000C0">(</font><font color="#008000">&quot;actual&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+    <font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;arbpoly-zoohybrid.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Various arbitrary polygonal/polyhedral meshes&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ma</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ma</font><font color="#4000C0">.</font><font color="#000000">showInternal</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#C00000">for</font> <font color="#000000">meshname</font> <font color="#C00000">in</font> <font color="#4000C0">(</font><font color="#008000">&quot;2D/mesh1_zl1&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;2D/mesh1_zl2&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;2D/mesh1_phzl&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;2D/mesh1_phzl2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2D/mesh1g_zl2&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#000000">meshname</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">ma</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+    <font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#C00000">for</font> <font color="#000000">meshname</font> <font color="#C00000">in</font> <font color="#4000C0">(</font><font color="#008000">&quot;2Dz/mesh1_zl1&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;2Dz/mesh1_zl2&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;2Dz/mesh1_phzl&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;2Dz/mesh1_phzl2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2Dz/mesh1g_zl2&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#000000">meshname</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+    <font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#000000">ma</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ma</font><font color="#4000C0">.</font><font color="#000000">showInternal</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">ma</font><font color="#4000C0">.</font><font color="#000000">opaqueMode</font> <font color="#4000C0">=</font> <font color="#000000">ma</font><font color="#4000C0">.</font><font color="#000000">On</font>
+<font color="#C00000">for</font> <font color="#000000">meshname</font> <font color="#C00000">in</font> <font color="#4000C0">(</font><font color="#008000">&quot;3D/mesh1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/mesh2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/mesh2g&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/mesh3&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/mesh3r&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#000000">meshname</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">ma</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">RotateAxis</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#4000C0">-</font><font color="#0080C0">30</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">RotateAxis</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">20</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+    <font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#C00000">for</font> <font color="#000000">varname</font> <font color="#C00000">in</font> <font color="#4000C0">(</font><font color="#008000">&quot;2D/n11&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2D/n12&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2D/n12g&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2D/n1phzl&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2D/n1phzl2&quot;</font><font color="#4000C0">,</font>
+                <font color="#008000">&quot;2D/z11&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2D/z12&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2D/z12g&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2D/z1phzl&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2D/z1phzl2&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">varname</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+    <font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#C00000">for</font> <font color="#000000">varname</font> <font color="#C00000">in</font> <font color="#4000C0">(</font><font color="#008000">&quot;2Dz/n11&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2Dz/n12&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2Dz/n12g&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2Dz/n1phzl&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2Dz/n1phzl2&quot;</font><font color="#4000C0">,</font>
+                <font color="#008000">&quot;2Dz/z11&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2Dz/z12&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2Dz/z12g&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2Dz/z1phzl&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;2Dz/z1phzl2&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">varname</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+    <font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#C00000">for</font> <font color="#000000">varname</font> <font color="#C00000">in</font> <font color="#4000C0">(</font><font color="#008000">&quot;3D/n1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/n2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/n2g&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/n3&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/n3r&quot;</font><font color="#4000C0">,</font>
+                <font color="#008000">&quot;3D/z1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/z2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/z2g&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/z3&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;3D/z3r&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">varname</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">RotateAxis</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#4000C0">-</font><font color="#0080C0">30</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">RotateAxis</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">20</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+    <font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;arbpoly-zoohybrid.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Scalar and Vector ASCII Label Plots&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;ascii&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.362263</font><font color="#4000C0">,</font> <font color="#0080C0">0.967737</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.0277375</font><font color="#4000C0">,</font> <font color="#0080C0">0.577737</font><font color="#4000C0">)</font>
+<font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+<font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Label&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;asciiw&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.362263</font><font color="#4000C0">,</font> <font color="#0080C0">0.967737</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.0277375</font><font color="#4000C0">,</font> <font color="#0080C0">0.577737</font><font color="#4000C0">)</font>
+<font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+<font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve with polar coordinates&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;circle&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+<font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;ghost_zone/node_labels&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_ghost_test_data/specmix_quad.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh_gnz&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh_gnz&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+<font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_ghost_test_data/specmix_quad.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_ghost_test_data/specmix_ucd.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh_gnz&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh_gnz&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+<font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_ghost_test_data/specmix_ucd.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test the way silo reads in curve data with expressions</font>
+<font color="#a02030">#</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">DefineCurveExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;alias&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;wave&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineCurveExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;waveSquared&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;wave*wave&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;wave&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">135</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;waveSquared&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">135</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+<font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;alias&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">curveAtts</font><font color="#4000C0">.</font><font color="#000000">curveColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">168</font><font color="#4000C0">,</font> <font color="#0080C0">168</font><font color="#4000C0">,</font> <font color="#0080C0">168</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">curveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_%d&quot;</font><font color="#4000C0">%</font><font color="#000000">testNum</font><font color="#4000C0">)</font>
+<font color="#000000">testNum</font> <font color="#4000C0">=</font> <font color="#000000">testNum</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">curvilinear_3d_surface</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#008000">&quot;&quot;&quot;Curvilinear (quad) surfaces in 3D&quot;&quot;&quot;</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;quad_disk.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;sphElev_on_mesh_3d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">RotateAxis</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#4000C0">-</font><font color="#0080C0">20</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">RotateAxis</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#4000C0">-</font><font color="#0080C0">30</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#000000">TestAutoName</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;sphElev_on_meshD_3d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestAutoName</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat_3d(mesh_3d)&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestAutoName</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;quad_disk.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;specmix_quad.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Index select doesn&#x27;t work quite right here</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;Mesh_3d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;IndexSelect&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">idxsel</font> <font color="#4000C0">=</font> <font color="#000000">IndexSelectAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">idxsel</font><font color="#4000C0">.</font><font color="#000000">xMin</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+    <font color="#000000">idxsel</font><font color="#4000C0">.</font><font color="#000000">xMax</font> <font color="#4000C0">=</font> <font color="#0080C0">15</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">idxsel</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestAutoName</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;p3d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestAutoName</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;u3d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestAutoName</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Material_3d(Mesh_3d)&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestAutoName</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;specmix_quad.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">degen_hex_metrics</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#008000">&quot;&quot;&quot;Verdict metrics on meshes with degenerate hexahedra&quot;&quot;&quot;</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;degen_hex.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;hex2&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetQueryOutputToValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume of hex2 mesh&quot;</font><font color="#4000C0">,</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Volume&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;degen_hex.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">colmajor_vector_var</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#008000">&quot;&quot;&quot;Col-major reordering for vector vars&quot;&quot;&quot;</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;quadf77.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Vector&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;f&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">0.8</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># If reordering happened correctly, node picks on variable &quot;f&quot;</font>
+    <font color="#a02030"># should be same as coords.</font>
+    <font color="#000000">failedAt</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">x</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">5</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#C00000">for</font> <font color="#000000">y</font> <font color="#C00000">in</font> <font color="#000000">range</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">4</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#000000">p</font> <font color="#4000C0">=</font> <font color="#000000">NodePick</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#000000">x</font><font color="#4000C0">,</font><font color="#000000">y</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+            <font color="#C00000">if</font> <font color="#000000">p</font><font color="#4000C0">[</font><font color="#008000">&#x27;f&#x27;</font><font color="#4000C0">]</font> <font color="#4000C0">!=</font> <font color="#4000C0">(</font><font color="#000000">x</font><font color="#4000C0">,</font><font color="#000000">y</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+                <font color="#000000">failedAt</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#000000">x</font><font color="#4000C0">,</font><font color="#000000">y</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+                <font color="#C00000">break</font>
+        <font color="#C00000">if</font> <font color="#000000">failedAt</font> <font color="#4000C0">!=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#C00000">break</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;f picks yield same as coord values&quot;</font><font color="#4000C0">,</font> <font color="#000000">failedAt</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;quadf77.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">curvilinear_3d_surface</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">degen_hex_metrics</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">colmajor_vector_var</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

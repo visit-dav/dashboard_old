@@ -1,0 +1,218 @@
+<html><body bgcolor="#e0e0e0"><head><title>quickrecipes/colortables.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  colortables.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Kathleen Biagas </font>
+<font color="#a02030">#  Date:       March 30, 2022</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modificatons:</font>
+<font color="#a02030">#    Justin Privitera, Wed Aug  3 19:46:13 PDT 2022</font>
+<font color="#a02030">#    Made changes to reflect the fact that built-in tables cannot be edited.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Mon Dec 12 19:02:35 PST 2022</font>
+<font color="#a02030">#    Add introspecting block</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#a02030"># NOTE: Sections of this test file are &#x27;literalinclude&#x27;d in quickrecipes.rst.</font>
+<font color="#a02030"># After modifying this file, ensure the proper content is still displayed in the doc.</font>
+
+<font color="#a02030"># comments of the form &#x27;# sometext {&#x27; and &#x27;# sometext }&#x27; bracket the sections</font>
+<font color="#a02030"># that are &#x27;literalinclude&#x27;d in quickrecipes.rst.</font>
+
+<font color="#C00000">def</font> <font color="#000000">introspectingColorTable</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+    <font color="#a02030"># introspectingColorTable {</font>
+    <font color="#000000">hotCT</font> <font color="#4000C0">=</font> <font color="#000000">GetColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;hot&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">print</font><font color="#4000C0">(</font><font color="#000000">hotCT</font><font color="#4000C0">)</font>
+    <font color="#a02030"># results of print</font>
+    <font color="#a02030">#    GetControlPoints(0).colors = (0, 0, 255, 255)</font>
+    <font color="#a02030">#    GetControlPoints(0).position = 0</font>
+    <font color="#a02030">#    GetControlPoints(1).colors = (0, 255, 255, 255)</font>
+    <font color="#a02030">#    GetControlPoints(1).position = 0.25</font>
+    <font color="#a02030">#    GetControlPoints(2).colors = (0, 255, 0, 255)</font>
+    <font color="#a02030">#    GetControlPoints(2).position = 0.5</font>
+    <font color="#a02030">#    GetControlPoints(3).colors = (255, 255, 0, 255)</font>
+    <font color="#a02030">#    GetControlPoints(3).position = 0.75</font>
+    <font color="#a02030">#    GetControlPoints(4).colors = (255, 0, 0, 255)</font>
+    <font color="#a02030">#    GetControlPoints(4).position = 1</font>
+    <font color="#a02030">#    smoothing = Linear  # NONE, Linear, CubicSpline</font>
+    <font color="#a02030">#    equalSpacingFlag = 0</font>
+    <font color="#a02030">#    discreteFlag = 0</font>
+    <font color="#a02030"># introspectingColorTable }</font>
+
+<font color="#C00000">def</font> <font color="#000000">modifyExistingColorTable</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+
+    <font color="#a02030"># modifyTable1 {</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">pc</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">centering</font><font color="#4000C0">=</font><font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">Nodal</font>
+    <font color="#a02030"># set color table name</font>
+    <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hot&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#a02030"># put the plot in full-frame mode</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font><font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">On</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#a02030"># modifyTable1 } </font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;standard_hot_table&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">hotCTorig</font> <font color="#4000C0">=</font> <font color="#000000">GetColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;hot&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># modifyTable2 {</font>
+    <font color="#000000">hotCT</font> <font color="#4000C0">=</font> <font color="#000000">GetColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;hot&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Remove a couple of control points</font>
+    <font color="#000000">hotCT</font><font color="#4000C0">.</font><font color="#000000">RemoveControlPoints</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+    <font color="#000000">hotCT</font><font color="#4000C0">.</font><font color="#000000">RemoveControlPoints</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># We must use a different name, as VisIt will not allow overwriting of built-in color tables</font>
+    <font color="#000000">SetColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;hot_edited&quot;</font><font color="#4000C0">,</font> <font color="#000000">hotCT</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># set color table name so changes to it will be reflected in plot</font>
+    <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hot_edited&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+    <font color="#a02030"># modifyTable2 }</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;modified_hot_table_1&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># modifyTable3 {</font>
+    <font color="#a02030"># Change colors</font>
+    <font color="#000000">hotCT</font><font color="#4000C0">.</font><font color="#000000">GetControlPoints</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">colors</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">hotCT</font><font color="#4000C0">.</font><font color="#000000">GetControlPoints</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">colors</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;hot_edited&quot;</font><font color="#4000C0">,</font> <font color="#000000">hotCT</font><font color="#4000C0">)</font>
+    <font color="#a02030"># modifyTable3 }</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;modified_hot_table_2&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># modifyTable4 {</font>
+    <font color="#a02030"># Turn on equal spacing</font>
+    <font color="#000000">hotCT</font><font color="#4000C0">.</font><font color="#000000">equalSpacingFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#a02030"># Create a new color table by providing a different name</font>
+    <font color="#000000">SetColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;hot2&quot;</font><font color="#4000C0">,</font> <font color="#000000">hotCT</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># tell the Pseudocolor plot to use the new color table</font>
+    <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hot2&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+    <font color="#a02030"># modifyTable4 }</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;hot2&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># modifyTable5 {</font>
+    <font color="#a02030"># Change positions so that the first and last are at the endpoints</font>
+    <font color="#000000">hotCT</font><font color="#4000C0">.</font><font color="#000000">equalSpacingFlag</font><font color="#4000C0">=</font><font color="#0080C0">0</font>
+    <font color="#000000">hotCT</font><font color="#4000C0">.</font><font color="#000000">GetControlPoints</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">hotCT</font><font color="#4000C0">.</font><font color="#000000">GetControlPoints</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font><font color="#0080C0">0.5</font>
+    <font color="#000000">hotCT</font><font color="#4000C0">.</font><font color="#000000">GetControlPoints</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;hot3&quot;</font><font color="#4000C0">,</font> <font color="#000000">hotCT</font><font color="#4000C0">)</font>
+
+    <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hot3&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+    <font color="#a02030"># modifyTable5 }</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;hot3&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># remove the added color tables</font>
+    <font color="#000000">RemoveColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;hot_edited&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">RemoveColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;hot2&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">RemoveColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;hot3&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">createContinuous</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># based on http://visitusers.org/index.php?title=Creating_a_color_table</font>
+
+    <font color="#a02030"># continuous1 {</font>
+    <font color="#a02030"># create control points (red, green, blue, position).</font>
+    <font color="#000000">ct</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0.</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0.8</font><font color="#4000C0">,</font><font color="#0080C0">0.</font><font color="#4000C0">,</font><font color="#0080C0">0.166</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0.333</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0.5</font><font color="#4000C0">)</font><font color="#4000C0">,</font>
+          <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0.666</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">0.8333</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">0.8</font><font color="#4000C0">,</font><font color="#0080C0">0.1</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ccpl</font> <font color="#4000C0">=</font> <font color="#000000">ColorControlPointList</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># add the control points to the list </font>
+    <font color="#C00000">for</font> <font color="#000000">pt</font> <font color="#C00000">in</font> <font color="#000000">ct</font><font color="#4000C0">:</font>
+        <font color="#000000">p</font> <font color="#4000C0">=</font> <font color="#000000">ColorControlPoint</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#a02030"># colors is RGBA and must be in range 0...255</font>
+        <font color="#a02030"># Python3.13, need to explicitly cast the floating point to int</font>
+        <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">colors</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#000000">int</font><font color="#4000C0">(</font><font color="#000000">pt</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font> <font color="#4000C0">*</font> <font color="#0080C0">255</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">int</font><font color="#4000C0">(</font><font color="#000000">pt</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font> <font color="#4000C0">*</font> <font color="#0080C0">255</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">int</font><font color="#4000C0">(</font><font color="#000000">pt</font><font color="#4000C0">[</font><font color="#0080C0">2</font><font color="#4000C0">]</font> <font color="#4000C0">*</font> <font color="#0080C0">255</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+        <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#000000">pt</font><font color="#4000C0">[</font><font color="#0080C0">3</font><font color="#4000C0">]</font>
+        <font color="#000000">ccpl</font><font color="#4000C0">.</font><font color="#000000">AddControlPoints</font><font color="#4000C0">(</font><font color="#000000">p</font><font color="#4000C0">)</font>
+    <font color="#000000">AddColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;myrainbow&quot;</font><font color="#4000C0">,</font> <font color="#000000">ccpl</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;speed&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Make the plot use the new color table</font>
+    <font color="#000000">pc</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;myrainbow&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.693476</font><font color="#4000C0">,</font> <font color="#0080C0">0.212776</font><font color="#4000C0">,</font> <font color="#0080C0">0.688344</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font> <font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.161927</font><font color="#4000C0">,</font> <font color="#0080C0">0.976983</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.138864</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+    <font color="#a02030"># continuous1 }</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;rainbow_continuous&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">RemoveColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;myrainbow&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">createDiscreteUsingVTKNamedColors</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># discrete1 {</font>
+    <font color="#C00000">try</font><font color="#4000C0">:</font>
+        <font color="#C00000">import</font> <font color="#000000">vtk</font> <font color="#a02030"># for vtk.vtkNamedColors</font>
+    <font color="#C00000">except</font><font color="#4000C0">:</font>
+        <font color="#C00000">return</font>
+
+    <font color="#a02030"># to see list of all color names available: </font>
+    <font color="#a02030"># print(vtk.vtkNamedColors.GetColorNames())</font>
+
+    <font color="#a02030"># choose some colors from vtk.vtkNamedColors</font>
+    <font color="#000000">colorNames</font> <font color="#4000C0">=</font> <font color="#4000C0">[</font><font color="#008000">&quot;tomato&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;turquoise&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;van_dyke_brown&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;carrot&quot;</font><font color="#4000C0">,</font>
+                  <font color="#008000">&quot;royalblue&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;naples_yellow_deep&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;cerulean&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;warm_grey&quot;</font><font color="#4000C0">,</font>
+                  <font color="#008000">&quot;venetian_red&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;seagreen&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;sky_blue&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pink&quot;</font><font color="#4000C0">]</font>
+    <font color="#a02030"># Create a color control point list</font>
+    <font color="#000000">ccpl</font> <font color="#4000C0">=</font> <font color="#000000">ColorControlPointList</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Make it discrete</font>
+    <font color="#000000">ccpl</font><font color="#4000C0">.</font><font color="#000000">discreteFlag</font><font color="#4000C0">=</font><font color="#0080C0">1</font>
+    <font color="#a02030"># Add color control points corresponding to color names</font>
+    <font color="#C00000">for</font> <font color="#000000">name</font> <font color="#C00000">in</font> <font color="#000000">colorNames</font><font color="#4000C0">:</font>
+        <font color="#000000">p</font> <font color="#4000C0">=</font> <font color="#000000">ColorControlPoint</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">colors</font><font color="#4000C0">=</font><font color="#000000">vtk</font><font color="#4000C0">.</font><font color="#000000">vtkNamedColors</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">GetColor4ub</font><font color="#4000C0">(</font><font color="#000000">name</font><font color="#4000C0">)</font>
+        <font color="#000000">ccpl</font><font color="#4000C0">.</font><font color="#000000">AddControlPoints</font><font color="#4000C0">(</font><font color="#000000">p</font><font color="#4000C0">)</font>
+    <font color="#a02030"># add a color table based on the color control points</font>
+    <font color="#000000">AddColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;mylevels&quot;</font><font color="#4000C0">,</font> <font color="#000000">ccpl</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;domains&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SubsetAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">colorType</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">ColorByColorTable</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;mylevels&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#a02030"># discrete1 }</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;discrete_using_vtk&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># remove the added color tables</font>
+    <font color="#000000">RemoveColorTable</font><font color="#4000C0">(</font><font color="#008000">&quot;mylevels&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">introspectingColorTable</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">modifyExistingColorTable</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">createContinuous</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">createDiscreteUsingVTKNamedColors</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

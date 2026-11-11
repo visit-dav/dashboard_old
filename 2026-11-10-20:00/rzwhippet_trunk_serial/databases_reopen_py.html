@@ -1,0 +1,550 @@
+<html><body bgcolor="#e0e0e0"><head><title>databases/reopen.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  MODES: serial</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  reopen.py </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      Reopening a database where the SIL is invariant.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       March 1, 2004</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Brad Whitlock, Fri Mar 19 15:09:09 PST 2004</font>
+<font color="#a02030">#    I changed one of the OpenDatabase calls to ReOpenDatabase. I also</font>
+<font color="#a02030">#    added more extensive reopen tests.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Fri Apr 9 16:28:01 PST 2004</font>
+<font color="#a02030">#    I added a test that really makes sure the engine reexecuted during</font>
+<font color="#a02030">#    a reopen.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Jeremy Meredith, Wed Apr 28 11:42:31 PDT 2004</font>
+<font color="#a02030">#    I made the &quot;Don&#x27;t need to copy&quot; message go to stderr.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Wed Feb 2 16:27:54 PST 2005</font>
+<font color="#a02030">#    Added a test for making sure that expressions are right after reopening</font>
+<font color="#a02030">#    a database when there are multiple windows. I also added a test to </font>
+<font color="#a02030">#    make sure that time sliders are shortened when we reopen a database</font>
+<font color="#a02030">#    that has had some of its time states removed.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Wed Feb 16 07:34:07 PST 2005</font>
+<font color="#a02030">#    Rename variables that have unsupported characters.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Brad Whitlock, Tue Feb 22 13:56:56 PST 2005</font>
+<font color="#a02030">#    Added a test case for reopening a file that has been deleted.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Jeremy Meredith, Wed Sep  7 12:06:04 PDT 2005</font>
+<font color="#a02030">#    Allowed spaces in variable names.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Jeremy Meredith, Wed Jan 20 11:02:36 EST 2010</font>
+<font color="#a02030">#    Fixed some file path issues and checked for &quot;from&quot; file before</font>
+<font color="#a02030">#    assuming a symlink return error implied a different error message.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Fri May 26 08:31:00 MST 2017</font>
+<font color="#a02030">#    Fixed reopen_04_01 for windows to use the same file as for non-windows.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Monday October 12, 2020 </font>
+<font color="#a02030">#    Use TestEnv.params[&quot;run_dir&quot;] instead of &quot;.&quot; in calls to os.listdir.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#C00000">from</font> <font color="#000000">__future__</font> <font color="#C00000">import</font> <font color="#000000">print_function</font>
+<font color="#C00000">import</font> <font color="#000000">os</font>
+<font color="#C00000">import</font> <font color="#000000">sys</font>
+<font color="#C00000">import</font> <font color="#000000">time</font>
+<font color="#C00000">import</font> <font color="#000000">shutil</font>
+
+<font color="#C00000">def</font> <font color="#000000">GetTruncatedWindowInformationString</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Get the window information and convert it to a string.</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Only use the first 5 or so lines from the string.</font>
+    <font color="#000000">lines</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">split</font><font color="#4000C0">(</font><font color="#008000">&quot;\n&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;&quot;</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font><font color="#4000C0">(</font><font color="#000000">i</font> <font color="#4000C0">&lt;</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">lines</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">lines</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font>
+            <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#C00000">return</font> <font color="#000000">s</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Look at the first few lines of the string representation of the</font>
+<font color="#a02030"># WindowInformation to see the list of time sliders, etc.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">,</font> <font color="#000000">GetTruncatedWindowInformationString</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">tsLength</font> <font color="#4000C0">=</font> <font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">testString</font> <font color="#4000C0">=</font> <font color="#008000">&quot;%s has %d states\n&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">GetActiveTimeSlider</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">tsLength</font><font color="#4000C0">)</font>
+    <font color="#000000">testString</font> <font color="#4000C0">=</font> <font color="#000000">testString</font> <font color="#4000C0">+</font> <font color="#000000">GetTruncatedWindowInformationString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">,</font> <font color="#000000">testString</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Returns whether all files in the list are in the run directory.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">FilesPresent</font><font color="#4000C0">(</font><font color="#000000">files</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">currentFileList</font> <font color="#4000C0">=</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">listdir</font><font color="#4000C0">(</font><font color="#000000">TestEnv</font><font color="#4000C0">.</font><font color="#000000">params</font><font color="#4000C0">[</font><font color="#008000">&quot;run_dir&quot;</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#000000">count</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">retval</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#C00000">if</font> <font color="#000000">type</font><font color="#4000C0">(</font><font color="#000000">files</font><font color="#4000C0">)</font> <font color="#4000C0">==</font> <font color="#000000">type</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font> <font color="#C00000">or</font> <font color="#000000">type</font><font color="#4000C0">(</font><font color="#000000">files</font><font color="#4000C0">)</font> <font color="#4000C0">==</font> <font color="#000000">type</font><font color="#4000C0">(</font><font color="#4000C0">[</font><font color="#4000C0">]</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#C00000">for</font> <font color="#000000">file</font> <font color="#C00000">in</font> <font color="#000000">files</font><font color="#4000C0">:</font>
+            <font color="#C00000">if</font> <font color="#000000">file</font> <font color="#C00000">in</font> <font color="#000000">currentFileList</font><font color="#4000C0">:</font>
+                <font color="#000000">count</font> <font color="#4000C0">=</font> <font color="#000000">count</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+        <font color="#000000">retval</font> <font color="#4000C0">=</font> <font color="#000000">count</font> <font color="#4000C0">==</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">files</font><font color="#4000C0">)</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#a02030"># We got here because the files argument was </font>
+        <font color="#a02030"># a single value instead of a tuple or list.</font>
+        <font color="#C00000">if</font> <font color="#000000">files</font> <font color="#C00000">in</font> <font color="#000000">currentFileList</font><font color="#4000C0">:</font>
+            <font color="#000000">retval</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+
+    <font color="#C00000">return</font> <font color="#000000">retval</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Removes all files ending in .silo or .visit from the run directory</font>
+<font color="#a02030"># to ensure that there are no such files left over from a failed test.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">RemoveAllSiloAndVisItFiles</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">currentFileList</font> <font color="#4000C0">=</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">listdir</font><font color="#4000C0">(</font><font color="#000000">TestEnv</font><font color="#4000C0">.</font><font color="#000000">params</font><font color="#4000C0">[</font><font color="#008000">&quot;run_dir&quot;</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">file</font> <font color="#C00000">in</font> <font color="#000000">currentFileList</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font> <font color="#000000">file</font><font color="#4000C0">[</font><font color="#4000C0">-</font><font color="#0080C0">5</font><font color="#4000C0">:</font><font color="#4000C0">]</font> <font color="#4000C0">==</font> <font color="#008000">&quot;.silo&quot;</font> <font color="#C00000">or</font> <font color="#000000">file</font><font color="#4000C0">[</font><font color="#4000C0">-</font><font color="#0080C0">6</font><font color="#4000C0">:</font><font color="#4000C0">]</font> <font color="#4000C0">==</font> <font color="#008000">&quot;.visit&quot;</font><font color="#4000C0">:</font>
+            <font color="#C00000">try</font><font color="#4000C0">:</font>
+                <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">unlink</font><font color="#4000C0">(</font><font color="#000000">file</font><font color="#4000C0">)</font>
+            <font color="#C00000">except</font><font color="#4000C0">:</font>
+                <font color="#a02030"># Ignore any exceptions</font>
+                <font color="#C00000">pass</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Function to create a .visit file or virtual database using time states</font>
+<font color="#a02030"># from wave.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">CreateMTFile</font><font color="#4000C0">(</font><font color="#000000">prefix</font><font color="#4000C0">,</font> <font color="#000000">makeVisItFile</font><font color="#4000C0">,</font> <font color="#000000">percent</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Create a list of files that will be used to create the database</font>
+    <font color="#a02030"># for the test.</font>
+    <font color="#000000">nStates</font> <font color="#4000C0">=</font> <font color="#0080C0">71</font>
+    <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">percent</font><font color="#4000C0">)</font> <font color="#4000C0">/</font> <font color="#0080C0">100.</font>
+    <font color="#000000">maxState</font> <font color="#4000C0">=</font> <font color="#000000">int</font><font color="#4000C0">(</font><font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">nStates</font><font color="#4000C0">)</font> <font color="#4000C0">*</font> <font color="#000000">t</font><font color="#4000C0">)</font>
+    <font color="#000000">files</font> <font color="#4000C0">=</font> <font color="#4000C0">[</font><font color="#4000C0">]</font>
+    <font color="#000000">prefixfiles</font> <font color="#4000C0">=</font> <font color="#4000C0">[</font><font color="#4000C0">]</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">maxState</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">w</font> <font color="#4000C0">=</font> <font color="#008000">&quot;wave%04d.silo&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">i</font> <font color="#4000C0">*</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+        <font color="#000000">files</font> <font color="#4000C0">=</font> <font color="#000000">files</font> <font color="#4000C0">+</font> <font color="#4000C0">[</font><font color="#000000">w</font><font color="#4000C0">]</font>
+        <font color="#000000">prefixfiles</font> <font color="#4000C0">=</font> <font color="#000000">prefixfiles</font> <font color="#4000C0">+</font> <font color="#4000C0">[</font><font color="#000000">prefix</font><font color="#4000C0">+</font><font color="#000000">w</font><font color="#4000C0">]</font>
+
+    <font color="#C00000">if</font> <font color="#000000">makeVisItFile</font> <font color="#4000C0">==</font> <font color="#0080C0">0</font><font color="#4000C0">:</font>
+        <font color="#a02030"># Virtual database</font>
+        <font color="#C00000">for</font> <font color="#000000">file</font> <font color="#C00000">in</font> <font color="#000000">files</font><font color="#4000C0">:</font>
+            <font color="#000000">fileFrom</font> <font color="#4000C0">=</font> <font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_hdf5_test_data/%s&quot;</font> <font color="#4000C0">%</font> <font color="#000000">file</font><font color="#4000C0">)</font>
+            <font color="#000000">fileTo</font>   <font color="#4000C0">=</font> <font color="#008000">&quot;%s%s&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">prefix</font><font color="#4000C0">,</font> <font color="#000000">file</font><font color="#4000C0">)</font>
+            <font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">exists</font><font color="#4000C0">(</font><font color="#000000">fileFrom</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+                <font color="#000000">print</font><font color="#4000C0">(</font><font color="#008000">&quot;Error: %s didn&#x27;t exist&quot;</font> <font color="#4000C0">%</font> <font color="#000000">fileFrom</font><font color="#4000C0">,</font> <font color="#000000">file</font><font color="#4000C0">=</font><font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">stderr</font><font color="#4000C0">)</font>
+            <font color="#C00000">try</font><font color="#4000C0">:</font>
+                <font color="#a02030"># Copy a file from the data directory to the current directory.</font>
+                <font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">platform</font><font color="#4000C0">.</font><font color="#000000">startswith</font><font color="#4000C0">(</font><font color="#008000">&quot;win&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+                    <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">link</font><font color="#4000C0">(</font><font color="#000000">fileFrom</font><font color="#4000C0">,</font> <font color="#000000">fileTo</font><font color="#4000C0">)</font>
+                <font color="#C00000">else</font><font color="#4000C0">:</font>
+                    <font color="#000000">shutil</font><font color="#4000C0">.</font><font color="#000000">copyfile</font><font color="#4000C0">(</font><font color="#000000">fileFrom</font><font color="#4000C0">,</font> <font color="#000000">fileTo</font><font color="#4000C0">)</font>
+            <font color="#C00000">except</font> <font color="#000000">OSError</font><font color="#4000C0">:</font>
+                <font color="#000000">print</font><font color="#4000C0">(</font><font color="#008000">&quot;Don&#x27;t need to copy %s&quot;</font> <font color="#4000C0">%</font> <font color="#000000">file</font><font color="#4000C0">,</font> <font color="#000000">file</font><font color="#4000C0">=</font><font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">stderr</font><font color="#4000C0">)</font>
+        <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;wave*.silo database&quot;</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#a02030"># .visit file.</font>
+        <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#008000">&quot;reopen_wave.visit&quot;</font>
+        <font color="#000000">f</font> <font color="#4000C0">=</font> <font color="#000000">open</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">,</font> <font color="#008000">&quot;wt&quot;</font><font color="#4000C0">)</font>
+        <font color="#C00000">for</font> <font color="#000000">file</font> <font color="#C00000">in</font> <font color="#000000">files</font><font color="#4000C0">:</font>
+            <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">write</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;silo_hdf5_test_data/%s\n&quot;</font> <font color="#4000C0">%</font> <font color="#000000">file</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+        <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">close</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">return</font> <font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">,</font> <font color="#000000">prefixfiles</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Function to remove the .visit file or the virtual database.</font>
+<font color="#C00000">def</font> <font color="#000000">DestroyMTFile</font><font color="#4000C0">(</font><font color="#000000">makeVisItFile</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">RemoveAllSiloAndVisItFiles</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Function to create a new SAMRAI .visit file.</font>
+<font color="#C00000">def</font> <font color="#000000">CreateTimeVaryingMTFile</font><font color="#4000C0">(</font><font color="#000000">percent</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Read in the entire dumps.visit file for the SAMRAI data so that</font>
+    <font color="#a02030"># we can get the list of files.</font>
+    <font color="#000000">f</font> <font color="#4000C0">=</font> <font color="#000000">open</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;samrai_test_data/sil_changes/dumps.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#008000">&quot;rt&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">lines</font> <font color="#4000C0">=</font> <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">readlines</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">close</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Create a new .visit file</font>
+    <font color="#000000">nStates</font> <font color="#4000C0">=</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">lines</font><font color="#4000C0">)</font>
+    <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">percent</font><font color="#4000C0">)</font> <font color="#4000C0">/</font> <font color="#0080C0">100.</font>
+    <font color="#000000">maxState</font> <font color="#4000C0">=</font> <font color="#000000">int</font><font color="#4000C0">(</font><font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">nStates</font><font color="#4000C0">)</font> <font color="#4000C0">*</font> <font color="#000000">t</font><font color="#4000C0">)</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#008000">&quot;reopen_samrai.visit&quot;</font>
+    <font color="#000000">f</font> <font color="#4000C0">=</font> <font color="#000000">open</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">,</font> <font color="#008000">&quot;wt&quot;</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">maxState</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">write</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;samrai_test_data/sil_changes/%s&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">%</font> <font color="#000000">lines</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">close</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">db</font>
+
+<font color="#a02030"># Function to remove the SAMRAI .visit file.</font>
+<font color="#C00000">def</font> <font color="#000000">DestroyTimeVaryingMTFile</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">RemoveAllSiloAndVisItFiles</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">SetTheView</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.735926</font><font color="#4000C0">,</font> <font color="#0080C0">0.562657</font><font color="#4000C0">,</font> <font color="#0080C0">0.376604</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">,</font> <font color="#0080C0">0.753448</font><font color="#4000C0">,</font> <font color="#0080C0">2.5</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.454745</font><font color="#4000C0">,</font> <font color="#0080C0">0.822858</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.340752</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">5.6398</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">11.2796</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">11.2796</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.0589778</font><font color="#4000C0">,</font> <font color="#0080C0">0.0898255</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.32552</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+
+<font color="#a02030">###############################################################################</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Make sure that Reopen does not reset the time slider state and also make</font>
+<font color="#a02030"># sure that we are getting the metadata for a late time state.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030">#</font>
+    <font color="#a02030"># This will open at timestep 0.  The variable &quot;transient&quot; will not be</font>
+    <font color="#a02030"># available then.</font>
+    <font color="#a02030">#</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Now set the time to a timestep when &quot;transient&quot; is available.</font>
+    <font color="#a02030">#</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">20</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_1_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># If we were to try and make a PC plot of transient right now, it wouldn&#x27;t</font>
+    <font color="#a02030"># work.  We need to do a re-open first.</font>
+    <font color="#a02030">#</font>
+    <font color="#000000">ReOpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Make a plot of transient. This had better not reset the time state to 0.</font>
+    <font color="#a02030">#</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;transient&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetTheView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_1_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030">#</font>
+    <font color="#a02030"># Delete the plots and close the database</font>
+    <font color="#a02030">#</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_1_02&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Now test that reopening a file actually makes the time slider longer. First</font>
+<font color="#a02030"># create a new .visit file that we can add onto later.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">test2</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">VirtualDatabase</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">VisItFile</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+
+    <font color="#000000">testIndex</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#C00000">for</font> <font color="#000000">method</font> <font color="#C00000">in</font> <font color="#4000C0">(</font><font color="#000000">VirtualDatabase</font><font color="#4000C0">,</font> <font color="#000000">VisItFile</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#a02030"># Add a section title.</font>
+        <font color="#C00000">if</font><font color="#4000C0">(</font><font color="#000000">method</font> <font color="#4000C0">==</font> <font color="#000000">VirtualDatabase</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Reopening virtual database&quot;</font><font color="#4000C0">)</font>
+        <font color="#C00000">else</font><font color="#4000C0">:</font>
+            <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Reopening .visit file&quot;</font><font color="#4000C0">)</font>
+
+        <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#000000">files</font> <font color="#4000C0">=</font> <font color="#000000">CreateMTFile</font><font color="#4000C0">(</font><font color="#008000">&quot;&quot;</font><font color="#4000C0">,</font> <font color="#000000">method</font><font color="#4000C0">,</font> <font color="#0080C0">30</font><font color="#4000C0">)</font>
+        <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+        <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+        <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+        <font color="#a02030"># Set up the view.</font>
+        <font color="#000000">SetTheView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+        <font color="#a02030"># Go to the last time state.</font>
+        <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_2_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">testIndex</font><font color="#4000C0">)</font>
+        <font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_2_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testIndex</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+        <font color="#a02030"># Create more time states in the file.</font>
+        <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#000000">files</font> <font color="#4000C0">=</font> <font color="#000000">CreateMTFile</font><font color="#4000C0">(</font><font color="#008000">&quot;&quot;</font><font color="#4000C0">,</font> <font color="#000000">method</font><font color="#4000C0">,</font> <font color="#0080C0">60</font><font color="#4000C0">)</font>
+        <font color="#000000">ReOpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+        <font color="#a02030"># Go to the last time state.</font>
+        <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_2_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testIndex</font> <font color="#4000C0">+</font> <font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+        <font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_2_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testIndex</font> <font color="#4000C0">+</font> <font color="#0080C0">3</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+        <font color="#a02030"># Create more time states in the file.</font>
+        <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#000000">files</font> <font color="#4000C0">=</font> <font color="#000000">CreateMTFile</font><font color="#4000C0">(</font><font color="#008000">&quot;&quot;</font><font color="#4000C0">,</font> <font color="#000000">method</font><font color="#4000C0">,</font> <font color="#0080C0">100</font><font color="#4000C0">)</font>
+        <font color="#000000">ReOpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+        <font color="#a02030"># Go to the last time state.</font>
+        <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_2_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testIndex</font> <font color="#4000C0">+</font> <font color="#0080C0">4</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+        <font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_2_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testIndex</font> <font color="#4000C0">+</font> <font color="#0080C0">5</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+        <font color="#a02030"># Get rid of the .visit file that we created.</font>
+        <font color="#000000">DestroyMTFile</font><font color="#4000C0">(</font><font color="#000000">method</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">)</font>
+        <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+        <font color="#a02030"># Get to the next testIndex</font>
+        <font color="#000000">testIndex</font> <font color="#4000C0">=</font> <font color="#000000">testIndex</font> <font color="#4000C0">+</font> <font color="#0080C0">6</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Now that we&#x27;ve tested time-invariant databases, try testing reopen with</font>
+<font color="#a02030"># a time-varying database to see if we get the right plots.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">test3</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Reopening .visit file of time-varying data&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">testIndex</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#C00000">for</font> <font color="#000000">percent</font> <font color="#C00000">in</font> <font color="#4000C0">(</font><font color="#0080C0">30</font><font color="#4000C0">,</font><font color="#0080C0">60</font><font color="#4000C0">,</font><font color="#0080C0">100</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">CreateTimeVaryingMTFile</font><font color="#4000C0">(</font><font color="#000000">percent</font><font color="#4000C0">)</font>
+        <font color="#C00000">if</font><font color="#4000C0">(</font><font color="#000000">percent</font> <font color="#4000C0">==</font> <font color="#0080C0">30</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+            <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Primitive Var _number_0&quot;</font><font color="#4000C0">)</font>
+            <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+            <font color="#a02030"># Set the view</font>
+            <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+            <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.598154</font><font color="#4000C0">,</font> <font color="#0080C0">0.519575</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.610127</font><font color="#4000C0">)</font>
+            <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">15</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">,</font> <font color="#0080C0">10</font><font color="#4000C0">)</font>
+            <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.418052</font><font color="#4000C0">,</font> <font color="#0080C0">0.851849</font><font color="#4000C0">,</font> <font color="#0080C0">0.315574</font><font color="#4000C0">)</font>
+            <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+            <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">20.6155</font>
+            <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">41.2311</font>
+            <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">41.2311</font>
+            <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.0200698</font><font color="#4000C0">,</font> <font color="#0080C0">0.0374771</font><font color="#4000C0">)</font>
+            <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+            <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+            <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+            <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+
+            <font color="#a02030"># Save a test</font>
+            <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_3_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">testIndex</font><font color="#4000C0">)</font>
+            <font color="#000000">testIndex</font> <font color="#4000C0">=</font> <font color="#000000">testIndex</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+            <font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_3_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">testIndex</font><font color="#4000C0">)</font>
+            <font color="#000000">testIndex</font> <font color="#4000C0">=</font> <font color="#000000">testIndex</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+        <font color="#C00000">else</font><font color="#4000C0">:</font>
+            <font color="#a02030"># Reopen the database to add the new time states.</font>
+            <font color="#000000">ReOpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+        <font color="#a02030"># Go to the last time state.</font>
+        <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+        <font color="#a02030"># Save a test</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_3_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">testIndex</font><font color="#4000C0">)</font>
+        <font color="#000000">testIndex</font> <font color="#4000C0">=</font> <font color="#000000">testIndex</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+        <font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_3_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">testIndex</font><font color="#4000C0">)</font>
+        <font color="#000000">testIndex</font> <font color="#4000C0">=</font> <font color="#000000">testIndex</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+    <font color="#a02030"># Clean up the time varying .visit file.</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">DestroyTimeVaryingMTFile</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test that reopening a file that has been overwritten works.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">test4</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Reopening overwritten file to test engine&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Copy curv2d to the current directory.</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#008000">&quot;test4.silo&quot;</font>
+    <font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">platform</font><font color="#4000C0">.</font><font color="#000000">startswith</font><font color="#4000C0">(</font><font color="#008000">&quot;win&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">link</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#000000">shutil</font><font color="#4000C0">.</font><font color="#000000">copyfile</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Open up the file and create a plot.</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_4_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Delete the file</font>
+    <font color="#C00000">try</font><font color="#4000C0">:</font>
+        <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">unlink</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#C00000">except</font><font color="#4000C0">:</font>
+        <font color="#a02030"># Ignore any exceptions</font>
+        <font color="#C00000">pass</font>
+
+    <font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">platform</font><font color="#4000C0">.</font><font color="#000000">startswith</font><font color="#4000C0">(</font><font color="#008000">&quot;win&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">link</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#000000">shutil</font><font color="#4000C0">.</font><font color="#000000">copyfile</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ReOpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_4_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Delete the file</font>
+    <font color="#C00000">try</font><font color="#4000C0">:</font>
+        <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">unlink</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#C00000">except</font><font color="#4000C0">:</font>
+        <font color="#a02030"># Ignore any exceptions</font>
+        <font color="#C00000">pass</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test that expressions are not lost after reopening a file when there</font>
+<font color="#a02030"># are multiple windows.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">test5</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing reopen/expressions with multiple windows&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv3d.silo&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">TestExpressions</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_5_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># See if the expressions are right after reopening.</font>
+    <font color="#000000">ReOpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">TestExpressions</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_5_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Delete the window that we added.</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test that time sliders are shortened when we reopen an MT database</font>
+<font color="#a02030"># that has had time states removed.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">test6</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing reopen at an invalid time state&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">RemoveAllSiloAndVisItFiles</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Make sure that there is no open database.</font>
+    <font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_6_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Create a short MT file.</font>
+    <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#000000">files</font> <font color="#4000C0">=</font> <font color="#000000">CreateMTFile</font><font color="#4000C0">(</font><font color="#008000">&quot;&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">10.</font> <font color="#4000C0">/</font> <font color="#0080C0">71.</font><font color="#4000C0">)</font> <font color="#4000C0">*</font> <font color="#0080C0">100.</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Create a plot and make sure its database has the right number</font>
+    <font color="#a02030"># of time states.</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_6_01&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_6_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Make a copy of the first window.</font>
+    <font color="#000000">CloneWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_6_03&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_6_04&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Delete the last few time states</font>
+    <font color="#000000">nStates</font> <font color="#4000C0">=</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">files</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">f</font> <font color="#C00000">in</font> <font color="#000000">files</font><font color="#4000C0">[</font><font color="#4000C0">-</font><font color="#0080C0">5</font><font color="#4000C0">:</font><font color="#4000C0">]</font><font color="#4000C0">:</font>
+        <font color="#C00000">try</font><font color="#4000C0">:</font>
+            <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">unlink</font><font color="#4000C0">(</font><font color="#000000">f</font><font color="#4000C0">)</font>
+        <font color="#C00000">except</font><font color="#4000C0">:</font>
+            <font color="#000000">print</font><font color="#4000C0">(</font><font color="#008000">&quot;Could not delete %s&quot;</font> <font color="#4000C0">%</font> <font color="#000000">f</font><font color="#4000C0">,</font> <font color="#000000">file</font><font color="#4000C0">=</font><font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">stderr</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change to a time state that we deleted. This should put the plot</font>
+    <font color="#a02030"># in the error state and we should get an error message.</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#000000">nStates</font> <font color="#4000C0">-</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_6_05&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_6_06&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do the same thing in window 2 so we can check leter if reopen</font>
+    <font color="#a02030"># causes the time slider, etc to be corrected.</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#000000">nStates</font> <font color="#4000C0">-</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Reopen the database. This should pick up that the database has</font>
+    <font color="#a02030"># fewer time states and should update the time slider so it is</font>
+    <font color="#a02030"># in bounds. The compute engine also should not crash.</font>
+    <font color="#000000">ReOpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_6_07&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_6_08&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># See if we&#x27;re at the right time state in window 2 too.</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_6_09&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestLength</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_6_10&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Delete all of the plots in window 1 and close the database.</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Delete the last few files.</font>
+    <font color="#000000">DestroyMTFile</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test reopening a database that has been removed from disk.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">test7</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing reopen on a deleted file&quot;</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Link a file from the data directory to the current directory.</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#008000">&quot;reopen_globe.silo&quot;</font>
+    <font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">platform</font><font color="#4000C0">.</font><font color="#000000">startswith</font><font color="#4000C0">(</font><font color="#008000">&quot;win&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">link</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#000000">shutil</font><font color="#4000C0">.</font><font color="#000000">copyfile</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;t&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_7_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Remove the file and make sure that we can&#x27;t reopen it.</font>
+    <font color="#000000">RemoveAllSiloAndVisItFiles</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">if</font> <font color="#000000">ReOpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;VisIt was able to reopen &quot;</font> <font color="#4000C0">+</font> <font color="#000000">db</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;VisIt was *NOT* able to reopen &quot;</font> <font color="#4000C0">+</font> <font color="#000000">db</font> <font color="#4000C0">+</font> <font color="#008000">&quot;!&quot;</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_7_01&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Do something that will make the plot be regenerated. Here we&#x27;re changing</font>
+    <font color="#a02030"># plot variables to force VisIt to recalculate the plot.</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;reopen_7_02&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Run the tests</font>
+<font color="#a02030">#</font>
+<font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Remove all .silo and .visit files that could be left over from</font>
+    <font color="#a02030"># previous failed runs.</font>
+    <font color="#000000">RemoveAllSiloAndVisItFiles</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Run the tests</font>
+    <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">test2</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">test3</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">test4</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">test5</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">test6</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">test7</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#C00000">except</font><font color="#4000C0">:</font>
+    <font color="#a02030"># If we got any kind of exception, make sure that we get rid of</font>
+    <font color="#a02030"># all of the .silo and .visit files that might be left.</font>
+    <font color="#000000">RemoveAllSiloAndVisItFiles</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Rethrow the exception so the test won&#x27;t look like it passed if</font>
+    <font color="#a02030"># it really didn&#x27;t pass</font>
+    <font color="#C00000">raise</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

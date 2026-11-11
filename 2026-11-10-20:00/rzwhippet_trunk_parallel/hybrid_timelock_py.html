@@ -1,0 +1,378 @@
+<html><body bgcolor="#e0e0e0"><head><title>hybrid/timelock.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  timelock.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 2D, 3D, curvilinear, single domain</font>
+<font color="#a02030">#              plots     - FilledBoundary, Pseudocolor</font>
+<font color="#a02030">#              databases - PDB, Silo</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Purpose:    This test case tests out locking windows in time with multiple</font>
+<font color="#a02030">#              databases in multiple windows. It makes sure that we get the</font>
+<font color="#a02030">#              right database correlations and the right time sliders.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Thu Mar 17 09:58:35 PDT 2005</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Brad Whitlock, Wed Mar 23 09:23:53 PDT 2005</font>
+<font color="#a02030">#    I made it truncate the window information so the scalable rendering flag</font>
+<font color="#a02030">#    is not included. This way, I don&#x27;t need mode-specific baselines. I also</font>
+<font color="#a02030">#    added 2 new test cases to check the window information because one of</font>
+<font color="#a02030">#    the baseline images in test case 2 was incorrect. Finally, I added code</font>
+<font color="#a02030">#    in the CleanSlate function to make sure that time locking is off. That</font>
+<font color="#a02030">#    was what caused the incorrect test case image.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Fri Jul 30 13:53:48 PDT 2010</font>
+<font color="#a02030">#    I increased the number of lines of information it prints to 18.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Tue Nov 12 10:27:55 PST 2024</font>
+<font color="#a02030">#    I modified the coding that skips some tests in scalable rendering mode</font>
+<font color="#a02030">#    to also skip the SetTimeSliderState call as well.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">import</font> <font color="#000000">os</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Look at the first few lines of the string representation of the</font>
+<font color="#a02030"># WindowInformation to see the list of time sliders, etc.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Get the window information and convert it to a string.</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Only use the first 18 or so lines from the string.</font>
+    <font color="#000000">lines</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">split</font><font color="#4000C0">(</font><font color="#008000">&quot;\n&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;&quot;</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#0080C0">18</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font><font color="#4000C0">(</font><font color="#000000">i</font> <font color="#4000C0">&lt;</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">lines</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">lines</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font>
+            <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#a02030"># Get the window information and convert it to a string.</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Tests that the database correlations look a certain way.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">TestCorrelations</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">names</font> <font color="#4000C0">=</font> <font color="#000000">GetDatabaseCorrelationNames</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;&quot;</font>
+    <font color="#C00000">for</font> <font color="#000000">name</font> <font color="#C00000">in</font> <font color="#000000">names</font><font color="#4000C0">:</font>
+        <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">GetDatabaseCorrelation</font><font color="#4000C0">(</font><font color="#000000">name</font><font color="#4000C0">)</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">CleanSlate</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Delete all but the first window.</font>
+    <font color="#000000">windows</font> <font color="#4000C0">=</font> <font color="#000000">list</font><font color="#4000C0">(</font><font color="#000000">GetGlobalAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">windows</font><font color="#4000C0">)</font>
+    <font color="#000000">windows</font><font color="#4000C0">.</font><font color="#000000">sort</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">win</font> <font color="#C00000">in</font> <font color="#000000">windows</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">:</font><font color="#4000C0">]</font><font color="#4000C0">:</font>
+        <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#000000">win</font><font color="#4000C0">)</font>
+        <font color="#000000">DeleteWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Delete all of the plots.</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Delete all of the database correlations:</font>
+    <font color="#000000">sources</font> <font color="#4000C0">=</font> <font color="#000000">GetGlobalAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">sources</font>
+    <font color="#000000">cL</font> <font color="#4000C0">=</font> <font color="#000000">GetDatabaseCorrelationNames</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">name</font> <font color="#C00000">in</font> <font color="#000000">cL</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font> <font color="#000000">name</font> <font color="#C00000">not</font> <font color="#C00000">in</font> <font color="#000000">sources</font><font color="#4000C0">:</font>
+            <font color="#000000">DeleteDatabaseCorrelation</font><font color="#4000C0">(</font><font color="#000000">name</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Close all of the sources.</font>
+    <font color="#C00000">for</font> <font color="#000000">src</font> <font color="#C00000">in</font> <font color="#000000">sources</font><font color="#4000C0">:</font>
+        <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">src</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Make sure clone window on first reference is off.</font>
+    <font color="#000000">SetCloneWindowOnFirstRef</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Make sure that window 1 is not locked in time!</font>
+    <font color="#C00000">if</font> <font color="#000000">GetWindowInformation</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">.</font><font color="#000000">lockTime</font> <font color="#4000C0">==</font> <font color="#0080C0">1</font><font color="#4000C0">:</font>
+        <font color="#000000">ToggleLockTime</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Returns whether all files in the list are in the current directory.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">FilesPresent</font><font color="#4000C0">(</font><font color="#000000">files</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">currentFileList</font> <font color="#4000C0">=</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">listdir</font><font color="#4000C0">(</font><font color="#008000">&quot;.&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">count</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">retval</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#C00000">if</font> <font color="#000000">type</font><font color="#4000C0">(</font><font color="#000000">files</font><font color="#4000C0">)</font> <font color="#4000C0">==</font> <font color="#000000">type</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font> <font color="#C00000">or</font> <font color="#000000">type</font><font color="#4000C0">(</font><font color="#000000">files</font><font color="#4000C0">)</font> <font color="#4000C0">==</font> <font color="#000000">type</font><font color="#4000C0">(</font><font color="#4000C0">[</font><font color="#4000C0">]</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#C00000">for</font> <font color="#000000">file</font> <font color="#C00000">in</font> <font color="#000000">files</font><font color="#4000C0">:</font>
+            <font color="#C00000">if</font> <font color="#000000">file</font> <font color="#C00000">in</font> <font color="#000000">currentFileList</font><font color="#4000C0">:</font>
+                <font color="#000000">count</font> <font color="#4000C0">=</font> <font color="#000000">count</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+        <font color="#000000">retval</font> <font color="#4000C0">=</font> <font color="#000000">count</font> <font color="#4000C0">==</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">files</font><font color="#4000C0">)</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#a02030"># We got here because the files argument was </font>
+        <font color="#a02030"># a single value instead of a tuple or list.</font>
+        <font color="#C00000">if</font> <font color="#000000">files</font> <font color="#C00000">in</font> <font color="#000000">currentFileList</font><font color="#4000C0">:</font>
+            <font color="#000000">retval</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+
+    <font color="#C00000">return</font> <font color="#000000">retval</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Waits for all files in the list to be present in the current directory.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">WaitForFilesToBePresent</font><font color="#4000C0">(</font><font color="#000000">files</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#C00000">while</font><font color="#4000C0">(</font><font color="#000000">FilesPresent</font><font color="#4000C0">(</font><font color="#000000">files</font><font color="#4000C0">)</font> <font color="#4000C0">==</font> <font color="#0080C0">0</font><font color="#4000C0">)</font><font color="#4000C0">:</font> <font color="#000000">sleep</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Remove all .visit files from the current directory.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">RemoveAllVisItFiles</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">currentFileList</font> <font color="#4000C0">=</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">listdir</font><font color="#4000C0">(</font><font color="#008000">&quot;.&quot;</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">file</font> <font color="#C00000">in</font> <font color="#000000">currentFileList</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font> <font color="#000000">file</font><font color="#4000C0">[</font><font color="#4000C0">-</font><font color="#0080C0">5</font><font color="#4000C0">:</font><font color="#4000C0">]</font> <font color="#4000C0">==</font> <font color="#008000">&quot;.silo&quot;</font> <font color="#C00000">or</font> <font color="#000000">file</font><font color="#4000C0">[</font><font color="#4000C0">-</font><font color="#0080C0">6</font><font color="#4000C0">:</font><font color="#4000C0">]</font> <font color="#4000C0">==</font> <font color="#008000">&quot;.visit&quot;</font><font color="#4000C0">:</font>
+            <font color="#C00000">try</font><font color="#4000C0">:</font>
+                <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">unlink</font><font color="#4000C0">(</font><font color="#000000">file</font><font color="#4000C0">)</font>
+            <font color="#C00000">except</font><font color="#4000C0">:</font>
+                <font color="#a02030"># Ignore any exceptions</font>
+                <font color="#C00000">pass</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Set a better view for wave.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">SetWaveDatabaseView</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.735926</font><font color="#4000C0">,</font> <font color="#0080C0">0.562657</font><font color="#4000C0">,</font> <font color="#0080C0">0.376604</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">,</font> <font color="#0080C0">0.753448</font><font color="#4000C0">,</font> <font color="#0080C0">2.5</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.454745</font><font color="#4000C0">,</font> <font color="#0080C0">0.822858</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.340752</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">5.6398</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">11.2796</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">11.2796</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.0589778</font><font color="#4000C0">,</font> <font color="#0080C0">0.0898255</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.32552</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Set the active window and also set the window&#x27;s background color so it&#x27;s</font>
+<font color="#a02030"># easy to tell which window we&#x27;re looking at.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#000000">win</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#000000">win</font><font color="#4000C0">)</font>
+
+    <font color="#000000">a</font> <font color="#4000C0">=</font> <font color="#000000">GetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">if</font> <font color="#000000">win</font> <font color="#4000C0">==</font> <font color="#0080C0">1</font><font color="#4000C0">:</font>
+        <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">backgroundColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#C00000">elif</font> <font color="#000000">win</font> <font color="#4000C0">==</font> <font color="#0080C0">2</font><font color="#4000C0">:</font>
+        <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">backgroundColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">backgroundColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">200</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test that we get an active time slider when a correlation is modified</font>
+<font color="#a02030"># as a result of locking the window in time.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Make sure we get a time slider when locking a window &quot;</font>
+                <font color="#008000">&quot;causes the most suitable correlation to be altered.&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetWindowLayout</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn on &quot;CloneWindowOnFirstRef&quot;</font>
+    <font color="#000000">SetCloneWindowOnFirstRef</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Copy wave.visit to this directory a few times.</font>
+    <font color="#000000">f</font> <font color="#4000C0">=</font> <font color="#000000">open</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font> <font color="#008000">&quot;rt&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">lines</font> <font color="#4000C0">=</font> <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">readlines</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">close</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">f0</font> <font color="#4000C0">=</font> <font color="#000000">open</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;wt&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">f1</font> <font color="#4000C0">=</font> <font color="#000000">open</font><font color="#4000C0">(</font><font color="#008000">&quot;wave1.visit&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;wt&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">f2</font> <font color="#4000C0">=</font> <font color="#000000">open</font><font color="#4000C0">(</font><font color="#008000">&quot;wave2.visit&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;wt&quot;</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">line</font> <font color="#C00000">in</font> <font color="#000000">lines</font><font color="#4000C0">:</font>
+        <font color="#000000">f0</font><font color="#4000C0">.</font><font color="#000000">write</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#000000">line</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+        <font color="#000000">f1</font><font color="#4000C0">.</font><font color="#000000">write</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#000000">line</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+        <font color="#000000">f2</font><font color="#4000C0">.</font><font color="#000000">write</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#000000">line</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">f0</font><font color="#4000C0">.</font><font color="#000000">close</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">f1</font><font color="#4000C0">.</font><font color="#000000">close</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">f2</font><font color="#4000C0">.</font><font color="#000000">close</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetWaveDatabaseView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">testindex</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Go to the next window. The plot should be copied. Replace the database</font>
+    <font color="#a02030"># before we draw the plots so we&#x27;ll be using a different database.</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;wave1.visit&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">3</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Go to the next window. The plot should be copied. Replace the database</font>
+    <font color="#a02030"># before we draw the plots so we&#x27;ll be using a different database.</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;wave2.visit&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">4</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">5</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Lock window 1 and 2. This should result in a database correlation.</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">ToggleLockTime</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">ToggleLockTime</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestCorrelations</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">6</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Lock window 3 in time now also. This should result in the new database</font>
+    <font color="#a02030"># correlation being modified to accomodate window 3&#x27;s database.</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+    <font color="#000000">ToggleLockTime</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestCorrelations</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">7</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change time states and make sure all windows look the same.</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">36</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">8</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">9</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">10</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">11</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">12</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">13</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get ready for the next test.</font>
+    <font color="#000000">CleanSlate</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">RemoveAllVisItFiles</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#C00000">return</font> <font color="#000000">testindex</font> <font color="#4000C0">+</font> <font color="#0080C0">14</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Test that time locking works for multiple windows. What we&#x27;re really</font>
+<font color="#a02030"># testing is that the database is copied to the newly referenced window</font>
+<font color="#a02030"># even though we have &quot;CloneWindowOnFirstRef&quot; set to off. Defect &#x27;6053.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">test2</font><font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Test that the time slider works when time locking multiple windows&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">a</font> <font color="#4000C0">=</font> <font color="#000000">GetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">b</font> <font color="#4000C0">=</font> <font color="#000000">GetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">b</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetCloneWindowOnFirstRef</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;pdb_test_data/dbA00.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;material(mesh)&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">testindex</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetWindowLayout</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">b</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh/nummm&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn on time locking in both windows.</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">ToggleLockTime</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">ToggleLockTime</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># See if both windows updated when we changed the time in window 2.</font>
+    <font color="#a02030"># This crashes in scalable,parallel,icet.</font>
+    <font color="#C00000">if</font> <font color="#000000">TestEnv</font><font color="#4000C0">.</font><font color="#000000">params</font><font color="#4000C0">[</font><font color="#008000">&quot;scalable&quot;</font><font color="#4000C0">]</font> <font color="#4000C0">==</font> <font color="#C00000">False</font><font color="#4000C0">:</font>
+        <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">3</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+        <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">4</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+        <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+        <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">5</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+        <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">6</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get ready for the next test.</font>
+    <font color="#000000">CleanSlate</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">)</font>
+
+    <font color="#C00000">return</font> <font color="#000000">testindex</font> <font color="#4000C0">+</font> <font color="#0080C0">7</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Make sure that replacing into a time-locked window updates the database</font>
+<font color="#a02030"># correlation.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">test3</font><font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Make sure replacing into a time-locked window updates &quot;</font>
+                <font color="#008000">&quot;the database correlation.&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetWindowLayout</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Turn on &quot;CloneWindowOnFirstRef&quot;</font>
+    <font color="#000000">SetCloneWindowOnFirstRef</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">dbs</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font>
+           <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave_tv.visit&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">dbs</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetWaveDatabaseView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">testindex</font><font color="#4000C0">)</font>
+
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Material&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">ToggleLockTime</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">ToggleLockTime</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">3</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Go to window 3 and make sure that certain fields were copied.</font>
+    <font color="#a02030"># Window 3 should already be locked in time and it should contain</font>
+    <font color="#a02030"># a Pseudocolor plot.</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">4</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Replace the database with wave_tv so we can make sure that VisIt can</font>
+    <font color="#a02030"># create correlations when it needs to during a replace. Note that we</font>
+    <font color="#a02030"># also replace with a later time state. This should cause the time states</font>
+    <font color="#a02030"># for the other windows to be updated.</font>
+    <font color="#000000">ReplaceDatabase</font><font color="#4000C0">(</font><font color="#000000">dbs</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#0080C0">36</font><font color="#4000C0">)</font>
+    <font color="#000000">TestCorrelations</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">5</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">6</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test that we change change to the transient variable.</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;transient&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">7</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Make sure that the time state changed in windows 1,2.</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">8</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">9</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">GotoWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">10</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestWindowInformation</font><font color="#4000C0">(</font><font color="#008000">&quot;timelock_%02d&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">+</font><font color="#0080C0">11</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get ready for the next test.</font>
+    <font color="#000000">CleanSlate</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#C00000">return</font> <font color="#000000">testindex</font> <font color="#4000C0">+</font> <font color="#0080C0">12</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Run the tests</font>
+<font color="#a02030">#</font>
+<font color="#C00000">try</font><font color="#4000C0">:</font>
+    <font color="#000000">testindex</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">testindex</font> <font color="#4000C0">=</font> <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">)</font>
+    <font color="#000000">testindex</font> <font color="#4000C0">=</font> <font color="#000000">test2</font><font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">)</font>
+    <font color="#000000">testindex</font> <font color="#4000C0">=</font> <font color="#000000">test3</font><font color="#4000C0">(</font><font color="#000000">testindex</font><font color="#4000C0">)</font>
+<font color="#C00000">except</font><font color="#4000C0">:</font>
+    <font color="#000000">RemoveAllVisItFiles</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">raise</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

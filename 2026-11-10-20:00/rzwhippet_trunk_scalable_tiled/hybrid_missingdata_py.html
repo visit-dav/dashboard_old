@@ -1,0 +1,72 @@
+<html><body bgcolor="#e0e0e0"><head><title>hybrid/missingdata.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  missingdata.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      missing data</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Thu Jan 19 09:49:15 PST 2012</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">def</font> <font color="#000000">SetTheView</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.02</font><font color="#4000C0">,</font> <font color="#0080C0">0.98</font><font color="#4000C0">,</font> <font color="#0080C0">0.25</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test0</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Missing data&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;earth.nc&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;height&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetTheView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;missingdata_0_00&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;carbon_particulates&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;missingdata_0_01&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;seatemp&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;missingdata_0_02&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;population&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;missingdata_0_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Pick on higher zone numbers to make sure pick works.</font>
+    <font color="#000000">PickByNode</font><font color="#4000C0">(</font><font color="#000000">domain</font><font color="#4000C0">=</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">element</font><font color="#4000C0">=</font><font color="#0080C0">833621</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;missingdata_0_04&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetPickOutput</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Expressions and missing data&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;earth.nc&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;meaningless&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;carbon_particulates + seatemp&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;meaningless&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetTheView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;missingdata_1_00&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;color&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;color(red,green,blue)&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Truecolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;color&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">SetTheView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;missingdata_1_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;color2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;color(population*0.364,green,blue)&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;color2&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.02</font><font color="#4000C0">,</font> <font color="#0080C0">0.98</font><font color="#4000C0">,</font> <font color="#0080C0">0.02</font><font color="#4000C0">,</font> <font color="#0080C0">0.98</font><font color="#4000C0">)</font>
+    <font color="#000000">v1</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">259.439</font><font color="#4000C0">,</font> <font color="#0080C0">513.299</font><font color="#4000C0">,</font> <font color="#0080C0">288.93</font><font color="#4000C0">,</font> <font color="#0080C0">540</font><font color="#4000C0">)</font> <font color="#a02030">#25.466)</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v1</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;missingdata_1_02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">datapath</font> <font color="#4000C0">=</font> <font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;netcdf_test_data&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">test0</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+
+<font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

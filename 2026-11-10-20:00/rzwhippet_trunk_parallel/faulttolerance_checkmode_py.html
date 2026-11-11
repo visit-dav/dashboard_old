@@ -1,0 +1,111 @@
+<html><body bgcolor="#e0e0e0"><head><title>faulttolerance/checkmode.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests: Ensures VisIt and/or the test harness is in the correct &quot;mode&quot;.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Mark C. Miller, Mon Sep 28 16:24:44 PDT 2020</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># Modifications:</font>
+<font color="#a02030">#    Mark C. Miller, Mon Jan 11 10:32:17 PST 2021</font>
+<font color="#a02030">#    Replace AssertTrue() with TestValueEQ(..., True)</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#C00000">import</font> <font color="#000000">json</font>
+<font color="#C00000">import</font> <font color="#000000">sys</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Obtain mode info directly from top-level command-line args passed to test</font>
+<font color="#a02030"># suite harness and stored to &quot;clargs&quot; member of TestEnv.params instead of</font>
+<font color="#a02030"># using any of the alternative logic in the test harness. This ensures we</font>
+<font color="#a02030"># compare with actual mode(s) requested on command-line.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">GetModeKeysFromClArgs</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">clargs</font> <font color="#4000C0">=</font> <font color="#000000">json</font><font color="#4000C0">.</font><font color="#000000">loads</font><font color="#4000C0">(</font><font color="#000000">TestEnv</font><font color="#4000C0">.</font><font color="#000000">params</font><font color="#4000C0">[</font><font color="#008000">&quot;clargs&quot;</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">clargs</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font> <font color="#000000">clargs</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font> <font color="#4000C0">==</font> <font color="#008000">&#x27;-m&#x27;</font><font color="#4000C0">:</font>
+            <font color="#C00000">return</font> <font color="#000000">clargs</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">+</font><font color="#0080C0">1</font><font color="#4000C0">]</font><font color="#4000C0">.</font><font color="#000000">split</font><font color="#4000C0">(</font><font color="#008000">&#x27;,&#x27;</font><font color="#4000C0">)</font>
+        <font color="#C00000">elif</font> <font color="#000000">clargs</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">:</font><font color="#0080C0">7</font><font color="#4000C0">]</font> <font color="#4000C0">==</font> <font color="#008000">&#x27;--mode=&#x27;</font><font color="#4000C0">:</font>
+            <font color="#C00000">return</font> <font color="#000000">clargs</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font><font color="#4000C0">[</font><font color="#0080C0">8</font><font color="#4000C0">:</font><font color="#4000C0">]</font><font color="#4000C0">.</font><font color="#000000">split</font><font color="#4000C0">(</font><font color="#008000">&#x27;,&#x27;</font><font color="#4000C0">)</font>
+    <font color="#C00000">return</font> <font color="#4000C0">(</font><font color="#008000">&#x27;serial&#x27;</font><font color="#4000C0">,</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Ensure all mode keys are compatible</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">AllModeKeysCompatible</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#C00000">if</font> <font color="#008000">&#x27;serial&#x27;</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font> <font color="#C00000">and</font> <font color="#008000">&#x27;parallel&#x27;</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font><font color="#4000C0">:</font>
+        <font color="#C00000">return</font> <font color="#C00000">False</font>
+    <font color="#C00000">if</font> <font color="#008000">&#x27;pdb&#x27;</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font> <font color="#C00000">and</font> <font color="#008000">&#x27;hdf5&#x27;</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font><font color="#4000C0">:</font>
+        <font color="#C00000">return</font> <font color="#C00000">False</font>
+    <font color="#C00000">if</font> <font color="#008000">&#x27;icet&#x27;</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font> <font color="#C00000">and</font> <font color="#008000">&#x27;parallel&#x27;</font> <font color="#C00000">not</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font><font color="#4000C0">:</font>
+        <font color="#C00000">return</font> <font color="#C00000">False</font>
+    <font color="#C00000">return</font> <font color="#C00000">True</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Check that engine matches the specified mode</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">EngineMatchesMode</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">pa</font> <font color="#4000C0">=</font> <font color="#000000">GetProcessAttributes</font><font color="#4000C0">(</font><font color="#008000">&quot;engine&quot;</font><font color="#4000C0">)</font>
+    <font color="#C00000">if</font> <font color="#008000">&#x27;parallel&#x27;</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font> <font color="#000000">pa</font><font color="#4000C0">.</font><font color="#000000">isParallel</font><font color="#4000C0">:</font>
+            <font color="#C00000">if</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">pa</font><font color="#4000C0">.</font><font color="#000000">pids</font><font color="#4000C0">)</font> <font color="#4000C0">&gt;</font> <font color="#0080C0">1</font><font color="#4000C0">:</font>
+                <font color="#C00000">return</font> <font color="#C00000">True</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">pa</font><font color="#4000C0">.</font><font color="#000000">isParallel</font><font color="#4000C0">:</font>
+            <font color="#C00000">if</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">pa</font><font color="#4000C0">.</font><font color="#000000">pids</font><font color="#4000C0">)</font> <font color="#4000C0">==</font> <font color="#0080C0">1</font><font color="#4000C0">:</font>
+                <font color="#C00000">return</font> <font color="#C00000">True</font>
+    <font color="#C00000">return</font> <font color="#C00000">False</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Check that Silo data path matches its mode</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">SiloDataPathMatchesMode</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#C00000">if</font> <font color="#008000">&#x27;pdb&#x27;</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font> <font color="#008000">&#x27;silo_pdb_test_data&#x27;</font> <font color="#C00000">in</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#C00000">return</font> <font color="#C00000">True</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font> <font color="#008000">&#x27;silo_hdf5_test_data&#x27;</font> <font color="#C00000">in</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&#x27;&#x27;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#C00000">return</font> <font color="#C00000">True</font>
+    <font color="#C00000">return</font> <font color="#C00000">False</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Ensure rendering mode matches mode</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">ScalableSettingMatchesMode</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">ra</font> <font color="#4000C0">=</font> <font color="#000000">GetRenderingAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">if</font> <font color="#008000">&#x27;scalable&#x27;</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">==</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Always</font><font color="#4000C0">:</font>
+            <font color="#C00000">return</font> <font color="#C00000">True</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#C00000">if</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">==</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Never</font><font color="#4000C0">:</font>
+            <font color="#C00000">return</font> <font color="#C00000">True</font>
+    <font color="#C00000">return</font> <font color="#C00000">False</font>
+
+<font color="#C00000">def</font> <font color="#000000">IcetClargMatchesMode</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#C00000">if</font> <font color="#008000">&#x27;icet&#x27;</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font> <font color="#C00000">and</font> <font color="#008000">&#x27;-icet&#x27;</font> <font color="#C00000">not</font> <font color="#C00000">in</font> <font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">argv</font><font color="#4000C0">:</font>
+        <font color="#C00000">return</font> <font color="#C00000">False</font>
+    <font color="#C00000">if</font> <font color="#008000">&#x27;-icet&#x27;</font> <font color="#C00000">in</font> <font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">argv</font> <font color="#C00000">and</font> <font color="#008000">&#x27;icet&#x27;</font> <font color="#C00000">not</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font><font color="#4000C0">:</font>
+        <font color="#C00000">return</font> <font color="#C00000">False</font>
+    <font color="#C00000">return</font> <font color="#C00000">True</font>
+
+<font color="#C00000">def</font> <font color="#000000">AllowdynamicClargMatchesMode</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#C00000">if</font> <font color="#008000">&#x27;dlb&#x27;</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font> <font color="#C00000">and</font> <font color="#008000">&#x27;-allowdynamic&#x27;</font> <font color="#C00000">not</font> <font color="#C00000">in</font> <font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">argv</font><font color="#4000C0">:</font>
+        <font color="#C00000">return</font> <font color="#C00000">False</font>
+    <font color="#C00000">if</font> <font color="#008000">&#x27;-allowdynamic&#x27;</font> <font color="#C00000">in</font> <font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">argv</font> <font color="#C00000">and</font> <font color="#008000">&#x27;dlb&#x27;</font> <font color="#C00000">not</font> <font color="#C00000">in</font> <font color="#000000">activeModeKeys</font><font color="#4000C0">:</font>
+        <font color="#C00000">return</font> <font color="#C00000">False</font>
+    <font color="#C00000">return</font> <font color="#C00000">True</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Capture clargs and known mode keys from raw data entries stored</font>
+<font color="#a02030"># to TestEnv.params. Do this once, now, instead of each time we</font>
+<font color="#a02030"># need to interrogate their contents in the above functions.</font>
+<font color="#a02030">#</font>
+<font color="#000000">activeModeKeys</font> <font color="#4000C0">=</font> <font color="#000000">GetModeKeysFromClArgs</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;All mode strings compatible&quot;</font><font color="#4000C0">,</font> <font color="#000000">AllModeKeysCompatible</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#C00000">True</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;Engine matches mode&quot;</font><font color="#4000C0">,</font> <font color="#000000">EngineMatchesMode</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#C00000">True</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;Silo data path matches mode&quot;</font><font color="#4000C0">,</font> <font color="#000000">SiloDataPathMatchesMode</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#C00000">True</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;Scalable setting matches mode&quot;</font><font color="#4000C0">,</font> <font color="#000000">ScalableSettingMatchesMode</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#C00000">True</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;Icet clarg matches mode&quot;</font><font color="#4000C0">,</font> <font color="#000000">IcetClargMatchesMode</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#C00000">True</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;Allowdynamic clarg matches mode&quot;</font><font color="#4000C0">,</font> <font color="#000000">AllowdynamicClargMatchesMode</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#C00000">True</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

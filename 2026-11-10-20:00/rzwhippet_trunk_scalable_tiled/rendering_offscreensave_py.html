@@ -1,0 +1,194 @@
+<html><body bgcolor="#e0e0e0"><head><title>rendering/offscreensave.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  offscreensave.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      save window options</font>
+<font color="#a02030">#              mesh      - 3D unstructured, multiple domains</font>
+<font color="#a02030">#              plots     - pc, mesh </font>
+<font color="#a02030">#              operators - slice </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Mark C. Miller </font>
+<font color="#a02030">#  Date:       29Mar04 </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Tue May 11 20:21:24 PDT 2004</font>
+<font color="#a02030">#    Changed scalable rendering controls to use activation mode</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Thu Jan  6 15:09:06 PST 2005</font>
+<font color="#a02030">#    Added a test that involves annotation objects</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Mon Aug  2 09:42:50 PDT 2021</font>
+<font color="#a02030">#    Added test of 16384 x 16384 image save.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Kathleen Biagas, Fri Aug 27, 2021</font>
+<font color="#a02030">#    Put tests into functions. Skip the large image test on Windows as it</font>
+<font color="#a02030">#    doesn&#x27;t yield the correct size image. Ensure the large image is saved</font>
+<font color="#a02030">#    to run_dir so the test will execute on Windows properly once it can</font>
+<font color="#a02030">#    be enabled.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Eric Brugger, Mon Nov 18 11:44:28 PST 2024</font>
+<font color="#a02030">#    Updated the large image test and added several more.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">import</font> <font color="#000000">hashlib</font>
+
+<font color="#C00000">def</font> <font color="#000000">GeneralTests</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TurnOnAllAnnotations</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">view</font><font color="#4000C0">=</font><font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.528567</font><font color="#4000C0">,</font> <font color="#0080C0">0.374238</font><font color="#4000C0">,</font> <font color="#0080C0">0.761946</font><font color="#4000C0">)</font>
+    <font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewUp</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">0.200044</font><font color="#4000C0">,</font> <font color="#0080C0">0.927212</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.316639</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;offscreen_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># build some savewindow attributes that DO NOT</font>
+    <font color="#a02030"># use screen capture</font>
+    <font color="#000000">swa</font><font color="#4000C0">=</font><font color="#000000">SaveWindowAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">screenCapture</font><font color="#4000C0">=</font><font color="#0080C0">0</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">width</font><font color="#4000C0">=</font><font color="#0080C0">400</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">height</font><font color="#4000C0">=</font><font color="#0080C0">400</font>
+
+    <font color="#a02030"># simple test to make sure we get all the annoations</font>
+    <font color="#a02030"># when we save window using off-screen save</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;offscreen_02&quot;</font><font color="#4000C0">,</font><font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># now, test saving at a different size</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">width</font><font color="#4000C0">=</font><font color="#0080C0">600</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">height</font><font color="#4000C0">=</font><font color="#0080C0">600</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;offscreen_03&quot;</font><font color="#4000C0">,</font><font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Ok, now diddle with annoations a bit and do some</font>
+    <font color="#a02030"># more saves</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">width</font><font color="#4000C0">=</font><font color="#0080C0">300</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">height</font><font color="#4000C0">=</font><font color="#0080C0">300</font>
+    <font color="#000000">a</font> <font color="#4000C0">=</font> <font color="#000000">AnnotationAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">userInfoFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">databaseInfoFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;offscreen_04&quot;</font><font color="#4000C0">,</font><font color="#000000">swa</font><font color="#4000C0">)</font>
+    <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">legendInfoFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;offscreen_05&quot;</font><font color="#4000C0">,</font><font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Ok, now put the window into SR mode</font>
+    <font color="#000000">ra</font> <font color="#4000C0">=</font> <font color="#000000">GetRenderingAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">scalableActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">ra</font><font color="#4000C0">.</font><font color="#000000">Always</font>
+    <font color="#000000">SetRenderingAttributes</font><font color="#4000C0">(</font><font color="#000000">ra</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;offscreen_06&quot;</font><font color="#4000C0">,</font><font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># diddle some more with annoations</font>
+    <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">databaseInfoFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">legendInfoFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;offscreen_07&quot;</font><font color="#4000C0">,</font><font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Now, use screen capture mode to save the window</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;offscreen_08&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+    <font color="#a02030"># Test off screen save of a 2D window</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;curvmesh2d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">width</font><font color="#4000C0">=</font><font color="#0080C0">400</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">height</font><font color="#4000C0">=</font><font color="#0080C0">400</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;offscreen_09&quot;</font><font color="#4000C0">,</font><font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test off screen save of a full frame 2D window</font>
+    <font color="#000000">view2</font><font color="#4000C0">=</font><font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">view2</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font><font color="#4000C0">=</font><font color="#000000">view2</font><font color="#4000C0">.</font><font color="#000000">On</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">view2</font><font color="#4000C0">)</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">width</font><font color="#4000C0">=</font><font color="#0080C0">500</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">height</font><font color="#4000C0">=</font><font color="#0080C0">500</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;offscreen_10&quot;</font><font color="#4000C0">,</font><font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Now test some annotation objects</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">view</font><font color="#4000C0">=</font><font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.528567</font><font color="#4000C0">,</font> <font color="#0080C0">0.374238</font><font color="#4000C0">,</font> <font color="#0080C0">0.761946</font><font color="#4000C0">)</font>
+    <font color="#000000">view</font><font color="#4000C0">.</font><font color="#000000">viewUp</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">0.200044</font><font color="#4000C0">,</font> <font color="#0080C0">0.927212</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.316639</font><font color="#4000C0">)</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">view</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Create a time slider</font>
+    <font color="#000000">slider</font> <font color="#4000C0">=</font> <font color="#000000">CreateAnnotationObject</font><font color="#4000C0">(</font><font color="#008000">&quot;TimeSlider&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">width</font><font color="#4000C0">=</font><font color="#0080C0">300</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">height</font><font color="#4000C0">=</font><font color="#0080C0">300</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;offscreen_11&quot;</font><font color="#4000C0">,</font><font color="#000000">swa</font><font color="#4000C0">)</font>
+
+    <font color="#000000">slider</font><font color="#4000C0">.</font><font color="#000000">Delete</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestLargeImage</font><font color="#4000C0">(</font><font color="#000000">width</font><font color="#4000C0">,</font> <font color="#000000">height</font><font color="#4000C0">,</font> <font color="#000000">md5sum</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Test saving a large image</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;d&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">view2</font><font color="#4000C0">=</font><font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">view2</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font><font color="#4000C0">=</font><font color="#000000">view2</font><font color="#4000C0">.</font><font color="#000000">Off</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">view2</font><font color="#4000C0">)</font>
+
+    <font color="#000000">swa</font><font color="#4000C0">=</font><font color="#000000">SaveWindowAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#a02030"># ensure the image is written to the run_dir by providing full path</font>
+    <font color="#000000">imgOutName</font><font color="#4000C0">=</font><font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">TestEnv</font><font color="#4000C0">.</font><font color="#000000">params</font><font color="#4000C0">[</font><font color="#008000">&quot;run_dir&quot;</font><font color="#4000C0">]</font><font color="#4000C0">,</font> <font color="#008000">&quot;image_%dx%d.png&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">width</font><font color="#4000C0">,</font><font color="#000000">height</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">width</font> <font color="#4000C0">=</font> <font color="#000000">width</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">height</font> <font color="#4000C0">=</font> <font color="#000000">height</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">resConstraint</font> <font color="#4000C0">=</font> <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">NoConstraint</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">fileName</font> <font color="#4000C0">=</font> <font color="#000000">imgOutName</font>
+    <font color="#000000">swa</font><font color="#4000C0">.</font><font color="#000000">family</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetSaveWindowAttributes</font><font color="#4000C0">(</font><font color="#000000">swa</font><font color="#4000C0">)</font>
+    <font color="#000000">SaveWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Comparing md5 sum instead of image, since the image is large.</font>
+    <font color="#000000">md5_hash</font> <font color="#4000C0">=</font> <font color="#000000">hashlib</font><font color="#4000C0">.</font><font color="#000000">md5</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">with</font> <font color="#000000">open</font><font color="#4000C0">(</font><font color="#000000">imgOutName</font><font color="#4000C0">,</font> <font color="#008000">&quot;rb&quot;</font><font color="#4000C0">)</font> <font color="#C00000">as</font> <font color="#000000">f</font><font color="#4000C0">:</font>
+        <font color="#a02030"># Read and update hash in chunks of 4K</font>
+        <font color="#C00000">for</font> <font color="#000000">byte_block</font> <font color="#C00000">in</font> <font color="#000000">iter</font><font color="#4000C0">(</font><font color="#C00000">lambda</font><font color="#4000C0">:</font> <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">read</font><font color="#4000C0">(</font><font color="#0080C0">4096</font><font color="#4000C0">)</font><font color="#4000C0">,</font><font color="#008000">b&quot;&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+            <font color="#000000">md5_hash</font><font color="#4000C0">.</font><font color="#000000">update</font><font color="#4000C0">(</font><font color="#000000">byte_block</font><font color="#4000C0">)</font>
+    <font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;md5 hash for %dx%d image&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">width</font><font color="#4000C0">,</font><font color="#000000">height</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">md5_hash</font><font color="#4000C0">.</font><font color="#000000">hexdigest</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#000000">md5sum</font><font color="#4000C0">)</font>
+
+<font color="#000000">GeneralTests</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">sys</font><font color="#4000C0">.</font><font color="#000000">platform</font><font color="#4000C0">.</font><font color="#000000">startswith</font><font color="#4000C0">(</font><font color="#008000">&quot;win&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Cannot perform this test on Windows as image size is limited</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">TestLargeImage</font><font color="#4000C0">(</font><font color="#0080C0">16384</font><font color="#4000C0">,</font> <font color="#0080C0">16384</font><font color="#4000C0">,</font> <font color="#008000">&quot;b9ba1aee7d5f2c031e212d81bcdad4e7&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestLargeImage</font><font color="#4000C0">(</font><font color="#0080C0">23168</font><font color="#4000C0">,</font> <font color="#0080C0">23168</font><font color="#4000C0">,</font> <font color="#008000">&quot;c98014414f27ef1a6d758c1f63b28fc4&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestLargeImage</font><font color="#4000C0">(</font><font color="#0080C0">32768</font><font color="#4000C0">,</font> <font color="#0080C0">16380</font><font color="#4000C0">,</font> <font color="#008000">&quot;bbb9b82d676d94eaec47a6fc9eea4107&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># The images sizes for the last 2 tests are too large so they</font>
+    <font color="#a02030"># will get scaled to be within the size allowed. The 32768x32768</font>
+    <font color="#a02030"># image will be 23168x23168 and the 32768x24000 will be 27071x19827.</font>
+    <font color="#000000">TestLargeImage</font><font color="#4000C0">(</font><font color="#0080C0">32768</font><font color="#4000C0">,</font> <font color="#0080C0">32768</font><font color="#4000C0">,</font> <font color="#008000">&quot;c98014414f27ef1a6d758c1f63b28fc4&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TestLargeImage</font><font color="#4000C0">(</font><font color="#0080C0">32768</font><font color="#4000C0">,</font> <font color="#0080C0">24000</font><font color="#4000C0">,</font> <font color="#008000">&quot;0fa2320f3c33c47debc284ce605f59de&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

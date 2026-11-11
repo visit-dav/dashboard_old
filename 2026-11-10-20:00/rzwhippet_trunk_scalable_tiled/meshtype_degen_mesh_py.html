@@ -1,0 +1,260 @@
+<html><body bgcolor="#e0e0e0"><head><title>meshtype/degen_mesh.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  degenerate.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 3D curvilinear, rectilinear</font>
+<font color="#a02030">#              plots     - pc, contour, mesh</font>
+<font color="#a02030">#              operators - none</font>
+<font color="#a02030">#              selection - none</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  &#x27;5333 &amp; &#x27;5335</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       August 26, 2004</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Cyrus Harrison, Thu Mar 25 09:57:34 PDT 2010</font>
+<font color="#a02030">#    Added call(s) to DrawPlots() b/c of changes to the default plot state</font>
+<font color="#a02030">#    behavior when an operator is added.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#a02030"># Define some expressions that will be handy for later.</font>
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;coords_plus1&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;coords(mesh)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;coords&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;{coords_plus1[0]-1., coords_plus1[1]-1., coords_plus1[2]-1. }&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;i_disp&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;{ -sqrt(coords[1]*coords[1] + coords[2]*coords[2]), 0, 0 }&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;j_disp&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;{ 0, -sqrt(coords[0]*coords[0] + coords[2]*coords[2]), 0 }&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;k_disp&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;{ 0, 0, -sqrt(coords[0]*coords[0] + coords[1]*coords[1]) }&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;pos&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;sqrt(coords[0]*coords[0]+coords[1]*coords[1]+coords[2]*coords[2])&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Start off by testing curvilinear meshes.</font>
+<font color="#a02030">#</font>
+
+<font color="#a02030"># Test that we can make the meshes with no modification.</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/curv_flat_i.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#a02030"># If you do a DrawPlots now, you will exhibit &#x27;5337</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/curv_flat_j.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/curv_flat_k.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;degen_mesh_01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test that we can handle displacing them and operating on them with</font>
+<font color="#a02030"># expressions.</font>
+<font color="#000000">disp</font> <font color="#4000C0">=</font> <font color="#000000">DisplaceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;i_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;j_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;k_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font><font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.449864</font><font color="#4000C0">,</font> <font color="#0080C0">0.604932</font><font color="#4000C0">,</font> <font color="#0080C0">0.657023</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.801178</font><font color="#4000C0">,</font> <font color="#0080C0">0.801178</font><font color="#4000C0">,</font> <font color="#0080C0">0.801178</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.377875</font><font color="#4000C0">,</font> <font color="#0080C0">0.537649</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.753753</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">2.00714</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">4.01428</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">4.01428</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">0.873008</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;degen_mesh_02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test that we can do PC plots (&#x27;5335)</font>
+<font color="#000000">ActivateDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/curv_flat_i.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pos&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font> <font color="#4000C0">=</font> <font color="#000000">DisplaceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;i_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ActivateDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/curv_flat_j.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pos&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;j_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ActivateDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/curv_flat_k.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pos&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;k_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;degen_mesh_03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># Test that we can do contours (&#x27;5333)</font>
+<font color="#000000">ActivateDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/curv_flat_i.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pos&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font> <font color="#4000C0">=</font> <font color="#000000">DisplaceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;i_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ActivateDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/curv_flat_j.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pos&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;j_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ActivateDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/curv_flat_k.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pos&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;k_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;degen_mesh_04&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Now do the same thing over again with rectilinear meshes.</font>
+<font color="#a02030">#</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test that we can make the meshes with no modification.</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/rect_flat_i.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#a02030"># If you do a DrawPlots now, you will exhibit &#x27;5337</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/rect_flat_j.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/rect_flat_k.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;degen_mesh_05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test that we can handle displacing them and operating on them with</font>
+<font color="#a02030"># expressions.</font>
+<font color="#000000">disp</font> <font color="#4000C0">=</font> <font color="#000000">DisplaceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;i_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;j_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;k_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.449864</font><font color="#4000C0">,</font> <font color="#0080C0">0.604932</font><font color="#4000C0">,</font> <font color="#0080C0">0.657023</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.801178</font><font color="#4000C0">,</font> <font color="#0080C0">0.801178</font><font color="#4000C0">,</font> <font color="#0080C0">0.801178</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.377875</font><font color="#4000C0">,</font> <font color="#0080C0">0.537649</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.753753</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">2.00714</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">4.01428</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">4.01428</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">0.873008</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;degen_mesh_06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test that we can do PC plots (&#x27;5335)</font>
+<font color="#000000">ActivateDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/rect_flat_i.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pos&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font> <font color="#4000C0">=</font> <font color="#000000">DisplaceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;i_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ActivateDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/rect_flat_j.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pos&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;j_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ActivateDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/rect_flat_k.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pos&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;k_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;degen_mesh_07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">5</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">4</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># Test that we can do contours (&#x27;5333)</font>
+<font color="#000000">ActivateDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/curv_flat_i.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pos&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font> <font color="#4000C0">=</font> <font color="#000000">DisplaceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;i_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ActivateDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/curv_flat_j.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pos&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;j_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ActivateDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;vtk_test_data/curv_flat_k.vtk&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pos&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">disp</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;k_disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">disp</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;degen_mesh_08&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

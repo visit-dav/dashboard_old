@@ -1,0 +1,101 @@
+<html><body bgcolor="#e0e0e0"><head><title>databases/Chombo.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  Chombo.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 2D AMR</font>
+<font color="#a02030">#              plots     - Pseudocolor</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Mon Sep 25 14:17:58 PST 2006</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 21 10:00:10 PST 2009</font>
+<font color="#a02030">#    Removed silly comments regarding global annotation object &#x27;a&#x27;</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">def</font> <font color="#000000">test0</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Changing time states&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Set up the plots.</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;chombo.visit&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Density&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleY</font> <font color="#4000C0">=</font> <font color="#0080C0">8.</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;Chombo_0_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Make sure we can change time states. This demonstrates the reader&#x27;s</font>
+    <font color="#a02030"># ability to change metadata/SIL over time.</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;Chombo_0_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get the time steps.</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Number of states: %d\n&quot;</font> <font color="#4000C0">%</font>  <font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font>
+        <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Cycle&quot;</font><font color="#4000C0">)</font>
+        <font color="#000000">cycle</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Time&quot;</font><font color="#4000C0">)</font>
+        <font color="#000000">time</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">values</font> <font color="#4000C0">=</font> <font color="#008000">&quot;Cycle=%d, Time=%g&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">cycle</font><font color="#4000C0">,</font> <font color="#000000">time</font><font color="#4000C0">)</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">values</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;Chombo_0_02&quot;</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;More distinct refinements&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;chombo.visit&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;patches&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;P_y_Over_Rho&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">On</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;Chombo_1_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test2</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Anisotropic refinement&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;aniso_refin.2d.hdf5&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;levels&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;Chombo_2_00&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TurnOffAllAnnotations</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">InvertBackgroundColor</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">datapath</font> <font color="#4000C0">=</font> <font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;Chombo_test_data&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">test0</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test2</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+
+    <font color="#000000">InvertBackgroundColor</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>
