@@ -1,0 +1,67 @@
+<html><body bgcolor="#e0e0e0"><head><title>databases/imgvol.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  imgvol.py </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      imgvol reader</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Mark C. Miller, Fri Apr 23 23:01:06 PDT 2010</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030"># </font>
+<font color="#a02030">#    Mark C. Miller, Sun Apr 25 21:30:29 PDT 2010</font>
+<font color="#a02030">#    Added missing Slice operator for contour plot.</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;imgvol_test_data/tcup.imgvol&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;intensity&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">sa</font><font color="#4000C0">=</font><font color="#000000">SliceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">sa</font><font color="#4000C0">.</font><font color="#000000">originType</font> <font color="#4000C0">=</font> <font color="#000000">sa</font><font color="#4000C0">.</font><font color="#000000">Percent</font>
+<font color="#000000">sa</font><font color="#4000C0">.</font><font color="#000000">originPercent</font> <font color="#4000C0">=</font> <font color="#0080C0">50</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">sa</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;imgvol_01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;intensity_nodal&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;imgvol_02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;InverseGhostZone&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;imgvol_03&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">RemoveLastOperator</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;intensity&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">sa</font><font color="#4000C0">)</font>
+<font color="#000000">ca</font><font color="#4000C0">=</font><font color="#000000">ContourAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ca</font><font color="#4000C0">.</font><font color="#000000">contourValue</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">65</font><font color="#4000C0">,</font><font color="#4000C0">)</font>
+<font color="#000000">ca</font><font color="#4000C0">.</font><font color="#000000">contourMethod</font> <font color="#4000C0">=</font> <font color="#000000">ca</font><font color="#4000C0">.</font><font color="#000000">Value</font>
+<font color="#000000">ca</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">ca</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;imgvol_04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;intensity&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;imgvol_05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">RemoveLastOperator</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">iv</font><font color="#4000C0">=</font><font color="#000000">IsovolumeAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">iv</font><font color="#4000C0">.</font><font color="#000000">lbound</font> <font color="#4000C0">=</font> <font color="#0080C0">65</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Isovolume&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">iv</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">sa</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;imgvol_06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;intensity_nodal&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;imgvol_07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

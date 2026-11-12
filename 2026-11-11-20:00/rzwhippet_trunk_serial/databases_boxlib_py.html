@@ -1,0 +1,119 @@
+<html><body bgcolor="#e0e0e0"><head><title>databases/boxlib.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  boxlib.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 2D AMR</font>
+<font color="#a02030">#              plots     - Pseudocolor, mesh, boundary, subset</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  none</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       March 31, 2005</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#  </font>
+<font color="#a02030">#    Mark C. Miller, Mon Sep 15 12:05:44 PDT 2008</font>
+<font color="#a02030">#    Added 3D test</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Mon Jan 11 10:40:34 PST 2021</font>
+<font color="#a02030">#    Replace Assert-style with TestValue-style tests.</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#000000">RequiredDatabasePlugin</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#008000">&quot;Boxlib2D&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Boxlib3D&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_test_data/2D/plt0822/Header&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;density&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Boundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;materials&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">b</font> <font color="#4000C0">=</font> <font color="#000000">BoundaryAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">b</font><font color="#4000C0">.</font><font color="#000000">colorType</font> <font color="#4000C0">=</font> <font color="#000000">b</font><font color="#4000C0">.</font><font color="#000000">ColorBySingleColor</font>
+<font color="#000000">b</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">b</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;patches&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SubsetAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">wireframe</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">colorType</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">ColorBySingleColor</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">singleColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">128</font><font color="#4000C0">)</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0.04</font><font color="#4000C0">,</font> <font color="#0080C0">0.09</font><font color="#4000C0">,</font> <font color="#0080C0">0.13</font><font color="#4000C0">)</font>
+<font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">2</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SILRestriction</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">levels</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">SetsInCategory</font><font color="#4000C0">(</font><font color="#008000">&quot;levels&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">level2</font> <font color="#4000C0">=</font> <font color="#000000">levels</font><font color="#4000C0">[</font><font color="#0080C0">2</font><font color="#4000C0">]</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">level2</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">TurnOnAll</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">level0</font> <font color="#4000C0">=</font> <font color="#000000">levels</font><font color="#4000C0">[</font><font color="#0080C0">0</font><font color="#4000C0">]</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">level0</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_test_data/2D/plt0822/Header&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_test_data/3D/plt_asgc05_0309/Header&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;tracer&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">=</font><font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">RotateAxis</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">,</font><font color="#4000C0">-</font><font color="#0080C0">45.0</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">RotateAxis</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">65.0</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_test_data/3D/plt_asgc05_0309/Header&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_test_data/3D/plt00000.cartgrid.body.small/Header&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;temperature&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;ThreeSlice&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">RotateAxis</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font><font color="#0080C0">45</font><font color="#4000C0">)</font>
+<font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">RotateAxis</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">45</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">silr</font> <font color="#4000C0">=</font> <font color="#000000">SILRestriction</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOnAll</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">TurnOffSet</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">.</font><font color="#000000">SetsInCategory</font><font color="#4000C0">(</font><font color="#008000">&#x27;materials&#x27;</font><font color="#4000C0">)</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">silr</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test precision {</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># Test double precision is working by reading a known double precision</font>
+<font color="#a02030"># database and ensuring we get expected min/max values within 15 digits</font>
+<font color="#a02030"># of accuracy.</font>
+<font color="#a02030">#</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_test_data/3D/plt00000.cartgrid.body.small/Header&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_test_data/2D/plt0000000/Header&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;temperature1&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetQueryOutputToValue</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;temperature1 min&quot;</font><font color="#4000C0">,</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Min&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">295.409999999999968</font><font color="#4000C0">,</font> <font color="#0080C0">15</font><font color="#4000C0">)</font>
+<font color="#000000">TestValueEQ</font><font color="#4000C0">(</font><font color="#008000">&quot;temperature1 max&quot;</font><font color="#4000C0">,</font> <font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;Max&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">295.410000000000082</font><font color="#4000C0">,</font> <font color="#0080C0">15</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;boxlib_test_data/2D/plt0000000/Header&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#a02030"># Test precision }</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

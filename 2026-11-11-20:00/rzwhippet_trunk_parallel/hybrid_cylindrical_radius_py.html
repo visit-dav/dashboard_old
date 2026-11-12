@@ -1,0 +1,232 @@
+<html><body bgcolor="#e0e0e0"><head><title>hybrid/cylindrical_radius.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  cylindrical_radius.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 3D structured, multi domain</font>
+<font color="#a02030">#              plots     - pc</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Ticket Id:  &#x27;7915</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Notes:      Created to test axis selection for the cylindrical_radius </font>
+<font color="#a02030">#              expression</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Cyrus Harrison</font>
+<font color="#a02030">#  Date:       March 31, 2008</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Thu Mar 25 09:57:34 PDT 2010</font>
+<font color="#a02030">#    Added call(s) to DrawPlots() b/c of changes to the default plot state</font>
+<font color="#a02030">#    behavior when an operator is added.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;multi_ucd3d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+
+<font color="#a02030"># Default use case</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cylin_rad_default&quot;</font><font color="#4000C0">,</font>   <font color="#008000">&quot;cylindrical_radius(mesh1)&quot;</font><font color="#4000C0">)</font>
+<font color="#a02030"># Cyl axis = {1,0,0}</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cylin_rad_x&quot;</font><font color="#4000C0">,</font>         <font color="#008000">&#x27;cylindrical_radius(mesh1,&quot;x&quot;)&#x27;</font><font color="#4000C0">)</font>
+<font color="#a02030"># Cyl axis = {0,1,0}</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cylin_rad_y&quot;</font><font color="#4000C0">,</font>         <font color="#008000">&#x27;cylindrical_radius(mesh1,&quot;y&quot;)&#x27;</font><font color="#4000C0">)</font>
+<font color="#a02030"># Cyl axis = {0,0,1} (same as default)</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cylin_rad_z&quot;</font><font color="#4000C0">,</font>         <font color="#008000">&#x27;cylindrical_radius(mesh1,&quot;z&quot;)&#x27;</font><font color="#4000C0">)</font>
+<font color="#a02030"># Cyl axis = {1,1,1}</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cylin_rad_diag_a&quot;</font><font color="#4000C0">,</font>    <font color="#008000">&#x27;cylindrical_radius(mesh1,{1,1,1})&#x27;</font><font color="#4000C0">)</font>
+<font color="#a02030"># Cyl axis = {1,1,-1}</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cylin_rad_diag_b&quot;</font><font color="#4000C0">,</font>    <font color="#008000">&#x27;cylindrical_radius(mesh1,{1,1,-1})&#x27;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># use rotate and defer expression to test proper axis selection</font>
+
+<font color="#C00000">def</font> <font color="#000000">test_cyl</font><font color="#4000C0">(</font><font color="#000000">var_name</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">var_name</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">var_name</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_%d&quot;</font> <font color="#4000C0">%</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font> <font color="#a02030"># rotate to another view</font>
+    <font color="#000000">TransformAtts</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doRotate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateOrigin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAxis</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAmount</font> <font color="#4000C0">=</font> <font color="#0080C0">45</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Deg</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">transformType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Similarity</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">inputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">outputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">TransformAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">var_name</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_%d&quot;</font> <font color="#4000C0">%</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test_cyl_x</font><font color="#4000C0">(</font><font color="#000000">var_name</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">var_name</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doRotate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateOrigin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAxis</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAmount</font> <font color="#4000C0">=</font> <font color="#0080C0">90</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Deg</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">transformType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Similarity</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">inputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">outputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">TransformAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;DeferExpression&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeferExpressionAtts</font> <font color="#4000C0">=</font> <font color="#000000">DeferExpressionAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeferExpressionAtts</font><font color="#4000C0">.</font><font color="#000000">exprs</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#000000">var_name</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">DeferExpressionAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">var_name</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_%d&quot;</font> <font color="#4000C0">%</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font> <font color="#a02030"># rotate to better view</font>
+    <font color="#000000">TransformAtts</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doRotate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateOrigin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAxis</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAmount</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">45</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Deg</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">transformType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Similarity</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">inputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">outputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">TransformAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">var_name</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_%d&quot;</font> <font color="#4000C0">%</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">test_cyl_y</font><font color="#4000C0">(</font><font color="#000000">var_name</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">var_name</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doRotate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateOrigin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAxis</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAmount</font> <font color="#4000C0">=</font> <font color="#0080C0">90</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Deg</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">transformType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Similarity</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">inputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">outputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">TransformAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;DeferExpression&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeferExpressionAtts</font> <font color="#4000C0">=</font> <font color="#000000">DeferExpressionAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeferExpressionAtts</font><font color="#4000C0">.</font><font color="#000000">exprs</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#000000">var_name</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">DeferExpressionAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">var_name</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_%d&quot;</font> <font color="#4000C0">%</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font> <font color="#a02030"># rotate to better view</font>
+    <font color="#000000">TransformAtts</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doRotate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateOrigin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAxis</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAmount</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">45</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Deg</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">transformType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Similarity</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">inputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">outputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">TransformAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">var_name</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_%d&quot;</font> <font color="#4000C0">%</font> <font color="#0080C0">2</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test_cyl_diag_a</font><font color="#4000C0">(</font><font color="#000000">var_name</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">var_name</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doRotate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateOrigin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAxis</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAmount</font> <font color="#4000C0">=</font> <font color="#0080C0">45</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Deg</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">transformType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Similarity</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">inputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">outputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">TransformAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font> <font color="#a02030"># rotate to better view</font>
+    <font color="#000000">TransformAtts</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doRotate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateOrigin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAxis</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.70710678118654746</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0.70710678118654746</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAmount</font> <font color="#4000C0">=</font> <font color="#0080C0">35.26</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Deg</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">transformType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Similarity</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">inputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">outputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">TransformAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;DeferExpression&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeferExpressionAtts</font> <font color="#4000C0">=</font> <font color="#000000">DeferExpressionAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeferExpressionAtts</font><font color="#4000C0">.</font><font color="#000000">exprs</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#000000">var_name</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">DeferExpressionAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">var_name</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_%d&quot;</font> <font color="#4000C0">%</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test_cyl_diag_b</font><font color="#4000C0">(</font><font color="#000000">var_name</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">var_name</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doRotate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateOrigin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAxis</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAmount</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">45</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Deg</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">transformType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Similarity</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">inputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">outputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">TransformAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font> <font color="#a02030"># rotate to better view</font>
+    <font color="#000000">TransformAtts</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doRotate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateOrigin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAxis</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.70710678118654746</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0.70710678118654746</font><font color="#4000C0">)</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateAmount</font> <font color="#4000C0">=</font> <font color="#0080C0">35.26</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">rotateType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Deg</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">transformType</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Similarity</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">inputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">outputCoordSys</font> <font color="#4000C0">=</font> <font color="#000000">TransformAtts</font><font color="#4000C0">.</font><font color="#000000">Cartesian</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">TransformAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;DeferExpression&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeferExpressionAtts</font> <font color="#4000C0">=</font> <font color="#000000">DeferExpressionAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DeferExpressionAtts</font><font color="#4000C0">.</font><font color="#000000">exprs</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#000000">var_name</font><font color="#4000C0">)</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">DeferExpressionAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">var_name</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_%d&quot;</font> <font color="#4000C0">%</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">test_cyl</font><font color="#4000C0">(</font><font color="#008000">&quot;cylin_rad_default&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">test_cyl_x</font><font color="#4000C0">(</font><font color="#008000">&quot;cylin_rad_x&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">test_cyl_y</font><font color="#4000C0">(</font><font color="#008000">&quot;cylin_rad_y&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">test_cyl</font><font color="#4000C0">(</font><font color="#008000">&quot;cylin_rad_z&quot;</font><font color="#4000C0">)</font> <font color="#a02030"># same as default</font>
+<font color="#000000">test_cyl_diag_a</font><font color="#4000C0">(</font><font color="#008000">&quot;cylin_rad_diag_a&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">test_cyl_diag_b</font><font color="#4000C0">(</font><font color="#008000">&quot;cylin_rad_diag_b&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

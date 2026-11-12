@@ -1,0 +1,115 @@
+<html><body bgcolor="#e0e0e0"><head><title>operators/ic_integration.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  ic_integration.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      operator      - integralcurve</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  -</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Allen Sanderson</font>
+<font color="#a02030">#  Date:       March 10, 2016</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Kathleen Biagas, Tue Sep 29 11:01:37 PDT 2020</font>
+<font color="#a02030">#    Turn off IC warnings.</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;operators/IntegralCurve/grad&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+
+<font color="#000000">View3DAtts</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.270729</font><font color="#4000C0">,</font> <font color="#0080C0">0.624198</font><font color="#4000C0">,</font> <font color="#0080C0">0.732859</font><font color="#4000C0">)</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.496062</font><font color="#4000C0">,</font> <font color="#0080C0">0.99603</font><font color="#4000C0">,</font> <font color="#0080C0">0.496062</font><font color="#4000C0">)</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.0922782</font><font color="#4000C0">,</font> <font color="#0080C0">0.774611</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.62567</font><font color="#4000C0">)</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">12.1829</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">24.3658</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">24.3658</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">axis3DScaleFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">axis3DScales</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">View3DAtts</font><font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sourceType</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">SpecifiedPlane</font>  <font color="#a02030"># SpecifiedPoint, SpecifiedPointList, SpecifiedLine, SpecifiedCircle, SpecifiedPlane, SpecifiedSphere, SpecifiedBox</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">limitMaximumTimestep</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxTimeStep</font> <font color="#4000C0">=</font> <font color="#0080C0">0.02</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">terminateByTime</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">termTime</font> <font color="#4000C0">=</font> <font color="#0080C0">200</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxSteps</font> <font color="#4000C0">=</font> <font color="#0080C0">100000</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">planeOrigin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">planeNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">planeUpAxis</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sampleDensity0</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sampleDensity1</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sampleDistance0</font> <font color="#4000C0">=</font> <font color="#0080C0">18</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sampleDistance1</font> <font color="#4000C0">=</font> <font color="#0080C0">18</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">integrationDirection</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">Both</font>  <font color="#a02030"># Forward, Backward, Both</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">relTol</font> <font color="#4000C0">=</font> <font color="#0080C0">1e-06</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">absTolSizeType</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">Absolute</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">absTolAbsolute</font> <font color="#4000C0">=</font> <font color="#0080C0">1e-07</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">integrationType</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">DormandPrince</font>  <font color="#a02030"># DormandPrince, AdamsBashforth, M3DC1Integrator</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxProcessCount</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxDomainCacheSize</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">workGroupSize</font> <font color="#4000C0">=</font> <font color="#0080C0">32</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">dataValue</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">TimeAbsolute</font>
+<font color="#a02030"># turn off warnings</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueAdvectionWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueBoundaryWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueTerminationWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueStepsizeWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueStiffnessWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueCriticalPointsWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+
+
+<font color="#a02030"># test defaults</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font> <font color="#008000">&quot;ic_integration_01&quot;</font> <font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxTimeStep</font> <font color="#4000C0">=</font> <font color="#0080C0">0.05</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font> <font color="#008000">&quot;ic_integration_02&quot;</font> <font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">limitMaximumTimestep</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font> <font color="#008000">&quot;ic_integration_03&quot;</font> <font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">absTolAbsolute</font> <font color="#4000C0">=</font> <font color="#0080C0">1e-03</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font> <font color="#008000">&quot;ic_integration_04&quot;</font> <font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">absTolSizeType</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">FractionOfBBox</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font> <font color="#008000">&quot;ic_integration_05&quot;</font> <font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">absTolBBox</font> <font color="#4000C0">=</font> <font color="#0080C0">1e-09</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font> <font color="#008000">&quot;ic_integration_06&quot;</font> <font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">absTolBBox</font> <font color="#4000C0">=</font> <font color="#0080C0">1e-04</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font> <font color="#008000">&quot;ic_integration_07&quot;</font> <font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">integrationType</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">AdamsBashforth</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font> <font color="#008000">&quot;ic_integration_08&quot;</font> <font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxStepLength</font> <font color="#4000C0">=</font> <font color="#0080C0">0.2</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font> <font color="#008000">&quot;ic_integration_09&quot;</font> <font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxStepLength</font> <font color="#4000C0">=</font> <font color="#0080C0">1.0</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font> <font color="#008000">&quot;ic_integration_10&quot;</font> <font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxStepLength</font> <font color="#4000C0">=</font> <font color="#0080C0">0.01</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font> <font color="#008000">&quot;ic_integration_11&quot;</font> <font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

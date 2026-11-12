@@ -1,0 +1,40 @@
+<html><body bgcolor="#e0e0e0"><head><title>databases/openPMD.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  openPMD.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      openPMD hdf5 files</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Dave Pugmire</font>
+<font color="#a02030">#  Date:       Mon Oct 28 13:00:15 EDT 2019</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#000000">RequiredDatabasePlugin</font><font color="#4000C0">(</font><font color="#008000">&quot;OpenPMD&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">openPMDFile</font> <font color="#4000C0">=</font> <font color="#008000">&#x27;openpmd_test_data/data00000500.opmd&#x27;</font>
+
+<font color="#000000">vars</font> <font color="#4000C0">=</font> <font color="#4000C0">[</font><font color="#008000">&#x27;Fields/rho&#x27;</font><font color="#4000C0">]</font>
+
+<font color="#C00000">def</font> <font color="#000000">test</font><font color="#4000C0">(</font><font color="#000000">var</font><font color="#4000C0">,</font> <font color="#000000">tagName</font><font color="#4000C0">)</font> <font color="#4000C0">:</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#000000">var</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">ContourAtts</font> <font color="#4000C0">=</font> <font color="#000000">ContourAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ContourAtts</font><font color="#4000C0">.</font><font color="#000000">minFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ContourAtts</font><font color="#4000C0">.</font><font color="#000000">min</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">ContourAtts</font><font color="#4000C0">.</font><font color="#000000">scaling</font> <font color="#4000C0">=</font> <font color="#000000">ContourAtts</font><font color="#4000C0">.</font><font color="#000000">Log</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">ContourAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">fileName</font> <font color="#4000C0">=</font> <font color="#000000">var</font><font color="#4000C0">.</font><font color="#000000">replace</font><font color="#4000C0">(</font><font color="#008000">&quot;/&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">tagName</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_&quot;</font> <font color="#4000C0">+</font>  <font color="#000000">fileName</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;3D Example openPMD File&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#000000">openPMDFile</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#C00000">for</font> <font color="#000000">var</font> <font color="#C00000">in</font> <font color="#000000">vars</font><font color="#4000C0">:</font>
+    <font color="#000000">test</font><font color="#4000C0">(</font><font color="#000000">var</font><font color="#4000C0">,</font><font color="#008000">&quot;openPMD_3D&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#000000">openPMDFile</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

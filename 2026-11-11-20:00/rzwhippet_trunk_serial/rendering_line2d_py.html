@@ -1,0 +1,101 @@
+<html><body bgcolor="#e0e0e0"><head><title>rendering/line2d.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  line2d.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh        - 2D curvilinear, single domain</font>
+<font color="#a02030">#              plots       - Pseudocolor</font>
+<font color="#a02030">#              annotations - Line2D</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  #1724 (arrowheads for 2D Line annotations broke in 2.7) </font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Kathleen Biagas </font>
+<font color="#a02030">#  Date:       July 1, 2015</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Kathleen Biagas, Mon Aug  3 17:35:13 PDT 2015</font>
+<font color="#a02030">#    Uncomment test line2d01, also set nextLine.useForegroundForLineColor.</font>
+<font color="#a02030">#    Change line width values so that they yield previous results, line</font>
+<font color="#a02030">#    annotation object now uses a lineWidth gui widget that allows values </font>
+<font color="#a02030">#    from 0 to 9.</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#a02030"># Set up the annotation colors, etc.</font>
+<font color="#000000">a</font> <font color="#4000C0">=</font> <font color="#000000">GetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">backgroundColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">foregroundColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">backgroundMode</font> <font color="#4000C0">=</font> <font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">Solid</font>
+<font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Open up the database and do a plot.</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;u&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create a Line2D object</font>
+<font color="#000000">line</font> <font color="#4000C0">=</font> <font color="#000000">CreateAnnotationObject</font><font color="#4000C0">(</font><font color="#008000">&quot;Line2D&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.62</font><font color="#4000C0">,</font> <font color="#0080C0">0.83</font><font color="#4000C0">)</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">position2</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.43</font><font color="#4000C0">,</font> <font color="#0080C0">0.7</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;line2d00&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Set the foreground color to see if it changes</font>
+<font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">foregroundColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;line2d01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test line color</font>
+<font color="#000000">a</font><font color="#4000C0">.</font><font color="#000000">foregroundColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">SetAnnotationAttributes</font><font color="#4000C0">(</font><font color="#000000">a</font><font color="#4000C0">)</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">useForegroundForLineColor</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">color</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;line2d02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test line width</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">width</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;line2d03&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># Test line arrow at start</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">color</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">width</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">beginArrow</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;line2d04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test solid arrow at end</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">endArrow</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;line2d05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Switch arrows</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">beginArrow</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">endArrow</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;line2d06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test line opacity</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">position</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.25</font><font color="#4000C0">,</font> <font color="#0080C0">0.32</font><font color="#4000C0">)</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">position2</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.85</font><font color="#4000C0">,</font> <font color="#0080C0">0.71</font><font color="#4000C0">)</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">width</font> <font color="#4000C0">=</font> <font color="#0080C0">4</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">beginArrow</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">endArrow</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">color</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">150</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;line2d07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create more line objects</font>
+<font color="#000000">nextLine</font> <font color="#4000C0">=</font> <font color="#000000">CreateAnnotationObject</font><font color="#4000C0">(</font><font color="#008000">&quot;Line2D&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">nextLine</font><font color="#4000C0">.</font><font color="#000000">useForegroundForLineColor</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">nextLine</font><font color="#4000C0">.</font><font color="#000000">color</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+<font color="#000000">nextLine</font><font color="#4000C0">.</font><font color="#000000">position</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">0.41</font><font color="#4000C0">,</font> <font color="#0080C0">0.86</font><font color="#4000C0">)</font>
+<font color="#000000">nextLine</font><font color="#4000C0">.</font><font color="#000000">position2</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">0.75</font><font color="#4000C0">,</font> <font color="#0080C0">0.6</font><font color="#4000C0">)</font>
+<font color="#000000">nextLine</font><font color="#4000C0">.</font><font color="#000000">width</font><font color="#4000C0">=</font><font color="#0080C0">1</font>
+<font color="#000000">nextLine</font><font color="#4000C0">.</font><font color="#000000">endArrow</font><font color="#4000C0">=</font><font color="#0080C0">2</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;line2d08&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Start Removing text</font>
+<font color="#000000">line</font><font color="#4000C0">.</font><font color="#000000">Delete</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;line2d09&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">nextLine</font><font color="#4000C0">.</font><font color="#000000">Delete</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;line2d10&quot;</font><font color="#4000C0">)</font>
+
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

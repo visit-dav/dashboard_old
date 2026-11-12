@@ -1,0 +1,64 @@
+<SCRIPT TYPE="text/javascript">
+<!--
+function popup(mylink, name)
+{
+if (! window.focus)return true;
+var href;
+if (typeof(mylink) == 'string')
+   href=mylink;
+else
+   href=mylink.href;
+window.open(href,name,'width=500,height=500,scrollbars=no');
+return false;
+}
+//-->
+</SCRIPT>
+<html><head><title>Results for unit/default_methods.py</title></head>
+<body bgcolor="#a0a0f0">
+<H1>Results of VisIt Regression Test - <a href=unit_default_methods_py.html>unit/default_methods</a></H1>
+<table border>
+ <tr>
+  <td rowspan=2><b><i>Test Case</b></i></td>
+  <td colspan=2 align=center><b><i>Errors</b></i></td>
+  <td colspan=3 align=center><b><i>Images</b></i></td>
+ </tr>
+ <tr>
+  <td>%Diffs</td>
+  <td>Maximum</td>
+  <td>Baseline</td>
+  <td>Current</td>
+  <td>Diff Map</td>
+ </tr>
+
+ <tr>
+  <td bgcolor="#00ff00">GetDebugLevel()</td>
+  <td colspan=5 align=left><pre> 0 .eq. 0 (prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">GetLastError()</td>
+  <td colspan=5 align=left><pre> "Can't delete the last window." .eq. "Can't delete the last window." : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Clearing GetLastError()</td>
+  <td colspan=5 align=left><pre> "" .eq. "" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">Version()</td>
+  <td colspan=5 align=left><pre> 350 .ge. 321 (prec=5) : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">LocalNameSpace()</td>
+  <td colspan=5 align=left><pre> "None" .eq. "None" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">WriteScript('foo.py') == WriteScript(f)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">WriteScript() file size</td>
+  <td colspan=5 align=left><pre> 4040 .gt. 3000 (prec=5) : True</pre></td>
+ </tr>
+</table>
+<p>Final Return Code: 111</p>
+</body>
+</html>

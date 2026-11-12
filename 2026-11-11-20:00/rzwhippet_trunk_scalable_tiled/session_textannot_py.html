@@ -1,0 +1,38 @@
+<html><body bgcolor="#e0e0e0"><head><title>session/textannot.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  textanot.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 2D curvilinear, single domain</font>
+<font color="#a02030">#              plots     - Pseudocolor</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Notes:      This test case uses a session file to set up a plot and create</font>
+<font color="#a02030">#              several text annotations and a time slider annotation.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Thu Dec 4 14:17:46 PST 2003</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Brad Whitlock, Wed Mar 9 09:15:30 PDT 2005</font>
+<font color="#a02030">#    Removed deprecated functions.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#000000">TurnOnAllAnnotations</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Set up the visualization by restoring a session file.</font>
+<font color="#000000">RestoreSessionWithDifferentSources</font><font color="#4000C0">(</font><font color="#000000">tests_path</font><font color="#4000C0">(</font><font color="#008000">&quot;session&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;textannot.session&quot;</font><font color="#4000C0">)</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font>
+                                   <font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;pdb_test_data&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;allinone00.pdb&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Save a test frame for some of the frames in the animation so we can see</font>
+<font color="#a02030"># if the time slider is working.</font>
+<font color="#000000">testindex</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">ntests</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">ntests</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">frame</font> <font color="#4000C0">=</font> <font color="#000000">int</font><font color="#4000C0">(</font><font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font> <font color="#4000C0">/</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">ntests</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font><font color="#4000C0">)</font> <font color="#4000C0">*</font> <font color="#4000C0">(</font><font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#000000">frame</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;textannot%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">testindex</font><font color="#4000C0">)</font>
+    <font color="#000000">testindex</font> <font color="#4000C0">=</font> <font color="#000000">testindex</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

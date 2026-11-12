@@ -1,0 +1,229 @@
+<html><body bgcolor="#e0e0e0"><head><title>plots/multicolor.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  MODES: serial</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  multicolor.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      Tests setting colors using the multiColor field in some of</font>
+<font color="#a02030">#              our plots.</font>
+<font color="#a02030">#              Plots     - Boundary, Contour, FilledBoundary, Subset</font>
+<font color="#a02030">#              Operators - Transform</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Wed Apr 6 17:52:12 PST 2005</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Thu Jul 13 22:41:56 PDT 2006</font>
+<font color="#a02030">#    Added test of user-specified material colors</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestColorDefinitions</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">,</font> <font color="#000000">colors</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#008000">&quot;&quot;</font>
+    <font color="#C00000">for</font> <font color="#000000">c</font> <font color="#C00000">in</font> <font color="#000000">colors</font><font color="#4000C0">:</font>
+        <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">s</font> <font color="#4000C0">+</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">TestMultiColor</font><font color="#4000C0">(</font><font color="#000000">section</font><font color="#4000C0">,</font> <font color="#000000">plotAtts</font><font color="#4000C0">,</font> <font color="#000000">decreasingOpacity</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Get the current colors.</font>
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">plotAtts</font><font color="#4000C0">.</font><font color="#000000">GetMultiColor</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test what the image currently looks like.</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;multicolor_%d_00&quot;</font> <font color="#4000C0">%</font> <font color="#000000">section</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change the colors all at once. We should have red-&gt;blue</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font> <font color="#4000C0">/</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+        <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">int</font><font color="#4000C0">(</font><font color="#000000">t</font> <font color="#4000C0">*</font> <font color="#0080C0">255.</font><font color="#4000C0">)</font>
+        <font color="#000000">m</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">-</font><font color="#000000">c</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">c</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+    <font color="#000000">plotAtts</font><font color="#4000C0">.</font><font color="#000000">SetMultiColor</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">plotAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;multicolor_%d_01&quot;</font> <font color="#4000C0">%</font> <font color="#000000">section</font><font color="#4000C0">)</font>
+    <font color="#000000">TestColorDefinitions</font><font color="#4000C0">(</font><font color="#008000">&quot;multicolor_%d_02&quot;</font> <font color="#4000C0">%</font> <font color="#000000">section</font><font color="#4000C0">,</font> <font color="#000000">plotAtts</font><font color="#4000C0">.</font><font color="#000000">GetMultiColor</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change the colors another way. We should get green to blue</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font> <font color="#4000C0">/</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+        <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">int</font><font color="#4000C0">(</font><font color="#000000">t</font> <font color="#4000C0">*</font> <font color="#0080C0">255.</font><font color="#4000C0">)</font>
+        <font color="#000000">plotAtts</font><font color="#4000C0">.</font><font color="#000000">SetMultiColor</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">-</font><font color="#000000">c</font><font color="#4000C0">,</font> <font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">plotAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;multicolor_%d_03&quot;</font> <font color="#4000C0">%</font> <font color="#000000">section</font><font color="#4000C0">)</font>
+    <font color="#000000">TestColorDefinitions</font><font color="#4000C0">(</font><font color="#008000">&quot;multicolor_%d_04&quot;</font> <font color="#4000C0">%</font> <font color="#000000">section</font><font color="#4000C0">,</font> <font color="#000000">plotAtts</font><font color="#4000C0">.</font><font color="#000000">GetMultiColor</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Change the colors another way. We should get yellow to red but</font>
+    <font color="#a02030"># the redder it gets, the more transparent it should also get.</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">)</font> <font color="#4000C0">/</font> <font color="#000000">float</font><font color="#4000C0">(</font><font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+        <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">int</font><font color="#4000C0">(</font><font color="#000000">t</font> <font color="#4000C0">*</font> <font color="#0080C0">255.</font><font color="#4000C0">)</font>
+        <font color="#C00000">if</font> <font color="#000000">decreasingOpacity</font><font color="#4000C0">:</font>
+            <font color="#000000">plotAtts</font><font color="#4000C0">.</font><font color="#000000">SetMultiColor</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">-</font><font color="#000000">c</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font> <font color="#4000C0">-</font> <font color="#000000">c</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+        <font color="#C00000">else</font><font color="#4000C0">:</font>
+            <font color="#000000">plotAtts</font><font color="#4000C0">.</font><font color="#000000">SetMultiColor</font><font color="#4000C0">(</font><font color="#000000">i</font><font color="#4000C0">,</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">-</font><font color="#000000">c</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">c</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">plotAtts</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;multicolor_%d_05&quot;</font> <font color="#4000C0">%</font> <font color="#000000">section</font><font color="#4000C0">)</font>
+    <font color="#000000">TestColorDefinitions</font><font color="#4000C0">(</font><font color="#008000">&quot;multicolor_%d_06&quot;</font> <font color="#4000C0">%</font> <font color="#000000">section</font><font color="#4000C0">,</font> <font color="#000000">plotAtts</font><font color="#4000C0">.</font><font color="#000000">GetMultiColor</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing setting of multiColor in Boundary plot&quot;</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Set up the plot</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;rect2d.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Boundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">b</font> <font color="#4000C0">=</font> <font color="#000000">BoundaryAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">b</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">4</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test the plot</font>
+    <font color="#000000">TestMultiColor</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">b</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Delete the plots</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test2</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing setting of multiColor in Contour plot&quot;</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Set up the plot</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;noise.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;hardyglobal&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">ContourAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">contourNLevels</font> <font color="#4000C0">=</font> <font color="#0080C0">20</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Set the view.</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.400348</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.676472</font><font color="#4000C0">,</font> <font color="#0080C0">0.618148</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.916338</font><font color="#4000C0">,</font> <font color="#0080C0">0.300483</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.264639</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">17.3205</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0.0397866</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.07998</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test the plot</font>
+    <font color="#000000">TestMultiColor</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#000000">c</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Delete the plots</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test3</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing setting of multiColor in FilledBoundary plot&quot;</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Set up the plots. First we want globe so we can see something inside</font>
+    <font color="#a02030"># of the Subset plot to make sure that setting alpha works.</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;w&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">p</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">legendFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;xray&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">p</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;bigsil.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mat&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">f</font> <font color="#4000C0">=</font> <font color="#000000">FilledBoundaryAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">legendFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">f</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Add an operator to globe to make it small.</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleX</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleY</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleZ</font> <font color="#4000C0">=</font> <font color="#0080C0">0.04</font><font color="#4000C0">,</font> <font color="#0080C0">0.04</font><font color="#4000C0">,</font> <font color="#0080C0">0.04</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">translateX</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">translateY</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">translateZ</font> <font color="#4000C0">=</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Set the view.</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.385083</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.737931</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.554229</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.922871</font><font color="#4000C0">,</font> <font color="#0080C0">0.310902</font><font color="#4000C0">,</font> <font color="#0080C0">0.227267</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.866025</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.0165315</font><font color="#4000C0">,</font> <font color="#0080C0">0.0489375</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.13247</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test the plot</font>
+    <font color="#000000">TestMultiColor</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">,</font> <font color="#000000">f</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Delete the plots</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test4</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing setting of multiColor in Subset plot&quot;</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Set up the plots. First we want globe so we can see something inside</font>
+    <font color="#a02030"># of the Subset plot to make sure that setting alpha works.</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;w&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">p</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">legendFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">p</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;xray&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">p</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;bigsil.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;domains&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SubsetAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">legendFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Add an operator to globe to make it small.</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">doScale</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleX</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleY</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">scaleZ</font> <font color="#4000C0">=</font> <font color="#0080C0">0.04</font><font color="#4000C0">,</font> <font color="#0080C0">0.04</font><font color="#4000C0">,</font> <font color="#0080C0">0.04</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">translateX</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">translateY</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">translateZ</font> <font color="#4000C0">=</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Set the view.</font>
+    <font color="#000000">v</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.385083</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.737931</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.554229</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.5</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.922871</font><font color="#4000C0">,</font> <font color="#0080C0">0.310902</font><font color="#4000C0">,</font> <font color="#0080C0">0.227267</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.866025</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.0165315</font><font color="#4000C0">,</font> <font color="#0080C0">0.0489375</font><font color="#4000C0">)</font>
+    <font color="#000000">v</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.13247</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Test the plot</font>
+    <font color="#000000">TestMultiColor</font><font color="#4000C0">(</font><font color="#0080C0">3</font><font color="#4000C0">,</font> <font color="#000000">s</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Delete the plots</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test5</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Testing user defined colors for FilledBoundary&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe_matcolors.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;FilledBoundary&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;mat1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Slice&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;multicolor_matcolors&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">test2</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">test3</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">test4</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">test5</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Run the tests</font>
+<font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

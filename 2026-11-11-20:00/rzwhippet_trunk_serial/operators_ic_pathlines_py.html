@@ -1,0 +1,160 @@
+<html><body bgcolor="#e0e0e0"><head><title>operators/ic_pathlines.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  ic_pathlines.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      operator      - integralcurve</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  -</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Allen Sanderson</font>
+<font color="#a02030">#  Date:       March 10, 2016</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Kathleen Biagas, Thu Sep 17 11:35:47 PDT 2020</font>
+<font color="#a02030">#    Turn off IC warnings. Set larger linewidth so for better images.</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#000000">RequiredDatabasePlugin</font><font color="#4000C0">(</font><font color="#008000">&quot;PICS_Tester&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;pics_test_data/pathline_test.pics&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;operators/IntegralCurve/velocity&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">pcAtts</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">;</font>
+<font color="#000000">pcAtts</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pcAtts</font><font color="#4000C0">)</font>
+
+<font color="#000000">View3DAtts</font> <font color="#4000C0">=</font> <font color="#000000">View3DAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.270729</font><font color="#4000C0">,</font> <font color="#0080C0">0.624198</font><font color="#4000C0">,</font> <font color="#0080C0">0.732859</font><font color="#4000C0">)</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.496062</font><font color="#4000C0">,</font> <font color="#0080C0">0.99603</font><font color="#4000C0">,</font> <font color="#0080C0">0.496062</font><font color="#4000C0">)</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.0922782</font><font color="#4000C0">,</font> <font color="#0080C0">0.774611</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.62567</font><font color="#4000C0">)</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">12.1829</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">24.3658</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">24.3658</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">axis3DScaleFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">View3DAtts</font><font color="#4000C0">.</font><font color="#000000">axis3DScales</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">View3DAtts</font><font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sourceType</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">SpecifiedPoint</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">pointSource</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.5</font><font color="#4000C0">,</font> <font color="#0080C0">0.1</font><font color="#4000C0">,</font> <font color="#0080C0">0.1</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">lineStart</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">lineEnd</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">planeOrigin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">planeNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">planeUpAxis</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">radius</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sphereOrigin</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">boxExtents</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">useWholeBox</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">pointList</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">fieldData</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sampleDensity0</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sampleDensity1</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sampleDensity2</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">dataValue</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">TimeAbsolute</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">dataVariable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;&quot;</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">integrationDirection</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">Forward</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxSteps</font> <font color="#4000C0">=</font> <font color="#0080C0">1000</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">terminateByDistance</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">termDistance</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">terminateByTime</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">termTime</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxStepLength</font> <font color="#4000C0">=</font> <font color="#0080C0">0.01</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">limitMaximumTimestep</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxTimeStep</font> <font color="#4000C0">=</font> <font color="#0080C0">0.1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">relTol</font> <font color="#4000C0">=</font> <font color="#0080C0">0.0001</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">absTolSizeType</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">FractionOfBBox</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">absTolAbsolute</font> <font color="#4000C0">=</font> <font color="#0080C0">1e-06</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">absTolBBox</font> <font color="#4000C0">=</font> <font color="#0080C0">1e-06</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">fieldType</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">Default</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">fieldConstant</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">velocitySource</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">integrationType</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">Euler</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">parallelizationAlgorithmType</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">VisItSelects</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxProcessCount</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">maxDomainCacheSize</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">workGroupSize</font> <font color="#4000C0">=</font> <font color="#0080C0">32</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">pathlines</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">pathlinesOverrideStartingTimeFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">pathlinesOverrideStartingTime</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">pathlinesPeriod</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">pathlinesCMFE</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">CONN_CMFE</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">displayGeometry</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">Lines</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">cropBeginFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">cropBegin</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">cropEndFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">cropEnd</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">cropValue</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">Time</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sampleDistance0</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sampleDistance1</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">sampleDistance2</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">fillInterior</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">randomSamples</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">randomSeed</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">numberOfRandomSamples</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueAdvectionWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueBoundaryWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueTerminationWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueStepsizeWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueStiffnessWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueCriticalPointsWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">criticalPointThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">0.001</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">correlationDistanceAngTol</font> <font color="#4000C0">=</font> <font color="#0080C0">5</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">correlationDistanceMinDistAbsolute</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">correlationDistanceMinDistBBox</font> <font color="#4000C0">=</font> <font color="#0080C0">0.005</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">correlationDistanceMinDistType</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">FractionOfBBox</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">selection</font> <font color="#4000C0">=</font> <font color="#008000">&quot;&quot;</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueAdvectionWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueBoundaryWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueTerminationWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueStepsizeWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueStiffnessWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">issueCriticalPointsWarnings</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ic_pathlines_01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">terminateByTime</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">termTime</font> <font color="#4000C0">=</font> <font color="#0080C0">3</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ic_pathlines_02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">TimeSliderSetState</font><font color="#4000C0">(</font><font color="#0080C0">6</font><font color="#4000C0">)</font>
+<font color="#000000">e</font> <font color="#4000C0">=</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;ic_pathlines_03&quot;</font><font color="#4000C0">,</font> <font color="#000000">e</font><font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">integrationDirection</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">Backward</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ic_pathlines_04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">terminateByTime</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ic_pathlines_05&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">pathlinesOverrideStartingTimeFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">pathlinesOverrideStartingTime</font> <font color="#4000C0">=</font> <font color="#0080C0">3.5</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ic_pathlines_06&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">TimeSliderSetState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">pathlinesCMFE</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">POS_CMFE</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ic_pathlines_07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">pathlinesCMFE</font> <font color="#4000C0">=</font> <font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">POS_CMFE</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;ic_pathlines_08&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">IntegralCurveAtts</font><font color="#4000C0">.</font><font color="#000000">pathlinesOverrideStartingTimeFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">IntegralCurveAtts</font><font color="#4000C0">)</font>
+<font color="#000000">e</font> <font color="#4000C0">=</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;ic_pathlines_09&quot;</font><font color="#4000C0">,</font> <font color="#000000">e</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

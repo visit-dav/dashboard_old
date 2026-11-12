@@ -1,0 +1,108 @@
+<html><body bgcolor="#e0e0e0"><head><title>databases/closedatabase.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  closedatabase.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - 3D, curvilinear, single domain</font>
+<font color="#a02030">#              plots     - Pseudocolor</font>
+<font color="#a02030">#              databases - Silo</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Purpose:    This test case tests that the viewer can close a database.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Bugs:       &#x27;3283</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Fri Mar 19 08:57:09 PDT 2004</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Wed Apr 14 15:41:11 PDT 2010</font>
+<font color="#a02030">#    Added test to check if database expressions are cleared after</font>
+<font color="#a02030">#    database is closed.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#a02030">#</font>
+<font color="#a02030"># Look at astring representation of the GlobalAttributes to see the list</font>
+<font color="#a02030"># of sources, etc.</font>
+<font color="#a02030">#</font>
+<font color="#C00000">def</font> <font color="#000000">TestGlobalAttributes</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#a02030"># Get the window information, convert it to a string, and use it as</font>
+    <font color="#a02030"># a test case.</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">testname</font><font color="#4000C0">,</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">GetGlobalAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">GetCloseString</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#C00000">if</font><font color="#4000C0">(</font><font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font> <font color="#4000C0">==</font> <font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">testString</font> <font color="#4000C0">=</font> <font color="#008000">&quot;The database %s was closed.&quot;</font> <font color="#4000C0">%</font> <font color="#000000">os</font><font color="#4000C0">.</font><font color="#000000">path</font><font color="#4000C0">.</font><font color="#000000">abspath</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#C00000">else</font><font color="#4000C0">:</font>
+        <font color="#000000">testString</font> <font color="#4000C0">=</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">testString</font>
+
+<font color="#a02030"># Open a database and create a plot</font>
+<font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave*.silo database&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">,</font> <font color="#0080C0">32</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Get a picture of the plot.</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;closedatabase00&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Look at the list of sources.</font>
+<font color="#000000">TestGlobalAttributes</font><font color="#4000C0">(</font><font color="#008000">&quot;closedatabase01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Try and close the database. VisIt should not let us close it since there</font>
+<font color="#a02030"># are plots that use it.</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;closedatabase02&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetCloseString</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Create another window that uses the database.</font>
+<font color="#000000">CloneWindow</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;closedatabase03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Delete all the plots in window 1 that use the database</font>
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;closedatabase04&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Try and close the database. VisIt should not let us close it since there</font>
+<font color="#a02030"># are still plots in window 2 that use it.</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;closedatabase05&quot;</font><font color="#4000C0">,</font> <font color="#000000">GetCloseString</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Try and close the database. VisIt should let us close it this time.</font>
+<font color="#000000">testString</font> <font color="#4000C0">=</font> <font color="#000000">GetCloseString</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font> <font color="#4000C0">+</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">GetGlobalAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;closedatabase06&quot;</font><font color="#4000C0">,</font> <font color="#000000">testString</font><font color="#4000C0">)</font>
+
+
+<font color="#a02030"># Try adding some databases</font>
+<font color="#000000">dbs</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font>
+       <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">,</font>
+       <font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;curv3d.silo&quot;</font><font color="#4000C0">)</font> <font color="#4000C0">)</font>
+
+<font color="#C00000">for</font> <font color="#000000">db</font> <font color="#C00000">in</font> <font color="#000000">dbs</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Look at the list of sources.</font>
+<font color="#000000">TestGlobalAttributes</font><font color="#4000C0">(</font><font color="#008000">&quot;closedatabase07&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Start removing databases</font>
+<font color="#000000">testindex</font> <font color="#4000C0">=</font> <font color="#0080C0">8</font>
+<font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">dbs</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">index</font> <font color="#4000C0">=</font> <font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">dbs</font><font color="#4000C0">)</font> <font color="#4000C0">-</font> <font color="#0080C0">1</font> <font color="#4000C0">-</font> <font color="#000000">i</font>
+    <font color="#000000">testString</font> <font color="#4000C0">=</font> <font color="#000000">GetCloseString</font><font color="#4000C0">(</font><font color="#000000">dbs</font><font color="#4000C0">[</font><font color="#000000">index</font><font color="#4000C0">]</font><font color="#4000C0">)</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font> <font color="#4000C0">+</font> <font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">GetGlobalAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;closedatabase%02d&quot;</font> <font color="#4000C0">%</font> <font color="#000000">testindex</font><font color="#4000C0">,</font> <font color="#000000">testString</font><font color="#4000C0">)</font>
+    <font color="#000000">testindex</font> <font color="#4000C0">=</font> <font color="#000000">testindex</font> <font color="#4000C0">+</font> <font color="#0080C0">1</font>
+
+<font color="#a02030"># Check that database expressions are cleared when database is closed.</font>
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">dbs</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font><font color="#4000C0">)</font>
+<font color="#000000">TestExpressions</font><font color="#4000C0">(</font><font color="#008000">&quot;closedatabase_exprs00&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">TestExpressions</font><font color="#4000C0">(</font><font color="#008000">&quot;closedatabase_exprs01&quot;</font><font color="#4000C0">,</font> <font color="#000000">prefix</font><font color="#4000C0">=</font><font color="#000000">GetCloseString</font><font color="#4000C0">(</font><font color="#000000">dbs</font><font color="#4000C0">[</font><font color="#0080C0">1</font><font color="#4000C0">]</font><font color="#4000C0">)</font><font color="#4000C0">+</font><font color="#008000">&quot;\n&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

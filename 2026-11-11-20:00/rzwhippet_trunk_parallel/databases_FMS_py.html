@@ -1,0 +1,590 @@
+<html><body bgcolor="#e0e0e0"><head><title>databases/FMS.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  FMS.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Tests:      mesh      - high order meshes</font>
+<font color="#a02030">#              plots     - Mesh, Pseudocolor</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Brad Whitlock</font>
+<font color="#a02030">#  Date:       Tue Aug  4 11:25:39 PDT 2020</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">def</font> <font color="#000000">FilterMetaData</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">lines</font> <font color="#4000C0">=</font> <font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">split</font><font color="#4000C0">(</font><font color="#008000">&quot;\n&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">txt</font> <font color="#4000C0">=</font> <font color="#008000">&quot;&quot;</font>
+    <font color="#000000">ignores</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#008000">&quot;exprList.&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;#expressions&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;.enum&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;simInfo.&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;blockNameScheme&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;.missingData&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;DataExtents =&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;.rectilinearGrid&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;.unitCell&quot;</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">line</font> <font color="#C00000">in</font> <font color="#000000">lines</font><font color="#4000C0">:</font>
+        <font color="#000000">keep</font> <font color="#4000C0">=</font> <font color="#C00000">True</font>
+        <font color="#C00000">for</font> <font color="#000000">ig</font> <font color="#C00000">in</font> <font color="#000000">ignores</font><font color="#4000C0">:</font>
+             <font color="#C00000">if</font> <font color="#000000">ig</font> <font color="#C00000">in</font> <font color="#000000">line</font><font color="#4000C0">:</font>
+                 <font color="#000000">keep</font> <font color="#4000C0">=</font> <font color="#C00000">False</font>
+                 <font color="#C00000">break</font>
+        <font color="#C00000">if</font> <font color="#000000">keep</font><font color="#4000C0">:</font>
+            <font color="#000000">txt</font> <font color="#4000C0">=</font> <font color="#000000">txt</font> <font color="#4000C0">+</font> <font color="#4000C0">(</font><font color="#000000">line</font> <font color="#4000C0">+</font> <font color="#008000">&quot;\n&quot;</font><font color="#4000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">txt</font>
+
+<font color="#C00000">def</font> <font color="#000000">test_mesh_plus_dofs</font><font color="#4000C0">(</font><font color="#000000">prefix</font><font color="#4000C0">,</font> <font color="#000000">db1</font><font color="#4000C0">,</font> <font color="#000000">order</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get the metadata</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">prefix</font><font color="#4000C0">+</font><font color="#008000">&quot;_00&quot;</font><font color="#4000C0">,</font> <font color="#000000">FilterMetaData</font><font color="#4000C0">(</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Show the mesh (curved)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+    <font color="#C00000">if</font> <font color="#000000">order</font> <font color="#4000C0">!=</font> <font color="#008000">&quot;one&quot;</font><font color="#4000C0">:</font>
+        <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;MultiresControl&quot;</font><font color="#4000C0">)</font>
+        <font color="#000000">mra</font> <font color="#4000C0">=</font> <font color="#000000">MultiresControlAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">mra</font><font color="#4000C0">.</font><font color="#000000">resolution</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+        <font color="#000000">mra</font><font color="#4000C0">.</font><font color="#000000">maxResolution</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+        <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mra</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">delta</font> <font color="#4000C0">=</font> <font color="#0080C0">0.03</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.</font><font color="#4000C0">-</font><font color="#000000">delta</font><font color="#4000C0">,</font> <font color="#0080C0">1.</font><font color="#4000C0">+</font><font color="#000000">delta</font><font color="#4000C0">,</font> <font color="#0080C0">0.</font><font color="#4000C0">-</font><font color="#000000">delta</font><font color="#4000C0">,</font> <font color="#0080C0">1.</font><font color="#4000C0">+</font><font color="#000000">delta</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.04</font><font color="#4000C0">,</font> <font color="#0080C0">0.98</font><font color="#4000C0">,</font> <font color="#0080C0">0.03</font><font color="#4000C0">,</font> <font color="#0080C0">0.98</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">Auto</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">xScale</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>  <font color="#a02030"># LINEAR, LOG</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">yScale</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>  <font color="#a02030"># LINEAR, LOG</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Overlay the dofs</font>
+    <font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;X&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;coords(dofs)[0]&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;X&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">pc</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">pointSizePixels</font> <font color="#4000C0">=</font> <font color="#0080C0">12</font>
+    <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hot_desaturated&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Project&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Transform&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">tform</font> <font color="#4000C0">=</font> <font color="#000000">TransformAttributes</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">tform</font><font color="#4000C0">.</font><font color="#000000">doTranslate</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">tform</font><font color="#4000C0">.</font><font color="#000000">translateZ</font> <font color="#4000C0">=</font> <font color="#0080C0">0.01</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">tform</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_02&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;zid&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#000000">prefix</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#000000">order</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">db1</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;domains_&quot;</font><font color="#4000C0">+</font><font color="#000000">protocol</font><font color="#4000C0">+</font><font color="#008000">&quot;_order_&quot;</font><font color="#4000C0">+</font><font color="#000000">order</font><font color="#4000C0">+</font><font color="#008000">&quot;.fms&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">test_mesh_plus_dofs</font><font color="#4000C0">(</font><font color="#000000">prefix</font><font color="#4000C0">,</font> <font color="#000000">db1</font><font color="#4000C0">,</font> <font color="#000000">order</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Cleanup</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseComputeEngine</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">quads_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#000000">prefix</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#000000">order</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">db1</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;quads_&quot;</font><font color="#4000C0">+</font><font color="#000000">protocol</font><font color="#4000C0">+</font><font color="#008000">&quot;_order_&quot;</font><font color="#4000C0">+</font><font color="#000000">order</font><font color="#4000C0">+</font><font color="#008000">&quot;.fms&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">test_mesh_plus_dofs</font><font color="#4000C0">(</font><font color="#000000">prefix</font><font color="#4000C0">,</font> <font color="#000000">db1</font><font color="#4000C0">,</font> <font color="#000000">order</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;r1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_04&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;r2&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_05&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;r3&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_06&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Cleanup</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseComputeEngine</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">hex_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#000000">prefix</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#000000">order</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">db1</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;hex_&quot;</font><font color="#4000C0">+</font><font color="#000000">protocol</font><font color="#4000C0">+</font><font color="#008000">&quot;_order_&quot;</font><font color="#4000C0">+</font><font color="#000000">order</font><font color="#4000C0">+</font><font color="#008000">&quot;.fms&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get the metadata</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">prefix</font><font color="#4000C0">+</font><font color="#008000">&quot;_00&quot;</font><font color="#4000C0">,</font> <font color="#000000">FilterMetaData</font><font color="#4000C0">(</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Show the mesh (curved)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+    <font color="#C00000">if</font> <font color="#000000">order</font> <font color="#4000C0">!=</font> <font color="#008000">&quot;one&quot;</font><font color="#4000C0">:</font>
+        <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;MultiresControl&quot;</font><font color="#4000C0">)</font>
+        <font color="#000000">mra</font> <font color="#4000C0">=</font> <font color="#000000">MultiresControlAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">mra</font><font color="#4000C0">.</font><font color="#000000">resolution</font> <font color="#4000C0">=</font> <font color="#0080C0">7</font>
+        <font color="#000000">mra</font><font color="#4000C0">.</font><font color="#000000">maxResolution</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+        <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mra</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.736972</font><font color="#4000C0">,</font> <font color="#0080C0">0.363225</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.570035</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.499999</font><font color="#4000C0">,</font> <font color="#0080C0">0.500005</font><font color="#4000C0">,</font> <font color="#0080C0">0.499787</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.289138</font><font color="#4000C0">,</font> <font color="#0080C0">0.931697</font><font color="#4000C0">,</font> <font color="#0080C0">0.219863</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.900499</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1.801</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">1.801</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.00987149</font><font color="#4000C0">,</font> <font color="#0080C0">0.0367767</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.15249</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.499999</font><font color="#4000C0">,</font> <font color="#0080C0">0.500005</font><font color="#4000C0">,</font> <font color="#0080C0">0.499787</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">axis3DScaleFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">axis3DScales</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">shear</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;zid&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">pc</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hot_desaturated&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;r1&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;r2&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_04&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Check that order 3 interior dofs look ok.</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Contour&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;r3&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font> <font color="#4000C0">=</font> <font color="#000000">ContourAttributes</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">contourValue</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.6</font><font color="#4000C0">,</font> <font color="#0080C0">0.8</font><font color="#4000C0">,</font> <font color="#0080C0">0.9</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1.2</font><font color="#4000C0">)</font>
+    <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">contourMethod</font> <font color="#4000C0">=</font> <font color="#000000">c</font><font color="#4000C0">.</font><font color="#000000">Value</font>  <font color="#a02030"># Level, Value, Percent</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">c</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font><font color="#0080C0">1</font><font color="#4000C0">)</font><font color="#4000C0">)</font> <font color="#a02030"># Delete mesh,pc plots</font>
+    <font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_05&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Cleanup</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseComputeEngine</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test0</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">protocol</font> <font color="#4000C0">=</font> <font color="#008000">&quot;ascii&quot;</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;domains - &quot;</font> <font color="#4000C0">+</font> <font color="#000000">protocol</font><font color="#4000C0">)</font>
+    <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_0_1&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;one&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_0_2&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;two&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_0_3&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;three&quot;</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">protocol</font> <font color="#4000C0">=</font> <font color="#008000">&quot;yaml&quot;</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;domains - &quot;</font> <font color="#4000C0">+</font> <font color="#000000">protocol</font><font color="#4000C0">)</font>
+    <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_1_1&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;one&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_1_2&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;two&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_1_3&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;three&quot;</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test2</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">protocol</font> <font color="#4000C0">=</font> <font color="#008000">&quot;json&quot;</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;domains - &quot;</font> <font color="#4000C0">+</font> <font color="#000000">protocol</font><font color="#4000C0">)</font>
+    <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_2_1&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;one&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_2_2&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;two&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_2_3&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;three&quot;</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test3</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">protocol</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hdf5&quot;</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;domains - &quot;</font> <font color="#4000C0">+</font> <font color="#000000">protocol</font><font color="#4000C0">)</font>
+    <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_3_1&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;one&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_3_2&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;two&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">domain_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_3_3&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;three&quot;</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test4</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">protocol</font> <font color="#4000C0">=</font> <font color="#008000">&quot;ascii&quot;</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;quads - &quot;</font> <font color="#4000C0">+</font> <font color="#000000">protocol</font><font color="#4000C0">)</font>
+    <font color="#000000">quads_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_4_1&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;one&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">quads_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_4_2&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;two&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">quads_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_4_3&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;three&quot;</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test5</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">protocol</font> <font color="#4000C0">=</font> <font color="#008000">&quot;yaml&quot;</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;quads - &quot;</font> <font color="#4000C0">+</font> <font color="#000000">protocol</font><font color="#4000C0">)</font>
+    <font color="#000000">quads_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_5_1&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;one&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">quads_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_5_2&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;two&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">quads_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_5_3&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;three&quot;</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test6</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">protocol</font> <font color="#4000C0">=</font> <font color="#008000">&quot;ascii&quot;</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;hex - &quot;</font> <font color="#4000C0">+</font> <font color="#000000">protocol</font><font color="#4000C0">)</font>
+    <font color="#000000">hex_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_6_1&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;one&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">hex_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_6_2&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;two&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">hex_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_6_3&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;three&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">hex_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_6_4&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;four&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">hex_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_6_5&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;five&quot;</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test7</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">protocol</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hdf5&quot;</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;hex - &quot;</font> <font color="#4000C0">+</font> <font color="#000000">protocol</font><font color="#4000C0">)</font>
+    <font color="#000000">hex_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_7_1&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;one&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">hex_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_7_2&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;two&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">hex_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_7_3&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;three&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">hex_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_7_4&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;four&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">hex_test</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font> <font color="#008000">&quot;FMS_7_5&quot;</font><font color="#4000C0">,</font> <font color="#000000">protocol</font><font color="#4000C0">,</font> <font color="#008000">&quot;five&quot;</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test8</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;hex - time varying&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">prefix</font> <font color="#4000C0">=</font> <font color="#008000">&quot;FMS_8_&quot;</font>
+    <font color="#000000">db1</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;hex*.fms database&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get the metadata</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">prefix</font><font color="#4000C0">+</font><font color="#008000">&quot;_00&quot;</font><font color="#4000C0">,</font> <font color="#000000">FilterMetaData</font><font color="#4000C0">(</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Show the mesh (curved)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;MultiresControl&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">mra</font> <font color="#4000C0">=</font> <font color="#000000">MultiresControlAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">mra</font><font color="#4000C0">.</font><font color="#000000">resolution</font> <font color="#4000C0">=</font> <font color="#0080C0">7</font>
+    <font color="#000000">mra</font><font color="#4000C0">.</font><font color="#000000">maxResolution</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mra</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.722008</font><font color="#4000C0">,</font> <font color="#0080C0">0.525589</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.449957</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.500085</font><font color="#4000C0">,</font> <font color="#0080C0">0.501459</font><font color="#4000C0">,</font> <font color="#0080C0">0.49554</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.465249</font><font color="#4000C0">,</font> <font color="#0080C0">0.850161</font><font color="#4000C0">,</font> <font color="#0080C0">0.246515</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">0.989501</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">1.979</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">1.979</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.12555</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.500085</font><font color="#4000C0">,</font> <font color="#0080C0">0.501459</font><font color="#4000C0">,</font> <font color="#0080C0">0.49554</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">axis3DScaleFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">axis3DScales</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">shear</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;r3&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">pc</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hot_desaturated&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">SetTimeSliderState</font><font color="#4000C0">(</font><font color="#0080C0">9</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Cleanup</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseComputeEngine</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test9</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Root file&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">prefix</font> <font color="#4000C0">=</font> <font color="#008000">&quot;FMS_9_&quot;</font>
+    <font color="#000000">db1</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;multidom.fms_root&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get the metadata</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">prefix</font><font color="#4000C0">+</font><font color="#008000">&quot;_00&quot;</font><font color="#4000C0">,</font> <font color="#000000">FilterMetaData</font><font color="#4000C0">(</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Show the mesh (curved)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;coords_magnitude&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">pc</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hot_desaturated&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteActivePlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Subset&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;domains&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Cleanup</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db1</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseComputeEngine</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">plot_converted_data</font><font color="#4000C0">(</font><font color="#000000">prefix</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#000000">var</font><font color="#4000C0">,</font> <font color="#000000">v0</font><font color="#4000C0">,</font> <font color="#000000">resolution</font><font color="#4000C0">,</font> <font color="#000000">meshName</font><font color="#4000C0">,</font> <font color="#000000">dodof</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Get the metadata</font>
+    <font color="#000000">md</font> <font color="#4000C0">=</font> <font color="#000000">GetMetaData</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#000000">prefix</font><font color="#4000C0">+</font><font color="#008000">&quot;_00&quot;</font><font color="#4000C0">,</font> <font color="#000000">FilterMetaData</font><font color="#4000C0">(</font><font color="#000000">str</font><font color="#4000C0">(</font><font color="#000000">md</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#000000">var</font><font color="#4000C0">)</font>
+    <font color="#000000">pc</font> <font color="#4000C0">=</font> <font color="#000000">PseudocolorAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">pc</font><font color="#4000C0">.</font><font color="#000000">colorTableName</font> <font color="#4000C0">=</font> <font color="#008000">&quot;hot_desaturated&quot;</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">pc</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;MultiresControl&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">mra</font> <font color="#4000C0">=</font> <font color="#000000">MultiresControlAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">mra</font><font color="#4000C0">.</font><font color="#000000">resolution</font> <font color="#4000C0">=</font> <font color="#000000">resolution</font>
+    <font color="#000000">mra</font><font color="#4000C0">.</font><font color="#000000">maxResolution</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">mra</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Try setting the view.</font>
+    <font color="#C00000">try</font><font color="#4000C0">:</font>
+        <font color="#000000">SetView3D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+    <font color="#C00000">except</font><font color="#4000C0">:</font>
+        <font color="#C00000">try</font><font color="#4000C0">:</font>
+            <font color="#000000">SetView2D</font><font color="#4000C0">(</font><font color="#000000">v0</font><font color="#4000C0">)</font>
+        <font color="#C00000">except</font><font color="#4000C0">:</font>
+            <font color="#000000">ResetView</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_01&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Add a mesh plot of the boundaries and refine them.</font>
+    <font color="#C00000">if</font> <font color="#000000">meshName</font> <font color="#4000C0">!=</font> <font color="#008000">&quot;&quot;</font><font color="#4000C0">:</font>
+        <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#000000">meshName</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+        <font color="#000000">m</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+        <font color="#000000">m</font><font color="#4000C0">.</font><font color="#000000">lineWidth</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+        <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m</font><font color="#4000C0">)</font>
+        <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_02&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># Add a mesh plot of the dofs.</font>
+    <font color="#C00000">if</font> <font color="#000000">dodof</font><font color="#4000C0">:</font>
+        <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Mesh&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;dofs&quot;</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+        <font color="#000000">m2</font> <font color="#4000C0">=</font> <font color="#000000">MeshAttributes</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+        <font color="#000000">m2</font><font color="#4000C0">.</font><font color="#000000">meshColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+        <font color="#000000">m2</font><font color="#4000C0">.</font><font color="#000000">meshColorSource</font> <font color="#4000C0">=</font> <font color="#000000">m2</font><font color="#4000C0">.</font><font color="#000000">MeshCustom</font>  <font color="#a02030"># Foreground, MeshCustom, MeshRandom</font>
+        <font color="#000000">m2</font><font color="#4000C0">.</font><font color="#000000">pointSize</font> <font color="#4000C0">=</font> <font color="#0080C0">0.075</font>
+        <font color="#000000">m2</font><font color="#4000C0">.</font><font color="#000000">opaqueColor</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">)</font>
+        <font color="#000000">m2</font><font color="#4000C0">.</font><font color="#000000">pointType</font> <font color="#4000C0">=</font> <font color="#000000">m2</font><font color="#4000C0">.</font><font color="#000000">SphereGeometry</font>  <font color="#a02030"># Box, Axis, Icosahedron, Octahedron, Tetrahedron, SphereGeometry, Point, Sphere</font>
+        <font color="#000000">m2</font><font color="#4000C0">.</font><font color="#000000">pointSizePixels</font> <font color="#4000C0">=</font> <font color="#0080C0">10</font>
+        <font color="#000000">m2</font><font color="#4000C0">.</font><font color="#000000">opacity</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+        <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">m2</font><font color="#4000C0">)</font>
+        <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+        <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#000000">prefix</font> <font color="#4000C0">+</font> <font color="#008000">&quot;_03&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#000000">db</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseComputeEngine</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">escher_view</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.301943</font><font color="#4000C0">,</font> <font color="#0080C0">0.349059</font><font color="#4000C0">,</font> <font color="#0080C0">0.887124</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.015155</font><font color="#4000C0">,</font> <font color="#0080C0">0.00931501</font><font color="#4000C0">,</font> <font color="#0080C0">0.00220501</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.108572</font><font color="#4000C0">,</font> <font color="#0080C0">0.937093</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.331767</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">2.69081</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">5.38163</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">5.38163</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.011426</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.0216873</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.62652</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.015155</font><font color="#4000C0">,</font> <font color="#0080C0">0.00931501</font><font color="#4000C0">,</font> <font color="#0080C0">0.00220501</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">axis3DScaleFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">axis3DScales</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">shear</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#C00000">return</font> <font color="#000000">v0</font>
+
+<font color="#C00000">def</font> <font color="#000000">test10</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Converted MFEM data: escher-p3-0ref&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;converted-data/escher-p3-0ref/Example5_000000.fms&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">escher_view</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">plot_converted_data</font><font color="#4000C0">(</font><font color="#008000">&quot;FMS_10&quot;</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">,</font> <font color="#000000">v0</font><font color="#4000C0">,</font> <font color="#0080C0">5</font><font color="#4000C0">,</font> <font color="#008000">&quot;boundary&quot;</font><font color="#4000C0">,</font> <font color="#C00000">True</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test11</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Converted MFEM data: escher-p3&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;converted-data/escher-p3/Example5_000000.fms&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">escher_view</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">plot_converted_data</font><font color="#4000C0">(</font><font color="#008000">&quot;FMS_11&quot;</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">,</font> <font color="#000000">v0</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">,</font> <font color="#008000">&quot;boundary&quot;</font><font color="#4000C0">,</font> <font color="#C00000">False</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test12</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Converted MFEM data: Example15&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;converted-data/Example15/Example15_000000.fms&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1.74594</font><font color="#4000C0">,</font> <font color="#0080C0">1.76718</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">1.7</font><font color="#4000C0">,</font> <font color="#0080C0">1.55366</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.01</font><font color="#4000C0">,</font> <font color="#0080C0">0.99</font><font color="#4000C0">,</font> <font color="#0080C0">0.01</font><font color="#4000C0">,</font> <font color="#0080C0">0.99</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">Auto</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">xScale</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>  <font color="#a02030"># LINEAR, LOG</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">yScale</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>  <font color="#a02030"># LINEAR, LOG</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+
+    <font color="#000000">plot_converted_data</font><font color="#4000C0">(</font><font color="#008000">&quot;FMS_12&quot;</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#008000">&quot;solution&quot;</font><font color="#4000C0">,</font> <font color="#000000">v0</font><font color="#4000C0">,</font> <font color="#0080C0">8</font><font color="#4000C0">,</font> <font color="#008000">&quot;boundary&quot;</font><font color="#4000C0">,</font> <font color="#C00000">True</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test13</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Converted MFEM data: Example9&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;converted-data/Example9/Example9_000000.fms&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.966025</font><font color="#4000C0">,</font> <font color="#0080C0">0.866025</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.01</font><font color="#4000C0">,</font> <font color="#0080C0">0.99</font><font color="#4000C0">,</font> <font color="#0080C0">0.01</font><font color="#4000C0">,</font> <font color="#0080C0">0.99</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">Auto</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">xScale</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>  <font color="#a02030"># LINEAR, LOG</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">yScale</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>  <font color="#a02030"># LINEAR, LOG</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+
+    <font color="#000000">plot_converted_data</font><font color="#4000C0">(</font><font color="#008000">&quot;FMS_13&quot;</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#008000">&quot;solution&quot;</font><font color="#4000C0">,</font> <font color="#000000">v0</font><font color="#4000C0">,</font> <font color="#0080C0">8</font><font color="#4000C0">,</font> <font color="#008000">&quot;&quot;</font><font color="#4000C0">,</font> <font color="#C00000">False</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">fichera_view</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.76587</font><font color="#4000C0">,</font> <font color="#0080C0">0.438546</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.470235</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.00682861</font><font color="#4000C0">,</font> <font color="#0080C0">0.00298607</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.00561833</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.368491</font><font color="#4000C0">,</font> <font color="#0080C0">0.898664</font><font color="#4000C0">,</font> <font color="#0080C0">0.237945</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">1.82615</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">3.6523</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">3.6523</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.00522255</font><font color="#4000C0">,</font> <font color="#0080C0">0.0292194</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.09494</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.00682861</font><font color="#4000C0">,</font> <font color="#0080C0">0.00298607</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">0.00561833</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">axis3DScaleFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">axis3DScales</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">shear</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#C00000">return</font> <font color="#000000">v0</font>
+
+<font color="#C00000">def</font> <font color="#000000">test14</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Converted MFEM data: fichera-q2-0ref&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;converted-data/fichera-q2-0ref/Example5_000000.fms&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">fichera_view</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">plot_converted_data</font><font color="#4000C0">(</font><font color="#008000">&quot;FMS_14&quot;</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">,</font> <font color="#000000">v0</font><font color="#4000C0">,</font> <font color="#0080C0">8</font><font color="#4000C0">,</font> <font color="#008000">&quot;boundary&quot;</font><font color="#4000C0">,</font> <font color="#C00000">True</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test15</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Converted MFEM data: fichera-q2&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;converted-data/fichera-q2/Example5_000000.fms&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">fichera_view</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">plot_converted_data</font><font color="#4000C0">(</font><font color="#008000">&quot;FMS_15&quot;</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">,</font> <font color="#000000">v0</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">,</font> <font color="#008000">&quot;boundary&quot;</font><font color="#4000C0">,</font> <font color="#C00000">False</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test16</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Converted MFEM data: star-q3-0ref&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;converted-data/star-q3-0ref/Example5_000000.fms&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1.8181</font><font color="#4000C0">,</font> <font color="#0080C0">1.8181</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">1.7</font><font color="#4000C0">,</font> <font color="#0080C0">1.58418</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.01</font><font color="#4000C0">,</font> <font color="#0080C0">0.99</font><font color="#4000C0">,</font> <font color="#0080C0">0.01</font><font color="#4000C0">,</font> <font color="#0080C0">0.99</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">Auto</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">xScale</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>  <font color="#a02030"># LINEAR, LOG</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">yScale</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>  <font color="#a02030"># LINEAR, LOG</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+
+    <font color="#000000">plot_converted_data</font><font color="#4000C0">(</font><font color="#008000">&quot;FMS_16&quot;</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">,</font> <font color="#000000">v0</font><font color="#4000C0">,</font> <font color="#0080C0">8</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">,</font> <font color="#C00000">True</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test17</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Converted MFEM data: star-q3&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;converted-data/star-q3/Example5_000000.fms&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">GetView2D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1.8181</font><font color="#4000C0">,</font> <font color="#0080C0">1.8181</font><font color="#4000C0">,</font> <font color="#4000C0">-</font><font color="#0080C0">1.7</font><font color="#4000C0">,</font> <font color="#0080C0">1.58418</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewportCoords</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.01</font><font color="#4000C0">,</font> <font color="#0080C0">0.99</font><font color="#4000C0">,</font> <font color="#0080C0">0.01</font><font color="#4000C0">,</font> <font color="#0080C0">0.99</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameActivationMode</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">Auto</font>  <font color="#a02030"># On, Off, Auto</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">fullFrameAutoThreshold</font> <font color="#4000C0">=</font> <font color="#0080C0">100</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">xScale</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>  <font color="#a02030"># LINEAR, LOG</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">yScale</font> <font color="#4000C0">=</font> <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">LINEAR</font>  <font color="#a02030"># LINEAR, LOG</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+
+    <font color="#000000">plot_converted_data</font><font color="#4000C0">(</font><font color="#008000">&quot;FMS_17&quot;</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">,</font> <font color="#000000">v0</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">,</font> <font color="#008000">&quot;boundary&quot;</font><font color="#4000C0">,</font> <font color="#C00000">False</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">toroid_view</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">GetView3D</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewNormal</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">focus</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.0503261</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewUp</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">viewAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">30</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">parallelScale</font> <font color="#4000C0">=</font> <font color="#0080C0">1.96586</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">nearPlane</font> <font color="#4000C0">=</font> <font color="#4000C0">-</font><font color="#0080C0">3.93172</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">farPlane</font> <font color="#4000C0">=</font> <font color="#0080C0">3.93172</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imagePan</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">imageZoom</font> <font color="#4000C0">=</font> <font color="#0080C0">1.29234</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">perspective</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">eyeAngle</font> <font color="#4000C0">=</font> <font color="#0080C0">2</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotationSet</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">centerOfRotation</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">0.0503261</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">axis3DScaleFlag</font> <font color="#4000C0">=</font> <font color="#0080C0">0</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">axis3DScales</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">shear</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">v0</font><font color="#4000C0">.</font><font color="#000000">windowValid</font> <font color="#4000C0">=</font> <font color="#0080C0">1</font>
+    <font color="#C00000">return</font> <font color="#000000">v0</font>
+
+<font color="#C00000">def</font> <font color="#000000">test18</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Converted MFEM data: toroid-hex-0ref&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;converted-data/toroid-hex-0ref/Example5_000000.fms&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">toroid_view</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">plot_converted_data</font><font color="#4000C0">(</font><font color="#008000">&quot;FMS_18&quot;</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">,</font> <font color="#000000">v0</font><font color="#4000C0">,</font> <font color="#0080C0">8</font><font color="#4000C0">,</font> <font color="#008000">&quot;mesh&quot;</font><font color="#4000C0">,</font> <font color="#C00000">True</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">test19</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TestSection</font><font color="#4000C0">(</font><font color="#008000">&quot;Converted MFEM data: toroid-hex&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">db</font> <font color="#4000C0">=</font> <font color="#000000">pjoin</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">,</font><font color="#008000">&quot;converted-data/toroid-hex/Example5_000000.fms&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">v0</font> <font color="#4000C0">=</font> <font color="#000000">toroid_view</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">plot_converted_data</font><font color="#4000C0">(</font><font color="#008000">&quot;FMS_19&quot;</font><font color="#4000C0">,</font> <font color="#000000">db</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">,</font> <font color="#000000">v0</font><font color="#4000C0">,</font> <font color="#0080C0">4</font><font color="#4000C0">,</font> <font color="#008000">&quot;boundary&quot;</font><font color="#4000C0">,</font> <font color="#C00000">False</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">RequiredDatabasePlugin</font><font color="#4000C0">(</font><font color="#008000">&quot;FMS&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">datapath</font> <font color="#4000C0">=</font> <font color="#000000">data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;FMS_test_data&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;zid&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;zoneid(mesh)&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># domains</font>
+    <font color="#000000">test0</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test1</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test2</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test3</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#a02030"># quads</font>
+    <font color="#000000">test4</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test5</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#a02030"># hex</font>
+    <font color="#000000">test6</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test7</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#a02030"># time varying data</font>
+    <font color="#000000">test8</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#a02030"># root</font>
+    <font color="#000000">test9</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#a02030"># Datasets that were converted from MFEM to FMS</font>
+    <font color="#000000">test10</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test11</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test12</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test13</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test14</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test15</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test16</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test17</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test18</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+    <font color="#000000">test19</font><font color="#4000C0">(</font><font color="#000000">datapath</font><font color="#4000C0">)</font>
+
+<font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

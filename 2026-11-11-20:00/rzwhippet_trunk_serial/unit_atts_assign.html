@@ -1,0 +1,1782 @@
+<SCRIPT TYPE="text/javascript">
+<!--
+function popup(mylink, name)
+{
+if (! window.focus)return true;
+var href;
+if (typeof(mylink) == 'string')
+   href=mylink;
+else
+   href=mylink.href;
+window.open(href,name,'width=500,height=500,scrollbars=no');
+return false;
+}
+//-->
+</SCRIPT>
+<html><head><title>Results for unit/atts_assign.py</title></head>
+<body bgcolor="#a0a0f0">
+<H1>Results of VisIt Regression Test - <a href=unit_atts_assign_py.html>unit/atts_assign</a></H1>
+<table border>
+ <tr>
+  <td rowspan=2><b><i>Test Case</b></i></td>
+  <td colspan=2 align=center><b><i>Errors</b></i></td>
+  <td colspan=3 align=center><b><i>Images</b></i></td>
+ </tr>
+ <tr>
+  <td>%Diffs</td>
+  <td>Maximum</td>
+  <td>Baseline</td>
+  <td>Current</td>
+  <td>Diff Map</td>
+ </tr>
+
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to bool member, "inverse", (of CylinderAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.inverse=1,2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.inverse='123'</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.inverse=(1+2j)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.inverse=[2, 4, 6]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.inverse=None</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.inverse=5</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetInverse('123')</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetInverse((1+2j))</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetInverse([2, 4, 6])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetInverse(None)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetInverse(5)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.inverse=0</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.inverse=1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.inverse=True</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.inverse=False</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetInverse(0)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetInverse(1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetInverse(True)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetInverse(False)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to int member, "samplesPerRay", (of VolumeAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay=1,2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay='123'</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay=(1+2j)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay=None</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay=[2, 4, 6]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay=2147483648</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetSamplesPerRay('123')</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetSamplesPerRay((1+2j))</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetSamplesPerRay(None)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetSamplesPerRay([2, 4, 6])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetSamplesPerRay(2147483648)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay=0</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay=1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay=-1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay=5</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay=True</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay=False</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.samplesPerRay=2147483647</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetSamplesPerRay(0)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetSamplesPerRay(1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetSamplesPerRay(-1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetSamplesPerRay(5)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetSamplesPerRay(True)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetSamplesPerRay(False)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetSamplesPerRay(2147483647)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to float member, "opacityAttenuation", (of VolumeAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation=1,2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation='123'</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation=(1+2j)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation=None</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation=[2, 4, 6]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation=3.402823e+39</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetOpacityAttenuation('123')</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetOpacityAttenuation((1+2j))</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetOpacityAttenuation(None)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetOpacityAttenuation([2, 4, 6])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetOpacityAttenuation(3.402823e+39)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation=0</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation=1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation=-1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation=0.3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation=3.40282e+37</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation=True</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.opacityAttenuation=False</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetOpacityAttenuation(0)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetOpacityAttenuation(1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetOpacityAttenuation(-1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetOpacityAttenuation(0.3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetOpacityAttenuation(3.40282e+37)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetOpacityAttenuation(True)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetOpacityAttenuation(False)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to double member, "radius", (of CylinderAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius=1,2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius='123'</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius=(1+2j)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius=None</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius=[2, 4, 6]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetRadius('123')</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetRadius((1+2j))</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetRadius(None)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetRadius([2, 4, 6])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius=0</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius=1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius=-1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius=5.5</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius=0.0</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius=inf</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius=True</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.radius=False</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetRadius(0)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetRadius(1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetRadius(-1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetRadius(5.5)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetRadius(0.0)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetRadius(inf)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetRadius(True)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetRadius(False)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to string member, "designator", (of CurveAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.designator="123","abc"</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.designator=0</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.designator=1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.designator=1.1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.designator=(1+2j)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.designator=None</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.designator=[2, 4, 6]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetDesignator(0)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetDesignator(1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetDesignator(1.1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetDesignator((1+2j))</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetDesignator(None)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetDesignator([2, 4, 6])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.designator='123'</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.designator='abc'</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.designator=''</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetDesignator('123')</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetDesignator('abc')</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetDesignator('')</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to GlyphType member, "pointType", (of MeshAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType=1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType='123'</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType=(1+2j)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType=None</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType=[2, 4, 6]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType=-1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType=123123123123123123123123123123</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetPointType('123')</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetPointType((1+2j))</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetPointType(None)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetPointType([2, 4, 6])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetPointType(-1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetPointType(123123123123123123123123123123)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType=0</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType=1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType=5</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType=True</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType=False</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.pointType=6</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetPointType(0)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetPointType(1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetPointType(5)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetPointType(True)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetPointType(False)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetPointType(6)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to Enum member, "smoothingLevel", (of MeshAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel='123'</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=(1+2j)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=None</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=[2, 4, 6]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=-1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=123123123</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=123123123123123123123123123123</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetSmoothingLevel('123')</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetSmoothingLevel((1+2j))</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetSmoothingLevel(None)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetSmoothingLevel([2, 4, 6])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetSmoothingLevel(-1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetSmoothingLevel(123123123)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SetSmoothingLevel(123123123123123123123123123123)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=0</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=True</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=False</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.smoothingLevel=1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SmoothingLevel(0)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SmoothingLevel(1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SmoothingLevel(2)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SmoothingLevel(True)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SmoothingLevel(False)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ma.SmoothingLevel(1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to tuple, "point1", member (of CylinderAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point=1,2,3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint(1,2,3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=1,2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=1,2,3,4</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=1, 2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=1, 2, 3, 4</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1='123'</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=1, (1+2j), 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=1, [2, 4, 6], 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=1, 'b', 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=1, None, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=array([1.1, 2.2]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=array([1.1, 2.2, 3.3, 4.4]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(1, 2)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(1, 2, 3, 4)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1('123')</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(1, (1+2j), 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(1, [2, 4, 6], 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(1, 'b', 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(1, None, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(array([1.1, 2.2])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(array([1.1, 2.2, 3.3, 4.4])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=1,2,3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=1, 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=1.1, 2.2, 3.3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=2, 4, 6</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=array([1, 2, 3]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.point1=array([1.1, 2.2, 3.3]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(1, 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(1.1, 2.2, 3.3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(2, 4, 6)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(array([1, 2, 3])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetPoint1(array([1.1, 2.2, 3.3])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to ucharVector member, "changedColors",  (of MultiCurveAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.changedColors=1,2,3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.changedColors=1, 123123123123123123123123123123, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.changedColors=1, (1+2j), 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.changedColors=1, [2, 4, 6], 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.changedColors=1, 'b', 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.changedColors=1, None, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.changedColors='123',</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.SetChangedColors(1, 123123123123123123123123123123, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.SetChangedColors(1, (1+2j), 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.SetChangedColors(1, [2, 4, 6], 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.SetChangedColors(1, 'b', 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.SetChangedColors(1, None, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.SetChangedColors('123',)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.changedColors=1, 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.changedColors=2, 4, 6</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.changedColors=1, True, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.changedColors=1, False, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.SetChangedColors(1, 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.SetChangedColors(2, 4, 6)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.SetChangedColors(1, True, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.SetChangedColors(1, False, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">mca.SetChangedColors(array([1, 2, 3])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to intVector member, "index", (of OnionPeelAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=1,2,3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=2147483648,</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=1+2j),</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index='b',</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=None,</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=1, 2147483648, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=1, (1+2j), 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=1, [2, 4, 6], 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=1, 'b', 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=1, None, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(2147483648,)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(1+2j),)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex('b',)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(None,)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(1, 2147483648, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(1, (1+2j), 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(1, [2, 4, 6], 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(1, 'b', 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(1, None, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=1, 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=[2, 4, 6]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=2, 4, 6</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=1, True, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=1, False, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.index=1, 2147483647, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(1, 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex([2, 4, 6])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(2, 4, 6)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(1, True, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(1, False, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(1, 2147483647, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">opa.SetIndex(array([1, 2, 3])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to doubleVector member, "values", (of ContourAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue=1,2,3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue=1+2j),</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue='b',</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue=None,</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue=1, (1+2j), 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue=1, [2, 4, 6], 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue=1, 'b', 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue=1, None, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue(1+2j),)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue('b',)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue(None,)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue(1, (1+2j), 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue(1, [2, 4, 6], 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue(1, 'b', 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue(1, None, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue=1, 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue=[2, 4, 6]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue=2, 4, 6</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue=1, True, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.contourValue=1, False, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue(1, 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue([2, 4, 6])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue(2, 4, 6)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue(1, True, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue(1, False, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetContourValue(array([1.1, 2.2, 3.3])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to ucharArray member, "freeformOpacity", (of VolumeAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=3,17</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(3,17)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=tuple(arr)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(*tuple(arr))</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=3,None</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=3,(1+2j)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=3,[2, 4, 6]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=3,'123'</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=None,17</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=(1+2j),17</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=[2, 4, 6],17</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity='123',17</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=-3,17</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=3,1700</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(3,None)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(3,(1+2j))</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(3,[2, 4, 6])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(3,'123')</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(None,17)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity((1+2j),17)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity([2, 4, 6],17)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity('123',17)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(-3,17)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(3,1700)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=(17,)*256</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity((17,)*256)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=(17, 17, 17, None, 17, 17, 17, ...</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=(17, 17, 17, (1+2j, ..., 17, 17, 17, ...</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=(17, 17, 17, [2, 4, 6], 17, 17, 17, ...</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=(17, 17, 17, (1, 2, 3, ..., 17, 17, 17, ...</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.freeformOpacity=(17, 17, 17, '123', 17, 17, 17, ...</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(17, 17, 17, None, 17, 17, 17, ...)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(17, 17, 17, (1+2j, ...), 17, 17, 17, ...)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(17, 17, 17, [2, 4, 6], 17, 17, 17, ...)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(17, 17, 17, (1, 2, 3, ...), 17, 17, 17, ...)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(17, 17, 17, '123', 17, 17, 17, ...)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(fails[0])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(fails[1])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(fails[2])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(fails[3])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetFreeformOpacity(fails[4])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to intArray member, "reflections", (of ReflectAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=0,1,0,1,0,1,0,1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=0, 1, None, 1, 0, 1, 0, 1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=0, 1, (1+2j), 1, 0, 1, 0, 1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=0, 1, [2, 4, 6], 1, 0, 1, 0, 1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=0, 1, 2147483648, 1, 0, 1, 0, 1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=0, 1, '123', 1, 0, 1, 0, 1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=0, 1, 0, 1, 0, 1, 0, 1, 1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=0, 1, 0, 1, 0, 1, 0</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.SetReflections(0, 1, None, 1, 0, 1, 0, 1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.SetReflections(0, 1, (1+2j), 1, 0, 1, 0, 1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.SetReflections(0, 1, [2, 4, 6], 1, 0, 1, 0, 1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.SetReflections(0, 1, 2147483648, 1, 0, 1, 0, 1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.SetReflections(0, 1, '123', 1, 0, 1, 0, 1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.SetReflections(0, 1, 0, 1, 0, 1, 0, 1, 1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.SetReflections(0, 1, 0, 1, 0, 1, 0)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=0, 1, 0, 1, 0, 1, 0, 1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=-1, 100, -1, 100, -1, 100, -1, 100</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=0, True, False, 1, 0, 1, 0, 1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=0, 1, 2147483647, 1, 0, 1, 0, 1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.reflections=array([0, 1, 0, 1, 0, 1, 0, 1]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.SetReflections(0, 1, 0, 1, 0, 1, 0, 1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.SetReflections(-1, 100, -1, 100, -1, 100, -1, 100)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.SetReflections(0, True, False, 1, 0, 1, 0, 1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.SetReflections(0, 1, 2147483647, 1, 0, 1, 0, 1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ra.SetReflections(array([0, 1, 0, 1, 0, 1, 0, 1])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to floatArray member, "center", (of RadialResampleAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=0,1,2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=0,1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=0,1,2,3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=0, 1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=0, 1, 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=0, None, 2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=0, (1+2j), 2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=0, [2, 4, 6], 2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=0, '123', 2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=0, 3.402823e+39, 2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(0, 1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(0, 1, 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(0, None, 2)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(0, (1+2j), 2)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(0, [2, 4, 6], 2)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(0, '123', 2)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(0, 3.402823e+39, 2)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=1, 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=1.1, 2.2, 3.3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=2, 4, 6</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=1, True, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=1, False, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=1, 3.40282e+37, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.center=array([1.1, 2.2, 3.3]</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(1, 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(1.1, 2.2, 3.3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(2, 4, 6)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(1, True, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(1, False, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(1, 3.40282e+37, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">rra.SetCenter(array([1.1, 2.2, 3.3])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>Assignment to doubleArray member, "materialProperties", (of VolumeAttributes())</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=0,1,2,3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=0,1,2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=0,1,2,3,4</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=0, 1</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=0, 1, 2, 3, 4</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=0, None, 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=0, (1+2j), 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=0, [2, 4, 6], 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=0, '123', 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetMaterialProperties(0, 1)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetMaterialProperties(0, 1, 2, 3, 4)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetMaterialProperties(0, None, 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetMaterialProperties(0, (1+2j), 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetMaterialProperties(0, [2, 4, 6], 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetMaterialProperties(0, '123', 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=1, 2, 3, 4</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=1.1, 2.2, 3.3, 4.4</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=1, True, 3, 4</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.materialProperties=1, False, 3, 4</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetMaterialProperties(1, 2, 3, 4)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetMaterialProperties(1.1, 2.2, 3.3, 4.4)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetMaterialProperties(1, True, 3, 4)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetMaterialProperties(1, False, 3, 4)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">va.SetMaterialProperties(array([1.1, 2.2, 3.3, 4.4])</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>ColorAttribute stuff</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.color=0, 1, 2</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.color=0, 1, 2, 3, 4</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.color=0, None, 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.color=0, (1+2j), 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.color=0, [2, 4, 6], 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.color=0, '123', 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.color=0, -1, 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.color=0, 256, 2, 3</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetColor(0, 1, 2)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetColor(0, 1, 2, 3, 4)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetColor(0, None, 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetColor(0, (1+2j), 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetColor(0, [2, 4, 6], 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetColor(0, '123', 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetColor(0, -1, 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">ca.SetColor(0, 256, 2, 3)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">cla.AddColors</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">cla.colors</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">cla.GetColors(0)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">cla.GetColors(2)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>behavior of dir()</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">dir()</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td colspan=6 align=center bgcolor="#0000ff"><font color="#ffffff"><b>behavior of help()</b></font></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">help(AddPlot)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">help(CreateDatabaseCorrelation)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+ <tr>
+  <td bgcolor="#00ff00">help(SILRestriction)</td>
+  <td colspan=5 align=left><pre> "True" .eq. "True" : True</pre></td>
+ </tr>
+</table>
+<p>Final Return Code: 111</p>
+</body>
+</html>

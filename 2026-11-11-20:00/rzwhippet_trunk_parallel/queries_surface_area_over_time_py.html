@@ -1,0 +1,144 @@
+<html><body bgcolor="#e0e0e0"><head><title>queries/surface_area_over_time.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ---------------------------------------------------------------------------- </font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  surface_area_over_time.py</font>
+<font color="#a02030">#  Tests:      queries     - surface area over time</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Cyrus Harrison</font>
+<font color="#a02030">#  Date:       Fri May 19 10:04:46 PDT 2017</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#    Kathleen Biagas, Tue Sep 22 13:24:42 PDT 2020</font>
+<font color="#a02030">#    Use custom color for curves, as the color-cycling is non-deterministic</font>
+<font color="#a02030">#    across runs.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+<font color="#C00000">from</font> <font color="#000000">visit_utils</font> <font color="#C00000">import</font> <font color="#4000C0">*</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">query_sa_stepwise</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">,</font> <font color="#000000">nts</font><font color="#4000C0">,</font> <font color="#000000">qname</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">c_vals</font> <font color="#4000C0">=</font> <font color="#4000C0">[</font><font color="#4000C0">]</font>
+    <font color="#000000">s_vals</font> <font color="#4000C0">=</font> <font color="#4000C0">[</font><font color="#4000C0">]</font>
+    <font color="#C00000">for</font> <font color="#000000">ts</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">,</font> <font color="#000000">nts</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">TimeSliderSetState</font><font color="#4000C0">(</font><font color="#000000">ts</font><font color="#4000C0">)</font>
+        <font color="#000000">c_vals</font><font color="#4000C0">.</font><font color="#000000">append</font><font color="#4000C0">(</font><font color="#000000">query</font><font color="#4000C0">(</font><font color="#008000">&quot;Cycle&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+        <font color="#000000">s_vals</font><font color="#4000C0">.</font><font color="#000000">append</font><font color="#4000C0">(</font><font color="#000000">query</font><font color="#4000C0">(</font><font color="#000000">qname</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">f</font> <font color="#4000C0">=</font> <font color="#000000">open</font><font color="#4000C0">(</font><font color="#008000">&quot;_out_query_sa_stepwise.ult&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;w&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">write</font><font color="#4000C0">(</font><font color="#008000">&quot;# sa vs cycle\n&quot;</font><font color="#4000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">i</font> <font color="#C00000">in</font> <font color="#000000">range</font><font color="#4000C0">(</font><font color="#000000">len</font><font color="#4000C0">(</font><font color="#000000">c_vals</font><font color="#4000C0">)</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+        <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">write</font><font color="#4000C0">(</font><font color="#008000">&quot;%s %s\n&quot;</font> <font color="#4000C0">%</font> <font color="#4000C0">(</font><font color="#000000">c_vals</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font><font color="#4000C0">,</font><font color="#000000">s_vals</font><font color="#4000C0">[</font><font color="#000000">i</font><font color="#4000C0">]</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+    <font color="#000000">f</font><font color="#4000C0">.</font><font color="#000000">close</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">query_sa_q_over_time</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">,</font> <font color="#000000">nts</font><font color="#4000C0">,</font> <font color="#000000">qname</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">TimeSliderSetState</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">QueryOverTime</font><font color="#4000C0">(</font><font color="#000000">qname</font><font color="#4000C0">,</font> <font color="#000000">start_time</font><font color="#4000C0">=</font><font color="#000000">s</font><font color="#4000C0">,</font> <font color="#000000">end_time</font><font color="#4000C0">=</font><font color="#000000">nts</font><font color="#4000C0">-</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#000000">stride</font><font color="#4000C0">=</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">setup_PC_Iso_plot</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Isosurface&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">setup_boundary_plot</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Boundary&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;Material&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">setup_data_binning</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#a02030"># We *Should* be using data binning like this, but there is </font>
+    <font color="#a02030"># a bug with query-over-time, so we add the operator separately.</font>
+    <font color="#a02030">#AddPlot(&quot;Pseudocolor&quot;, &quot;operators/DataBinning/2D/quadmesh&quot;)</font>
+
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;DataBinning&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DataBinningAtts</font> <font color="#4000C0">=</font> <font color="#000000">DataBinningAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">DataBinningAtts</font><font color="#4000C0">.</font><font color="#000000">numDimensions</font> <font color="#4000C0">=</font> <font color="#000000">DataBinningAtts</font><font color="#4000C0">.</font><font color="#000000">Two</font>
+    <font color="#000000">DataBinningAtts</font><font color="#4000C0">.</font><font color="#000000">dim1BinBasedOn</font> <font color="#4000C0">=</font> <font color="#000000">DataBinningAtts</font><font color="#4000C0">.</font><font color="#000000">X</font>
+    <font color="#000000">DataBinningAtts</font><font color="#4000C0">.</font><font color="#000000">dim2BinBasedOn</font> <font color="#4000C0">=</font> <font color="#000000">DataBinningAtts</font><font color="#4000C0">.</font><font color="#000000">Y</font>
+    <font color="#000000">DataBinningAtts</font><font color="#4000C0">.</font><font color="#000000">reductionOperator</font> <font color="#4000C0">=</font> <font color="#000000">DataBinningAtts</font><font color="#4000C0">.</font><font color="#000000">Maximum</font>
+    <font color="#000000">DataBinningAtts</font><font color="#4000C0">.</font><font color="#000000">varForReduction</font> <font color="#4000C0">=</font> <font color="#008000">&quot;pressure&quot;</font>
+    <font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">DataBinningAtts</font><font color="#4000C0">,</font> <font color="#0080C0">1</font><font color="#4000C0">)</font>
+
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">run_queries</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">,</font> <font color="#000000">numSteps</font><font color="#4000C0">,</font> <font color="#000000">qname</font> <font color="#4000C0">=</font> <font color="#008000">&quot;3D Surface area&quot;</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">query_sa_stepwise</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">,</font> <font color="#000000">numSteps</font><font color="#4000C0">,</font> <font color="#000000">qname</font><font color="#4000C0">)</font>
+    <font color="#000000">query_sa_q_over_time</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">,</font> <font color="#000000">numSteps</font><font color="#4000C0">,</font> <font color="#000000">qname</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">ca1</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">ca1</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">ca1</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">ca1</font><font color="#4000C0">.</font><font color="#000000">curveColor</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">ca1</font><font color="#4000C0">)</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;_out_query_sa_stepwise.ult&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Curve&quot;</font><font color="#4000C0">,</font><font color="#008000">&quot;sa vs cycle&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">ca2</font> <font color="#4000C0">=</font> <font color="#000000">CurveAttributes</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">ca2</font><font color="#4000C0">.</font><font color="#000000">curveColorSource</font> <font color="#4000C0">=</font> <font color="#000000">ca2</font><font color="#4000C0">.</font><font color="#000000">Custom</font>
+    <font color="#000000">ca2</font><font color="#4000C0">.</font><font color="#000000">curveColor</font><font color="#4000C0">=</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#0080C0">255</font><font color="#4000C0">,</font> <font color="#0080C0">0</font><font color="#4000C0">)</font>
+    <font color="#000000">SetPlotOptions</font><font color="#4000C0">(</font><font color="#000000">ca2</font><font color="#4000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">open_db</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave.visit&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">clear_qot</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+    <font color="#000000">DeleteAllPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">CloseDatabase</font><font color="#4000C0">(</font><font color="#008000">&quot;_out_query_sa_stepwise.ult&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">SetActiveWindow</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">TurnMaterialsOn</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font><font color="#4000C0">:</font>
+    <font color="#000000">open_db</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">setup_PC_Iso_plot</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">numSteps</font> <font color="#4000C0">=</font> <font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">run_queries</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">numSteps</font><font color="#4000C0">)</font>
+
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;SA_OverTime_0000&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">clear_qot</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">setup_boundary_plot</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">run_queries</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">numSteps</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;SA_OverTime_0001&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">clear_qot</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">numSteps</font> <font color="#4000C0">=</font> <font color="#0080C0">45</font>
+    <font color="#000000">m2</font> <font color="#4000C0">=</font> <font color="#008000">&quot;2 water&quot;</font>
+    <font color="#000000">m1</font> <font color="#4000C0">=</font> <font color="#008000">&quot;1 barrier&quot;</font>
+    <font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#000000">m2</font><font color="#4000C0">)</font>
+    <font color="#000000">run_queries</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">numSteps</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;SA_OverTime_0002&quot;</font><font color="#4000C0">)</font>
+
+    <font color="#000000">clear_qot</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">TimeSliderSetState</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">)</font>
+    <font color="#000000">TurnMaterialsOff</font><font color="#4000C0">(</font><font color="#000000">m1</font><font color="#4000C0">)</font>
+    <font color="#000000">run_queries</font><font color="#4000C0">(</font><font color="#0080C0">1</font><font color="#4000C0">,</font> <font color="#000000">numSteps</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;SA_OverTime_0003&quot;</font><font color="#4000C0">)</font>
+
+
+    <font color="#000000">clear_qot</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+    <font color="#000000">setup_data_binning</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">numSteps</font> <font color="#4000C0">=</font> <font color="#000000">TimeSliderGetNStates</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+    <font color="#000000">run_queries</font><font color="#4000C0">(</font><font color="#0080C0">0</font><font color="#4000C0">,</font> <font color="#000000">numSteps</font><font color="#4000C0">,</font> <font color="#008000">&quot;2D area&quot;</font><font color="#4000C0">)</font>
+    <font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;SA_OverTime_0004&quot;</font><font color="#4000C0">)</font>
+
+
+
+<font color="#a02030"># Call the main function</font>
+<font color="#000000">TurnOnAllAnnotations</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">main</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>

@@ -1,0 +1,138 @@
+<html><body bgcolor="#e0e0e0"><head><title>hybrid/conn_cmfe.py</title></head><pre><font face="Lucida,Courier New"><font color="#a02030"># ----------------------------------------------------------------------------</font>
+<font color="#a02030">#  CLASSES: nightly</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Test Case:  conn_cmfe.py</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Defect ID:  &#x27;6616</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Programmer: Hank Childs</font>
+<font color="#a02030">#  Date:       August 30, 2005</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#  Modifications:</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Tue Sep 20 13:15:11 PDT 2005</font>
+<font color="#a02030">#    Test for non-existent databases, especially those with short names [&#x27;6616]</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Hank Childs, Fri Oct  7 17:14:07 PDT 2005</font>
+<font color="#a02030">#    Test error message for Eulerian material selection.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Mark C. Miller, Wed Jan 20 07:37:11 PST 2010</font>
+<font color="#a02030">#    Added ability to swtich between Silo&#x27;s HDF5 and PDB data.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Thu Mar 25 09:57:34 PDT 2010</font>
+<font color="#a02030">#    Added call(s) to DrawPlots() b/c of changes to the default plot state</font>
+<font color="#a02030">#    behavior when an operator is added.</font>
+<font color="#a02030">#</font>
+<font color="#a02030">#    Cyrus Harrison, Wed Aug 25 14:25:13 PDT 2010</font>
+<font color="#a02030">#    SIL id shift (from 1 to 2) due to changes in SIL generation.</font>
+<font color="#a02030">#</font>
+<font color="#a02030"># ----------------------------------------------------------------------------</font>
+
+
+<font color="#000000">OpenDatabase</font><font color="#4000C0">(</font><font color="#000000">silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave0200.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+
+
+
+<font color="#a02030"># Test general capability.</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;conn_cmfe(&lt;%s:pressure&gt;, quadmesh)&quot;</font> <font color="#4000C0">%</font> <font color="#000000">cmfe_silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave0020.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">AddPlot</font><font color="#4000C0">(</font><font color="#008000">&quot;Pseudocolor&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;cmfe&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_01&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test using the expression as a secondary variable.</font>
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;pressure&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Threshold&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">ThresholdAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">lowerBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#4000C0">-</font><font color="#0080C0">1.0</font><font color="#4000C0">)</font>
+<font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">upperBounds</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#0080C0">0.1</font><font color="#4000C0">)</font>
+<font color="#000000">t</font><font color="#4000C0">.</font><font color="#000000">listedVarNames</font> <font color="#4000C0">=</font> <font color="#4000C0">(</font><font color="#008000">&quot;cmfe&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">SetOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">t</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_02&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test using cmfe in another expression.</font>
+<font color="#000000">DefineVectorExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;disp&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;{0, 3*cmfe, 0}&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">RemoveLastOperator</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">d</font> <font color="#4000C0">=</font> <font color="#000000">DisplaceAttributes</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">d</font><font color="#4000C0">.</font><font color="#000000">variable</font> <font color="#4000C0">=</font> <font color="#008000">&quot;disp&quot;</font>
+<font color="#000000">SetDefaultOperatorOptions</font><font color="#4000C0">(</font><font color="#000000">d</font><font color="#4000C0">)</font>
+<font color="#000000">AddOperator</font><font color="#4000C0">(</font><font color="#008000">&quot;Displace&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_03&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">RemoveLastOperator</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+
+<font color="#000000">Query</font><font color="#4000C0">(</font><font color="#008000">&quot;MinMax&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">GetQueryOutputString</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_04&quot;</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Now test error conditions.</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;conn_cmfe(pressure, quadmesh)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe2&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_05&quot;</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">)</font>
+
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe3&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;conn_cmfe(&lt;bad_file.silo:a_var&gt;, quadmesh)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe3&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_06&quot;</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">)</font>
+
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe4&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;conn_cmfe(&lt;%s:pressure&gt;, quadmesh, pressure)&quot;</font> <font color="#4000C0">%</font>  <font color="#000000">cmfe_silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave0100.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe4&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_07&quot;</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">)</font>
+
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe5&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;conn_cmfe(&lt;%s:pressure&gt;)&quot;</font> <font color="#4000C0">%</font> <font color="#000000">cmfe_silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave0100.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe5&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_08&quot;</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># And one more cool picture just for grins.</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe6&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;conn_cmfe(&lt;%s:pressure&gt;, quadmesh)&quot;</font> <font color="#4000C0">%</font> <font color="#000000">cmfe_silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave0570.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;max&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;if(ge(pressure, cmfe6), pressure, cmfe6)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;max&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_09&quot;</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Invalid variable in new database.</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe7&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;conn_cmfe(&lt;%s:pressure&gt;, quadmesh)&quot;</font> <font color="#4000C0">%</font> <font color="#000000">cmfe_silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe7&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_10&quot;</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Now a good variable, but connectivity doesn&#x27;t match.</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe8&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;conn_cmfe(&lt;%s:t&gt;, quadmesh)&quot;</font> <font color="#4000C0">%</font> <font color="#000000">cmfe_silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;globe.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe8&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_11&quot;</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">)</font>
+
+<font color="#a02030"># Test multiple CMFEs</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe9&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;conn_cmfe(&lt;%s:pressure&gt;, quadmesh)&quot;</font> <font color="#4000C0">%</font> <font color="#000000">cmfe_silo_data_path</font><font color="#4000C0">(</font><font color="#008000">&quot;wave0100.silo&quot;</font><font color="#4000C0">)</font><font color="#4000C0">)</font>
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;max2&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;if(ge(max, cmfe9), max, cmfe9)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;max2&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">Test</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_12&quot;</font><font color="#4000C0">)</font>
+
+<font color="#000000">DefineScalarExpression</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe10&quot;</font><font color="#4000C0">,</font> <font color="#008000">&quot;conn_cmfe(&lt;30:d&gt;, quadmesh)&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe10&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_13&quot;</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">)</font>
+
+<font color="#000000">ChangeActivePlotsVar</font><font color="#4000C0">(</font><font color="#008000">&quot;cmfe&quot;</font><font color="#4000C0">)</font>
+<font color="#000000">DrawPlots</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">s</font> <font color="#4000C0">=</font> <font color="#000000">SILRestriction</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">TurnOffAll</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">s</font><font color="#4000C0">.</font><font color="#000000">TurnOnSet</font><font color="#4000C0">(</font><font color="#0080C0">2</font><font color="#4000C0">)</font>
+<font color="#000000">SetPlotSILRestriction</font><font color="#4000C0">(</font><font color="#000000">s</font><font color="#4000C0">)</font>
+<font color="#000000">t</font> <font color="#4000C0">=</font> <font color="#000000">GetLastError</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000">TestText</font><font color="#4000C0">(</font><font color="#008000">&quot;conn_cmfe_14&quot;</font><font color="#4000C0">,</font> <font color="#000000">t</font><font color="#4000C0">)</font>
+
+<font color="#000000">Exit</font><font color="#4000C0">(</font><font color="#4000C0">)</font>
+<font color="#000000"></font></font></pre></body></html>
